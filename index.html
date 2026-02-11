@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- Metadata -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow" /><!-- Page indexée -->
+<!-- Title & description -->
+    <title>Création Site Web Professionnel & Éco-conçu | AM 2.0</title>
+    <meta name="description" content="Développe ton activité avec un système digital éco-conçu. Un site ultra-rapide pensé pour guider tes clients et remplir ton agenda automatiquement.">
+<!-- Canonical -->
+    <link rel="canonical" href="https://www.am20.fr" />
+<!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon/favicon.ico">
+    <link rel="icon" href="images/favicon/favicon16.png" sizes="16x16"/>
+    <link rel="icon" href="images/favicon/favicon32.png" sizes="32x32"/>
+    <link rel="icon" href="images/favicon/android192.png" sizes="192x192"/>
+    <link rel="icon" href="images/favicon/android512.png" sizes="512x512"/>    
+    <link rel="apple-touch-icon" href="images/favicon/apple-touch-icon.png"/>
+<!-- Open Graph -->
+    <meta property="og:title" content="Deviens l'évidence sur le web avec AM 2.0">
+    <meta property="og:description" content="Ton site pensé comme un système pour guider tes clients et remplir ton agenda.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.am20.fr/">
+    <meta property="og:image" content="https://www.am20.fr/images/og-img.jpg">
+<!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Deviens l'évidence sur le web avec AM 2.0">
+    <meta name="twitter:description" content="Ton site pensé comme un système pour guider tes clients et remplir ton agenda.">
+    <meta name="twitter:image" content="https://www.am20.fr/images/og-img.jpg">
+<!-- PRELOAD -->
+    <link rel="preload" href="/dist/style.css" as="style">
+    <link rel="preload" as="image" href="images/hero/background-hero-mob.webp" media="(max-width: 1023px)" fetchpriority="high">
+    <link rel="preload" as="image" href="images/hero/background-hero-desk.webp" media="(min-width: 1024px)">
+<!-- CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+<!-- Données structurées JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": "https://www.am20.fr/#organization",
+  "name": "AM 2.0 - Création de sites web & Architecture de parcours clients",
+  "alternateName": "AM 2.0",
+  "description": "Expertise en création de sites web éco-conçus à Obernai. Nous transformons votre présence en ligne en un système performant pour guider vos clients et automatiser vos prises de rendez-vous.",
+  "url": "https://www.am20.fr",
+  "image": "https://www.am20.fr/images/og-img.jpg",
+  "logo": "https://www.am20.fr/images/logo-am20.webp",
+  "email": "contact@am20.fr",
+  "priceRange": "€€",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Obernai",
+    "addressRegion": "Grand Est",
+    "addressCountry": "FR"
+  },
+  "areaServed": [
+    {
+      "@type": "Country",
+      "name": "France"
+    },
+    {
+      "@type": "AdministrativeArea",
+      "name": "Bas-Rhin"
+    },
+    {
+      "@type": "AdministrativeArea",
+      "name": "Grand Est"
+    }
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Services de création web et stratégie",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Vitrine PERFORMANCE",
+          "description": "Site web multi-pages éco-conçu, optimisé pour le SEO local et la hiérarchisation des offres pour booster votre activité."
+        },
+        "priceCurrency": "EUR",
+        "price": "2949",
+        "url": "https://www.am20.fr#offres"
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Vitrine CONVERSION",
+          "description": "Site internet stratégique conçu pour transformer chaque visite en rendez-vous et remplir votre agenda."
+        },
+        "priceCurrency": "EUR",
+        "price": "1639",
+        "url": "https://www.am20.fr#offres"
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Diagnostic Stratégique Offert",
+          "description": "Analyse de 20 minutes du parcours client, de la visibilité et de la performance technique."
+        }
+      }
+    ]
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "Sales",
+    "email": "contact@am20.fr",
+    "areaServed": "FR",
+    "availableLanguage": "fr"
+  },
+  "founder": {
+  "@type": "Person",
+  "name": "Aurore",
+  "jobTitle": "Architecte de parcours clients & Créatrice de sites web"
+  },
+  "sameAs": [
+    "https://www.instagram.com/am2.0_sites_web",
+    "https://www.facebook.com/share/1AGtSiAVGz",
+    "https://www.linkedin.com/in/aurore-am20"
+  ]
+}
+</script>
+</head>
+<body class="text-primary text-lg">
+<!-- HEADER -->
+<header class="fixed top-0 left-0 w-full z-50 bg-white border-b border-accent py-6 px-4 lg:px-8">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <a href="#" class="flex items-center gap-3 group">
+            <img src="images/logo/logo-am20.webp" alt="Logo AM 2.0" class="w-10 h-10 object-contain transition-transform group-hover:scale-110">
+            <div class="flex flex-col justify-center">
+                <span class="font-bold text-gradient leading-none text-base md:text-lg">
+                    Vitrine Express
+                </span>
+                <span class="text-[10px] md:text-xs font-medium text-accent tracking-wider uppercase">
+                    by AM 2.0
+                </span>
+            </div>
+        </a>
+        <a href="#configurateur" class="group flex items-center gap-2 bg-gradient-to-r from-[#8449d9] to-[#4d0fa5] rounded-full px-4 py-2 md:px-6 md:py-2.5 shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-white/10">
+            <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform group-hover:rotate-12" viewBox="0 0 640 640" fill="currentColor">
+                <path d="M295.4 37L310.2 73.8L347 88.6C350 89.8 352 92.8 352 96C352 99.2 350 102.2 347 103.4L310.2 118.2L295.4 155C294.2 158 291.2 160 288 160C284.8 160 281.8 158 280.6 155L265.8 118.2L229 103.4C226 102.2 224 99.2 224 96C224 92.8 226 89.8 229 88.6L265.8 73.8L280.6 37C281.8 34 284.8 32 288 32C291.2 32 294.2 34 295.4 37zM492 64C503 64 513.6 68.4 521.5 76.2L563.8 118.5C571.6 126.4 576 137 576 148C576 159 571.6 169.6 563.8 177.5L475.6 265.7L374.3 164.4L462.5 76.2C470.4 68.4 481 64 492 64zM76.2 462.5L340.4 198.3L441.7 299.6L177.5 563.8C169.6 571.6 159 576 148 576C137 576 126.4 571.6 118.5 563.8L76.2 521.5C68.4 513.6 64 503 64 492C64 481 68.4 470.4 76.2 462.5z" 
+                fill="white" />
+            </svg>
+            <span class="font-bold uppercase tracking-tight text-xs md:text-sm text-white">
+                <span class="md:hidden">Lancer</span>
+                <span class="hidden md:inline">Je crée ma vitrine</span>
+            </span>
+        </a>
+        </div>
+    </header>
+<div class="h-20"></div>
+<main>
+<!-- HERO -->
+<section id="hero" class="relative min-h-screen flex items-center overflow-hidden bg-bg-1">
+    <div class="relative z-20 max-w-7xl w-full flex flex-col lg:flex-row items-center justify-between mx-auto px-4 pt-20 pb-12"> 
+       <header class="w-full lg:w-2/3 flex flex-col gap-6 lg:gap-8 text-center lg:text-left">
+            <h1 class="text-lg lg:text-xl font-bold uppercase tracking-widest text-accent">
+                Ton site web pro, sans prise de tête
+            </h1>
+            <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight uppercase text-accent">
+                <span class="text-gradient">Crée ta vitrine professionnelle en quelques minutes, </span>sans outils compliqués
+            </h2>
+            <p class="text-lg lg:text-xl leading-relaxed max-w-2xl">
+                Choisis ton modèle, personnalise-le, mets-le en ligne et commence à recevoir des contacts ou des rendez-vous.
+            </p>
+           <div class="flex flex-col sm:flex-row gap-6 w-full lg:w-fit mt-8 items-center">
+                <a href="#configurateur" class="group relative flex items-center justify-center gap-3 px-10 py-4 lg:py-5 bg-gradient-to-r from-[#8449d9] to-[#4d0fa5] text-white rounded-full font-bold text-xl transition-all hover:scale-105 shadow-[0_10px_25px_-5px_rgba(132,73,217,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(132,73,217,0.5)] w-full sm:w-fit uppercase tracking-wide">
+                    <span>Je crée ma vitrine</span>
+                    <div class="flex items-center justify-center transition-all flex-shrink-0">
+                        <svg class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </div>
+                </a>
+                <a href="#modeles" class="flex items-center justify-center px-10 py-4 lg:py-5 bg-white rounded-full font-bold text-xl transition-all hover:scale-105 shadow-lg hover:shadow-xl border border-slate-100 w-full sm:w-fit uppercase tracking-wide">
+                    Voir des modèles
+                </a>
+            </div>
+            <div class="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2 text-xs lg:text-sm font-bold uppercase tracking-wider mt-2">
+                <span class="flex items-center gap-2">
+                    <span class="text-validate text-lg">✓</span> Sans inscription
+                </span>
+                <span class="text-white/70 hidden sm:block">•</span>
+                <span class="flex items-center gap-2">
+                    <span class="text-validate text-lg">✓</span> Sans abonnement
+                </span>
+                <span class="text-white/70 hidden sm:block">•</span>
+                <span class="flex items-center gap-2">
+                    <span class="text-validate text-lg">✓</span> Prêt en 15 min
+                </span>
+            </div>
+        </header>
+        <div class="w-full lg:w-1/2 pt-12 lg:pt-0 flex justify-center lg:justify-end">
+            <img src="images/hero/am20-hero-mob.webp" 
+                 width="500" height="500" 
+                 alt="Exemple de site vitrine express by AM 2.0" 
+                 class="w-full max-w-[280px] lg:max-w-xl h-auto drop-shadow-2xl" 
+                 fetchpriority="high">
+        </div>
+    </div>
+</section>
+<!-- POUR QUI -->
+<section id="pour-qui" class="py-20 lg:py-32 bg-bg-1">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col items-center">
+        <header class="text-center mb-16">
+            <h2 class="text-3xl lg:text-5xl text-gradient font-bold mb-4 uppercase tracking-tight animate-on-scroll fx-fade-up">
+                C'est <span class="text-gradient scribble-underline-accent">pour toi</span> si...
+            </h2>
+        </header>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+            <div class="bg-white/35 shadow-lg p-8 rounded-lg flex flex-col items-center text-center gap-6 animate-on-scroll fx-fade-up transition-all">
+                <span class="text-5xl text-gradient-green font-extrabold italic">01</span>
+                <p class="text-lg lg:text-xl font-medium leading-relaxed">
+                    Tu n’as pas envie de t’arracher les cheveux sur des outils compliqués.
+                </p>
+            </div>
+            <div class="bg-white/35 shadow-lg p-8 rounded-lg flex flex-col items-center text-center gap-6 animate-on-scroll fx-fade-up transition-all hover:bg-white/15" style="transition-delay: 200ms;">
+                 <span class="text-5xl text-gradient-green font-extrabold italic">02</span>
+                <p class="text-lg lg:text-xl font-medium leading-relaxed">
+                    Tu veux un rendu pro et crédible tout de suite, pas dans 3 mois.
+                </p>
+            </div>
+            <div class="bg-white/35 shadow-lg p-8 rounded-lg flex flex-col items-center text-center gap-6 animate-on-scroll fx-fade-up transition-all hover:bg-white/15" style="transition-delay: 400ms;">
+                 <span class="text-5xl text-gradient-green font-extrabold italic">03</span>
+                <p class="text-lg lg:text-xl font-medium leading-relaxed">
+                    Tu as besoin d’un site qui inspire confiance sans exploser ton budget.
+                </p>
+            </div>
+        </div>
+        <p class="mt-16 text-center font-bold uppercase tracking-widest text-gradient text-xl lg:text-2xl animate-on-scroll fx-zoom-in">
+            Vitrine Express est faite pour toi.
+        </p>
+    </div>
+</section>
+<!-- CONCEPT -->
+<section id="processus" class="py-20 lg:py-32 bg-bg-2 overflow-hidden">
+    <div class="max-w-6xl mx-auto px-4">
+        <header class="text-center mb-20">
+            <h2 class="text-3xl lg:text-5xl font-bold mb-4 uppercase tracking-tight animate-on-scroll opacity-0 translate-y-10 transition-all duration-700">
+                Comment <span class="font-bold text-gradient scribble-underline-accent"> ça marche ?</span>
+            </h2>
+            <h3 class="text-accent text-xl lg:text-2xl italic">
+                Simple. Rapide. Sans charge mentale.
+            </h3>
+        </header>
+        <div id="timeline-container" class="relative">  
+            <div class="timeline-line-bg"></div>
+            <div id="progress-line" class="timeline-line-progress"></div>
+            <ul class="space-y-12 lg:space-y-32 list-none p-0" role="list" aria-label="Processus de création"> 
+                <li class="step-container relative flex flex-col lg:flex-row items-start lg:items-center animate-on-scroll opacity-0 translate-y-10 transition-all duration-700" role="listitem">
+                    <div class="hidden lg:flex w-1/2 pr-16 justify-end" aria-hidden="true">
+                        <span class="ghost-text text-7xl font-black text-white/5 uppercase select-none">Structure</span>
+                    </div>
+                    <div class="timeline-dot absolute left-4 lg:left-1/2 transform -translate-x-1/2 lg:-translate-x-1/2 w-4 h-4 rounded-full bg-white/20 z-10 transition-all duration-500"></div>
+                    <div class="w-full lg:w-1/2 pl-12 lg:pl-16">
+                        <div class="bg-white/45 border border-accent shadow-lg p-8 rounded-lg hover:border-validate/50 transition-all duration-300 group">
+                            <div class="flex items-center gap-4 mb-4">
+                                <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="gradient-layout-green" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#478722" />
+                                            <stop offset="100%" stop-color="#89d957" />
+                                        </linearGradient>
+                                    </defs>
+                                    <rect x="3" y="3" width="18" height="5" rx="2" fill="url(#gradient-layout-green)" />
+                                    <rect x="3" y="10" width="10" height="11" rx="2" fill="url(#gradient-layout-green)" fill-opacity="0.8" />
+                                    <rect x="15" y="10" width="6" height="4" rx="2" fill="url(#gradient-layout-green)" fill-opacity="0.6" />
+                                    <rect x="15" y="16" width="6" height="5" rx="2" fill="url(#gradient-layout-green)" fill-opacity="0.4" />
+                                </svg>
+                            </div>
+                            <h4 class="text-xl font-bold mb-3 uppercase tracking-wide text-gradient">Choisis ta structure</h4>
+                            <p class="leading-relaxed">
+                                Des modèles pensés par une architecte web, 100% optimisés pour mobile. Des structures pensées pour inciter tes visiteurs à te contacter ou à prendre rendez-vous.
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                <li class="step-container relative flex flex-col lg:flex-row items-start lg:items-center animate-on-scroll opacity-0 translate-y-10 transition-all duration-700" role="listitem">
+                    <div class="w-full lg:w-1/2 pl-12 lg:pl-0 lg:pr-16 order-2 lg:order-1">
+                        <div class="bg-white/35 border border-accent shadow-lg p-8 rounded-lg hover:border-validate/50 transition-all duration-300 group lg:text-right">
+                            <div class="flex items-center lg:justify-end gap-4 mb-4">
+                                <svg class="w-10 h-10" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="gradient-sparkle-wand" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#478722" />
+                                            <stop offset="100%" stop-color="#89d957" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path d="M295.4 37L310.2 73.8L347 88.6C350 89.8 352 92.8 352 96C352 99.2 350 102.2 347 103.4L310.2 118.2L295.4 155C294.2 158 291.2 160 288 160C284.8 160 281.8 158 280.6 155L265.8 118.2L229 103.4C226 102.2 224 99.2 224 96C224 92.8 226 89.8 229 88.6L265.8 73.8L280.6 37C281.8 34 284.8 32 288 32C291.2 32 294.2 34 295.4 37zM142.7 105.7L164.2 155.8L214.3 177.3C220.2 179.8 224 185.6 224 192C224 198.4 220.2 204.2 214.3 206.7L164.2 228.2L142.7 278.3C140.2 284.2 134.4 288 128 288C121.6 288 115.8 284.2 113.3 278.3L91.8 228.2L41.7 206.7C35.8 204.2 32 198.4 32 192C32 185.6 35.8 179.8 41.7 177.3L91.8 155.8L113.3 105.7C115.8 99.8 121.6 96 128 96C134.4 96 140.2 99.8 142.7 105.7zM496 368C502.4 368 508.2 371.8 510.7 377.7L532.2 427.8L582.3 449.3C588.2 451.8 592 457.6 592 464C592 470.4 588.2 476.2 582.3 478.7L532.2 500.2L510.7 550.3C508.2 556.2 502.4 560 496 560C489.6 560 483.8 556.2 481.3 550.3L459.8 500.2L409.7 478.7C403.8 476.2 400 470.4 400 464C400 457.6 403.8 451.8 409.7 449.3L459.8 427.8L481.3 377.7C483.8 371.8 489.6 368 496 368zM492 64C503 64 513.6 68.4 521.5 76.2L563.8 118.5C571.6 126.4 576 137 576 148C576 159 571.6 169.6 563.8 177.5L475.6 265.7L374.3 164.4L462.5 76.2C470.4 68.4 481 64 492 64zM76.2 462.5L340.4 198.3L441.7 299.6L177.5 563.8C169.6 571.6 159 576 148 576C137 576 126.4 571.6 118.5 563.8L76.2 521.5C68.4 513.6 64 503 64 492C64 481 68.4 470.4 76.2 462.5z" 
+                                        fill="url(#gradient-sparkle-wand)" />
+                                </svg>
+                            </div>
+                            <h4 class="text-xl font-bold mb-3 uppercase tracking-wide text-gradient">Personnalise en direct</h4>
+                            <p class="leading-relaxed">
+                                Change tes couleurs et tes images, le rendu s’affiche instantanément. C'est ton identité, sans la complexité technique.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="timeline-dot absolute left-4 lg:left-1/2 transform -translate-x-1/2 lg:-translate-x-1/2 w-4 h-4 rounded-full bg-white/20 z-10 transition-all duration-500"></div>
+                    <div class="hidden lg:flex w-1/2 pl-16 order-1 lg:order-2" aria-hidden="true">
+                        <span class="ghost-text text-7xl font-black text-white/5 uppercase select-none">Design</span>
+                    </div>
+                </li>
+                <li class="step-container relative flex flex-col lg:flex-row items-start lg:items-center animate-on-scroll opacity-0 translate-y-10 transition-all duration-700" role="listitem">
+                    <div class="hidden lg:flex w-1/2 pr-16 justify-end" aria-hidden="true">
+                        <span class="ghost-text text-7xl font-black text-white/5 uppercase select-none">Contenu</span>
+                    </div>
+                    <div class="timeline-dot absolute left-4 lg:left-1/2 transform -translate-x-1/2 lg:-translate-x-1/2 w-4 h-4 rounded-full bg-white/20 z-10 transition-all duration-500"></div>
+                    <div class="w-full lg:w-1/2 pl-12 lg:pl-16">
+                        <div class="bg-white/35 border border-accent shadow-lg p-8 rounded-lg hover:border-validate/50 transition-all duration-300 group">
+                            <div class="flex items-center gap-4 mb-4">
+                                <svg class="w-10 h-10" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="gradient-list-check" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#478722" />
+                                            <stop offset="100%" stop-color="#89d957" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path d="M197.8 100.3C208.7 107.9 211.3 122.9 203.7 133.7L147.7 213.7C143.6 219.5 137.2 223.2 130.1 223.8C123 224.4 116 222 111 217L71 177C61.7 167.6 61.7 152.4 71 143C80.3 133.6 95.6 133.7 105 143L124.8 162.8L164.4 106.2C172 95.3 187 92.7 197.8 100.3zM197.8 260.3C208.7 267.9 211.3 282.9 203.7 293.7L147.7 373.7C143.6 379.5 137.2 383.2 130.1 383.8C123 384.4 116 382 111 377L71 337C61.6 327.6 61.6 312.4 71 303.1C80.4 293.8 95.6 293.7 104.9 303.1L124.7 322.9L164.3 266.3C171.9 255.4 186.9 252.8 197.7 260.4zM288 160C288 142.3 302.3 128 320 128L544 128C561.7 128 576 142.3 576 160C576 177.7 561.7 192 544 192L320 192C302.3 192 288 177.7 288 160zM288 320C288 302.3 302.3 288 320 288L544 288C561.7 288 576 302.3 576 320C576 337.7 561.7 352 544 352L320 352C302.3 352 288 337.7 288 320zM224 480C224 462.3 238.3 448 256 448L544 448C561.7 448 576 462.3 576 480C576 497.7 561.7 512 544 512L256 512C238.3 512 224 497.7 224 480zM128 440C150.1 440 168 457.9 168 480C168 502.1 150.1 520 128 520C105.9 520 88 502.1 88 480C88 457.9 105.9 440 128 440z" 
+                                        fill="url(#gradient-list-check)" />
+                                </svg>
+                            </div>
+                            <h4 class="text-xl font-bold mb-3 uppercase tracking-wide text-gradient">Suis les instructions</h4>
+                            <p class="leading-relaxed">
+                                Chaque section contient des instructions claires sur quoi écrire. On t'accompagne pas à pas pour construire un message qui donne envie de te contacter.
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                <li class="step-container relative flex flex-col lg:flex-row items-start lg:items-center animate-on-scroll opacity-0 translate-y-10 transition-all duration-700" role="listitem">
+                    <div class="w-full lg:w-1/2 pl-12 lg:pl-0 lg:pr-16 order-2 lg:order-1">
+                        <div class="bg-white/35 border border-accent shadow-lg p-8 rounded-lg hover:border-validate/50 transition-all duration-300 group lg:text-right">
+                            <div class="flex items-center lg:justify-end gap-4 mb-4"> 
+                                <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="gradient-green-sparkle" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#478722" />
+                                        <stop offset="100%" stop-color="#89d957" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M12 3L14.5 9L21 11.5L14.5 14L12 20L9.5 14L3 11.5L9.5 9L12 3Z" fill="url(#gradient-green-sparkle)" />
+                                <path d="M19 16L19.75 18L22 18.75L19.75 19.5L19 21.5L18.25 19.5L16 18.75L18.25 18L19 16Z" fill="url(#gradient-green-sparkle)" fill-opacity="0.7" />
+                            </svg>
+                            </div>
+                            <h4 class="text-xl font-bold mb-3 uppercase tracking-wide text-gradient">Besoin d’inspiration ?</h4>
+                            <p class="leading-relaxed">
+                                Copie-colle les prompts dans ton IA préférée pour t’inspirer facilement. Ne repars plus jamais d'une page blanche.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="timeline-dot absolute left-4 lg:left-1/2 transform -translate-x-1/2 lg:-translate-x-1/2 w-4 h-4 rounded-full bg-white/20 z-10 transition-all duration-500"></div>
+                    <div class="hidden lg:flex w-1/2 pl-16 order-1 lg:order-2" aria-hidden="true">
+                        <span class="ghost-text text-7xl font-black text-white/5 uppercase select-none">Agilité</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <footer class="mt-32 p-8 max-w-3xl mx-auto text-center animate-on-scroll opacity-0 translate-y-10 transition-all duration-700">
+            <p class="text-xl font-bold uppercase tracking-widest text-gradient">Et pour la mise en ligne ?</p>
+            <p class="lg:text-xl leading-relaxed mt-4">  
+                Tu déploies ta vitrine <strong class="text-gradient font-bold scribble-underline-accent">en un clic</strong>.
+            </p>
+            <p class="text-lg leading-relaxed">
+                Et si tu bloques, un petit tuto te remet sur les rails.
+            </p>
+        </footer>
+    </div>
+</section>
+<!-- TARIFS -->
+<section id="tarifs" class="py-20 lg:py-32 bg-bg-1">
+    <div class="max-w-7xl mx-auto px-4">
+        <header class="text-center mb-16">
+            <h2 class="text-3xl lg:text-5xl text-gradient font-bold mb-4 uppercase tracking-tight animate-on-scroll fx-fade-up">
+                Tarifs & Avantages
+            </h2>
+        </header>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            <div class="bg-white/45 shadow-lg p-8 rounded-2xl flex flex-col items-center text-center animate-on-scroll fx-fade-up">
+                <div class="mb-6 p-4 bg-white rounded-full shadow-inner">
+                   <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 18.5c-2.28 0-4.22-1.39-5-3.35h5v-2h-5.45c-.03-.22-.05-.44-.05-.65 0-.21.02-.43.05-.65H15v-2H10c.78-1.96 2.72-3.35 5-3.35 1.74 0 3.28.81 4.28 2.07l1.72-1.72C19.46 5.31 17.38 4 15 4c-3.72 0-6.86 2.56-7.74 6h-2.26v2h1.77c-.02.22-.03.44-.03.65 0 .21.01.43.03.65H5v2h2.26c.88 3.44 4.02 6 7.74 6 2.38 0 4.46-1.31 6-3.25l-1.72-1.72c-1 1.26-2.54 2.07-4.28 2.07z" fill="url(#gradient-layout-green)"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-2 uppercase tracking-wide text-gradient">Paiement unique</h3>
+                <div class="text-4xl font-extrabold text-gradient-green mb-4">199 €</div>
+                <p class="leading-relaxed">
+                    Ton site est à toi, pour toujours. Pas d’abonnement, pas de frais cachés. Une seule fois, c'est tout.
+                </p>
+            </div>
+            <div class="bg-white/45 shadow-lg p-8 rounded-2xl flex flex-col items-center text-center animate-on-scroll fx-fade-up" style="transition-delay: 100ms;">
+                <div class="mb-6 p-4 bg-white rounded-full shadow-inner">
+                    <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="url(#gradient-layout-green)"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 uppercase tracking-wide text-gradient">Modifiable à volonté</h3>
+                <p class="leading-relaxed">
+                    Change tes textes et tes images quand tu veux, sans frais supplémentaires. Ton site évolue avec ton activité.
+                </p>
+            </div>
+            <div class="bg-white/45 shadow-lg p-8 rounded-2xl flex flex-col items-center text-center animate-on-scroll fx-fade-up" style="transition-delay: 200ms;">
+                <div class="mb-6 p-4 bg-white rounded-full shadow-inner">
+                    <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="url(#gradient-layout-green)"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 uppercase tracking-wide text-gradient">Zéro stress légal</h3>
+                <p class="leading-relaxed">
+                    Mentions légales et politique de confidentialité sont <strong class="text-gradient">incluses et générées</strong>. Ton site est 100% en conformité avec la loi.
+                </p>
+            </div>
+            <div class="bg-white/45 shadow-lg p-8 rounded-2xl flex flex-col items-center text-center animate-on-scroll fx-fade-up" style="transition-delay: 300ms;">
+                <div class="mb-6 p-4 bg-white rounded-full shadow-inner">
+                    <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" fill="url(#gradient-layout-green)"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 uppercase tracking-wide text-gradient">Mise en ligne flash</h3>
+                <p class="leading-relaxed">
+                    Déploiement simple en quelques clics. Ton site est prêt à être partagé et à recevoir tes clients dès aujourd'hui.
+                </p>
+            </div>
+            <div class="bg-white/45 shadow-lg p-8 rounded-2xl flex flex-col items-center text-center animate-on-scroll fx-fade-up" style="transition-delay: 400ms;">
+                <div class="mb-6 p-4 bg-white rounded-full shadow-inner">
+                    <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" fill="url(#gradient-layout-green)"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 uppercase tracking-wide text-gradient">Domaine Pro</h3>
+                <p class="leading-relaxed mb-4">
+                    Connecte ton propre nom de domaine perso (.fr, .com...) pour une image 100% pro. 
+                </p>
+                <span class="inline-block px-3 py-1 bg-accent/10 text-gradient text-[10px] font-bold uppercase rounded-full border border-accent">Aide à la config en option</span>
+            </div>
+            <div class="md:col-span-2 lg:col-span-1 border border-accent shadow-2xl p-8 rounded-2xl flex flex-col items-center text-center animate-on-scroll fx-fade-up relative overflow-hidden group" style="transition-delay: 500ms;">
+                <div class="absolute top-4 right-4 bg-gradient-accent text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                    Option Premium
+                </div>
+                <div class="mb-6 p-4 bg-white rounded-full shadow-inner">
+                    <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V18H19V19Z" fill="url(#gradient-sparkle-wand)"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-2 uppercase tracking-wide text-gradient">Boost Visibilité</h3>
+                <p class="leading-relaxed">
+                    Besoin de passer à la vitesse supérieure ? Je t'accompagne personnellement pour optimiser ton SEO local et propulser ta présence sur Google.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- VITRINES EXEMPLES -->
+<section id="realisations" class="py-20 lg:py-32 bg-bg-2">
+    <div class="max-w-7xl mx-auto px-4">
+        <header class="text-center mb-16">
+            <h2 class="text-3xl lg:text-5xl text-gradient font-bold mb-4 uppercase tracking-tight animate-on-scroll fx-fade-up">
+                Ils ont lancé <span class="text-gradient scribble-underline-accent">leur vitrine</span>
+            </h2>
+            <p class="text-lg lg:text-xl max-w-2xl mx-auto animate-on-scroll fx-fade-up">
+                Découvrez comment nos clients ont transformé nos modèles pour créer un site unique à leur image.
+            </p>
+        </header>
+        <div class="grid grid-cols-2 gap-4 md:gap-12">
+            <div class="group animate-on-scroll fx-fade-up">
+                <div class="relative overflow-hidden rounded-xl shadow-md transition-all hover:shadow-xl border border-accent/10">
+                    <img src="images/illustrations/hero-vitrine-pop1-desk.webp" alt="Exemple Vitrine" class="hidden md:block w-full h-auto transform transition-transform duration-500 group-hover:scale-105">
+                    <img src="images/illustrations/hero-vitrine-pop1-mob.webp" alt="Exemple Vitrine Mobile" class="block md:hidden w-full h-auto transform transition-transform duration-500 group-hover:scale-105">  
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center">
+                        <button onclick="openPreview()" class="p-3 bg-white rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                            <svg class="w-6 h-6 text-slate-700" viewBox="0 0 640 640" fill="currentColor"><path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/></svg>
+                        </button>
+                    </div>
+                    <button onclick="openPreview()" class="md:hidden absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow-md text-slate-700 z-10">
+                        <svg class="w-5 h-5" viewBox="0 0 640 640" fill="currentColor"><path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/></svg>
+                    </button>
+                </div>
+                <div class="mt-4">
+                    <p class="font-bold text-gradient uppercase tracking-widest mb-1">Vitrine Pop</p>
+                    <p class="text-xs md:text-base leading-snug">Transformée par <span class="font-bold">Sarah D.</span></p>
+                </div>
+            </div>
+            <div class="group animate-on-scroll fx-fade-up" style="transition-delay: 100ms;">
+                <div class="relative overflow-hidden rounded-xl shadow-md transition-all border border-accent/10">
+                    <img src="images/illustrations/hero-vitrine-pop1-desk.webp" class="hidden md:block w-full h-auto transform transition-transform duration-500 group-hover:scale-105">
+                    <img src="images/illustrations/hero-vitrine-pop1-mob.webp" class="block md:hidden w-full h-auto transform transition-transform duration-500 group-hover:scale-105">
+                    <button onclick="openPreview()" class="md:hidden absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow-md text-slate-700 z-10"><svg class="w-5 h-5" viewBox="0 0 640 640" fill="currentColor"><path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/></svg></button>
+                </div>
+                <div class="mt-4">
+                    <p class="font-bold text-gradient uppercase tracking-widest mb-1">Vitrine Zen</p>
+                    <p class="text-xs md:text-base leading-snug">Transformée par <span class="font-bold">Marc A.</span></p>
+                </div>
+            </div>
+            <div class="group animate-on-scroll fx-fade-up" style="transition-delay: 200ms;">
+                <div class="relative overflow-hidden rounded-xl shadow-md transition-all border border-accent/10">
+                    <img src="images/illustrations/hero-vitrine-pop1-desk.webp" class="hidden md:block w-full h-auto transform transition-transform duration-500 group-hover:scale-105">
+                    <img src="images/illustrations/hero-vitrine-pop1-mob.webp" class="block md:hidden w-full h-auto transform transition-transform duration-500 group-hover:scale-105">
+                    <button onclick="openPreview()" class="md:hidden absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow-md text-slate-700 z-10"><svg class="w-5 h-5" viewBox="0 0 640 640" fill="currentColor"><path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/></svg></button>
+                </div>
+                <div class="mt-4">
+                    <p class="font-bold text-gradient uppercase tracking-widest mb-1">Vitrine Moderne</p>
+                    <p class="text-xs md:text-base leading-snug">Transformée par <span class="font-bold">Julie C.</span></p>
+                </div>
+            </div>
+            <div class="group animate-on-scroll fx-fade-up" style="transition-delay: 300ms;">
+                <div class="relative overflow-hidden rounded-xl shadow-md transition-all border border-accent/10">
+                    <img src="images/illustrations/hero-vitrine-pop1-desk.webp" class="hidden md:block w-full h-auto transform transition-transform duration-500 group-hover:scale-105">
+                    <img src="images/illustrations/hero-vitrine-pop1-mob.webp" class="block md:hidden w-full h-auto transform transition-transform duration-500 group-hover:scale-105">
+                    <button onclick="openPreview()" class="md:hidden absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow-md text-slate-700 z-10"><svg class="w-5 h-5" viewBox="0 0 640 640" fill="currentColor"><path d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/></svg></button>
+                </div>
+                <div class="mt-4">
+                    <p class="font-bold text-gradient uppercase tracking-widest mb-1">Vitrine Audacieuse</p>
+                    <p class="text-xs md:text-base leading-snug">Transformée par <span class="font-bold">Thomas R.</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- SELECTION DE MODELES -->
+<section id="modeles" class="py-20 lg:py-32 bg-bg-1">
+    <div class="max-w-7xl mx-auto px-4">
+        <header class="text-center mb-16">
+            <h2 class="text-3xl lg:text-5xl text-gradient font-bold mb-4 uppercase tracking-tight animate-on-scroll fx-fade-up">
+                <span class="text-gradient scribble-underline-accent">Choisis</span> ta vitrine
+            </h2>
+            <p class="text-lg lg:text-xl max-w-2xl mx-auto animate-on-scroll fx-fade-up">
+                Change les photos, les textes et les couleurs en un éclair. <br class="hidden sm:block">
+                Trouve la base qui correspond à ton énergie et ton style.
+            </p>
+        </header>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
+            <div class="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-2 animate-on-scroll fx-fade-up">
+                <div class="h-48 bg-slate-100 flex items-center justify-center relative group">
+                    <span class="absolute top-4 left-4 bg-gradient-subtle text-white text-[10px] font-bold uppercase px-2 py-1 rounded [text-shadow:_0_1px_2px_rgb(0_0_0_/_70%)]">Épuré</span>
+                    <button onclick="openPreview()" class="absolute top-3 right-3 z-30 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all hover:scale-110 group/eye" title="Aperçu">
+                        <svg class="w-5 h-5 text-slate-700 transition-colors group-hover/eye:text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                            <path fill="currentColor" d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/>
+                        </svg>
+                    </button>
+                    <p class="text-slate-400 font-medium">Aperçu Vitrine Moderne</p>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-2xl font-bold mb-1">Vitrine Moderne</h3>
+                    <p class="text-gradient font-bold text-sm uppercase mb-4">Crédible & professionnelle</p>
+                    <p class="mb-8 flex-grow">
+                        Petites entreprises, startups, services B2B. Inspires confiance dès le premier clic.
+                    </p>
+                     <div class="pt-4 flex justify-center">
+                        <a href="#configurateur" class="group w-full flex items-center justify-center gap-3 px-6 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-slate-50">
+                            <span class="font-bold text-gradient text-sm uppercase tracking-wide ml-4">
+                                Je personnalise
+                            </span>
+                            
+                            <div class="flex items-center justify-center text-accent transition-all flex-shrink-0">
+                                <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200 transition-all hover:shadow-2xl hover:-translate-y-2 animate-on-scroll fx-fade-up" style="transition-delay: 100ms;">
+                <div class="h-48 bg-teal-50 flex items-center justify-center relative group">
+                    <span class="absolute top-4 left-4 bg-gradient-green text-white text-[10px] font-bold uppercase px-2 py-1 rounded [text-shadow:_0_1px_2px_rgb(0_0_0_/_70%)]">Sobriété</span>
+                    <button onclick="openPreview()" class="absolute top-3 right-3 z-30 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all hover:scale-110 group/eye" title="Aperçu">
+                        <svg class="w-5 h-5 text-slate-700 transition-colors group-hover/eye:text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                            <path fill="currentColor" d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/>
+                        </svg>
+                    </button>
+                    <p class="text-teal-200 font-medium">Aperçu Vitrine Zen</p>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-2xl font-bold mb-1">Vitrine Zen</h3>
+                    <p class="text-gradient font-bold text-sm uppercase mb-4">Clarté & sérénité</p>
+                    <p class="mb-8 flex-grow">
+                        Thérapeutes, coachs bien-être, professions libérales. Inspire confiance et calme dès le premier regard.
+                    </p>
+                     <div class="pt-4 flex justify-center">
+                        <a href="#configurateur" class="group w-full flex items-center justify-center gap-3 px-6 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-slate-50">
+                            <span class="font-bold text-gradient text-sm uppercase tracking-wide ml-4">
+                                Je personnalise
+                            </span>
+                            
+                            <div class="flex items-center justify-center text-accent transition-all flex-shrink-0">
+                                <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200 transition-all hover:shadow-2xl hover:-translate-y-2 animate-on-scroll fx-fade-up" style="transition-delay: 200ms;">
+                <div class="h-48 bg-indigo-50 flex items-center justify-center relative group">
+                    <span class="absolute top-4 left-4 bg-gradient-accent text-white text-[10px] font-bold uppercase px-2 py-1 rounded [text-shadow:_0_1px_2px_rgb(0_0_0_/_70%)]">Impact</span>
+                    <button onclick="openPreview()" class="absolute top-3 right-3 z-30 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all hover:scale-110 group/eye" title="Aperçu">
+                        <svg class="w-5 h-5 text-slate-700 transition-colors group-hover/eye:text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                            <path fill="currentColor" d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/>
+                        </svg>
+                    </button>
+                    <p class="text-indigo-200 font-medium">Aperçu Vitrine Audacieuse</p>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-2xl font-bold mb-1">Vitrine Audacieuse</h3>
+                    <p class="text-gradient font-bold text-sm uppercase mb-4">Impact fort</p>
+                    <p class="mb-8 flex-grow">
+                        Freelances, coachs, consultants qui veulent marquer les esprits et sortir du lot.
+                    </p>
+                     <div class="pt-4 flex justify-center">
+                        <a href="#configurateur" class="group w-full flex items-center justify-center gap-3 px-6 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-slate-50">
+                            <span class="font-bold text-gradient text-sm uppercase tracking-wide ml-4">
+                                Je personnalise
+                            </span>
+                            
+                            <div class="flex items-center justify-center text-accent transition-all flex-shrink-0">
+                                <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200 transition-all hover:shadow-2xl hover:-translate-y-2 animate-on-scroll fx-fade-up" style="transition-delay: 300ms;">
+                <div class="h-48 bg-orange-50 flex items-center justify-center relative group">
+                    <span class="absolute top-4 left-4 bg-gradient-orange text-white text-[10px] font-bold uppercase px-2 py-1 rounded [text-shadow:_0_1px_2px_rgb(0_0_0_/_70%)]">Fun</span> 
+                    <button onclick="openPreview()" class="absolute top-3 right-3 z-30 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all hover:scale-110 group/eye" title="Aperçu">
+                        <svg class="w-5 h-5 text-slate-700 transition-colors group-hover/eye:text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                            <path fill="currentColor" d="M320 96C239.2 96 174.5 132.8 127.4 176.6C80.6 220.1 49.3 272 34.4 307.7C31.1 315.6 31.1 324.4 34.4 332.3C49.3 368 80.6 420 127.4 463.4C174.5 507.1 239.2 544 320 544C400.8 544 465.5 507.2 512.6 463.4C559.4 419.9 590.7 368 605.6 332.3C608.9 324.4 608.9 315.6 605.6 307.7C590.7 272 559.4 220 512.6 176.6C465.5 132.9 400.8 96 320 96zM176 320C176 240.5 240.5 176 320 176C399.5 176 464 240.5 464 320C464 399.5 399.5 464 320 464C240.5 464 176 399.5 176 320zM320 256C320 291.3 291.3 320 256 320C244.5 320 233.7 317 224.3 311.6C223.3 322.5 224.2 333.7 227.2 344.8C240.9 396 293.6 426.4 344.8 412.7C396 399 426.4 346.3 412.7 295.1C400.5 249.4 357.2 220.3 311.6 224.3C316.9 233.6 320 244.4 320 256z"/>
+                        </svg>
+                    </button>
+                    <p class="text-orange-200 font-medium">Aperçu Vitrine Pop</p>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-2xl font-bold mb-1">Vitrine Pop</h3>
+                    <p class="text-gradient font-bold text-sm uppercase mb-4">Dynamique & colorée</p>
+                    <p class="mb-8 flex-grow">
+                        Artistes, commerces locaux, activités créatives. Pour mettre de la joie et de l’énergie dès l’accueil.
+                    </p>
+                    <div class="pt-4 flex justify-center">
+                        <a href="#configurateur" class="group w-full flex items-center justify-center gap-3 px-6 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-slate-50">
+                            <span class="font-bold text-gradient text-sm uppercase tracking-wide ml-4">
+                                Je personnalise
+                            </span>
+                            
+                            <div class="flex items-center justify-center text-accent transition-all flex-shrink-0">
+                                <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="mt-20 text-center animate-on-scroll fx-zoom-in">
+            <p class="text-xl font-bold uppercase tracking-widest text-gradient">
+                Choisis ton style et lance ta vitrine pro en 15 minutes.
+            </p>
+            <div class="mt-6">
+                <a href="#contact" class="hover:text-green-600 transition-colors font-medium">
+                    Un besoin spécifique ? <span class="scribble-underline-accent">Parlons-en.</span>
+                </a>
+            </div>
+        </footer>
+    </div>
+</section>
+<!-- A SAVOIR -->
+<section id="succes" class="py-20 lg:py-32 bg-bg-2">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex flex-col lg:flex-row items-stretch gap-12 lg:gap-20">
+            <div class="lg:w-1/2 flex flex-col justify-center animate-on-scroll fx-fade-up">
+                <h2 class="text-3xl lg:text-5xl text-gradient font-bold mb-8 uppercase tracking-tight">
+                    Un outil pensé pour <br><span class="text-gradient scribble-underline-accent">ton succès</span>
+                </h2>
+                <div class="space-y-6 text-lg lg:text-xl leading-relaxed">
+                    <p>
+                        <strong class="text-gradient">Vitrine Express</strong> est un coup de pouce pour les pros qui ne veulent plus perdre une minute à créer leur site web.
+                    </p>
+                    <p>
+                        <span class="text-gradient font-semibold">L’objectif :</span> te donner une page d’atterrissage <span class="text-gradient font-semibold italic">propre, moderne et crédible</span> qui donne envie de te contacter ou de prendre rendez-vous.
+                    </p>
+                    <p>
+                        Les templates sont pensés pour l’essentiel : mettre en avant ton savoir-faire, rassurer tes prospects, et rendre la prise de contact fluide et évidente.
+                    </p>
+                </div>
+                <div class="mt-12">
+                    <p class="text-xl font-bold uppercase tracking-widest text-gradient">
+                        Vitrine Express est ton point de départ.<br>La suite se construit ensemble.
+                    </p>
+                </div>
+            </div>
+            <div class="lg:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-6 animate-on-scroll fx-fade-up">
+                
+                <div class="flex flex-col bg-white/35 border border-accent shadow-lg p-8 rounded-lg hover:border-validate/50 transition-all duration-300 group">
+                    <div class="mb-6">
+                        <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="url(#gradient-layout-green)"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 uppercase tracking-wide text-gradient">L'essentiel est là</h3>
+                    <p class="leading-relaxed mb-4">
+                        Ta vitrine possède les fondations indispensables pour débuter : 
+                    </p>
+                    <ul class="text-base space-y-2">
+                        <li><span class="text-validate text-lg">✓</span> Titre & description personnalisés pour Google</li>
+                        <li><span class="text-validate text-lg">✓</span> Favicon & image de partage réseaux inclus</li>
+                        <li><span class="text-validate text-lg">✓</span> Structure technique saine et rapide</li>
+                    </ul>
+                </div>
+                <div class="flex flex-col bg-white/35 border border-accent shadow-lg p-8 rounded-lg hover:border-validate/50 transition-all duration-300 group">
+                    <div class="mb-6">
+                        <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 16.08C17.24 16.08 16.56 16.38 16.04 16.85L8.91 12.7C8.96 12.47 9 12.24 9 12C9 11.76 8.96 11.53 8.91 11.3L15.96 7.19C16.5 7.69 17.21 8 18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.81C7.5 9.31 6.79 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15C6.79 15 7.5 14.69 8.04 14.19L15.16 18.34C15.11 18.55 15.08 18.77 15.08 19C15.08 20.61 16.39 21.92 18 21.92C19.61 21.92 20.92 20.61 20.92 19C20.92 17.39 19.61 16.08 18 16.08Z" fill="url(#gradient-sparkle-wand)"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 uppercase tracking-wide text-gradient">Rayonner partout</h3>
+                    <p class="leading-relaxed">
+                        C'est ton point central : lien bio, réseaux, cartes de visite ou fiche Google. Une page claire qui inspire confiance 24h/24, même quand tu n'es pas dispo pour répondre.
+                    </p>
+                </div>
+                <div class="md:col-span-2 flex flex-col md:flex-row items-center gap-6 bg-white/35 border border-accent shadow-lg p-8 rounded-lg hover:border-validate/50 transition-all duration-300 group">
+                    <div class="flex-shrink-0">
+                        <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 6L18.29 8.29L13.41 13.17L9.41 9.17L2 16.59L3.41 18L9.41 12L13.41 16L19.71 9.71L22 12V6H16Z" fill="url(#gradient-layout-green)"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2 uppercase tracking-wide text-gradient">Évolutive</h3>
+                        <p class="leading-relaxed">
+                            Besoin d'aller plus loin ? Quand ton activité grandit, ta vitrine aussi. Tu pourras ensuite enrichir ton contenu ou travailler ta visibilité locale avec un accompagnement sur mesure.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- FAQ -->
+<section id="faq" class="py-20 lg:py-32 bg-bg-1">
+    <div class="max-w-4xl mx-auto px-4">
+        <header class="text-center mb-16">
+            <h2 class="text-3xl lg:text-5xl text-gradient font-bold mb-4 uppercase tracking-tight animate-on-scroll fx-fade-up">
+                <span class="text-gradient scribble-underline-accent">Questions</span> fréquentes
+            </h2>
+            <p class="animate-on-scroll fx-fade-up">
+                Tout ce que tu dois savoir pour lancer ta Vitrine Express sans prise de tête.
+            </p>
+        </header>
+        <div class="space-y-4">
+            <div class="faq-item group bg-white border border-accent/10 rounded-lg overflow-hidden transition-all duration-300 animate-on-scroll fx-fade-up">
+                <button class="faq-toggle w-full p-6 flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
+                    <span class="text-lg font-bold pr-4">Est-ce que Vitrine Express est adapté à mon activité ?</span>
+                    <div class="faq-icon flex-shrink-0 w-8 h-8 rounded-full border border-accent/20 flex items-center justify-center transition-transform duration-300 group-[.is-open]:rotate-180">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
+                    <div class="p-6 pt-0 leading-relaxed">
+                        <p class="mb-4">Oui si tu es freelance, indépendant, TPE ou profession libérale et que tu veux une présence en ligne claire, crédible et rapide, pensée pour générer des prises de contact ou des rendez-vous. Les modèles couvrent les besoins essentiels.</p>
+                        <div class="p-4 bg-bg-1 rounded-lg border-l-4 border-accent">
+                            <p class="text-sm">Si tu ne trouves pas de structure adaptée (sections spécifiques, plusieurs pages, logique particulière), on part sur un projet personnalisé.</p>
+                            <button class="calendly-popup-trigger group/link text-accent font-bold mt-2 hover:underline inline-flex items-center">
+                                Discuter de mon projet
+                                <svg class="w-4 h-4 ml-1 transform transition-transform group-hover/link:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item group bg-white border border-accent/10 rounded-lg overflow-hidden transition-all duration-300 animate-on-scroll fx-fade-up">
+                <button class="faq-toggle w-full p-6 flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
+                    <span class="text-lg font-bold pr-4">Jusqu’où je peux personnaliser mon site ?</span>
+                    <div class="faq-icon flex-shrink-0 w-8 h-8 rounded-full border border-accent/20 flex items-center justify-center transition-transform duration-300 group-[.is-open]:rotate-180">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
+                    <div class="p-6 pt-0 leading-relaxed">
+                        <p class="mb-3 font-semibold">Tu peux modifier librement :</p>
+                        <ul class="list-disc ml-5 mb-4 space-y-1">
+                            <li>les textes</li>
+                            <li>les images</li>
+                            <li>les couleurs</li>
+                        </ul>
+                        <p class="mb-4 font-medium">La structure reste fixe, et c'est ce qui garantit que ton site est <span class="text-gradient font-bold">parfaitement adapté à toutes les tailles d'écran</span>.</p>
+                        <p>Chaque modèle est pensé "Mobile First" : tes futurs clients profitent d'une expérience fluide et ultra-rapide sur smartphone, tablette et ordinateur, sans aucun effort de ta part.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item group bg-white border border-accent/10 rounded-lg overflow-hidden transition-all duration-300 animate-on-scroll fx-fade-up">
+                <button class="faq-toggle w-full p-6 flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
+                    <span class="text-lg font-bold pr-4">Est-ce que je peux modifier mon site après l’achat ?</span>
+                    <div class="faq-icon flex-shrink-0 w-8 h-8 rounded-full border border-accent/20 flex items-center justify-center transition-transform duration-300 group-[.is-open]:rotate-180">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
+                    <div class="p-6 pt-0 leading-relaxed">
+                        <p class="mb-3">Oui, autant que tu veux. Textes et images sont modifiables librement, sans repayer.</p>
+                        <p class="text-sm bg-orange-50 p-3 rounded-lg border border-orange-100 italic">
+                            Les mentions légales générées sont validées lors de la première saisie de tes informations (nom, entreprise, SIRET…). Toute modification ultérieure de ces mentions nécessite une nouvelle génération (option payante).
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item group bg-white border border-accent/10 rounded-lg overflow-hidden transition-all duration-300 animate-on-scroll fx-fade-up">
+                <button class="faq-toggle w-full p-6 flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
+                    <span class="text-lg font-bold pr-4">Comment mon site est mis en ligne et hébergé ?</span>
+                    <div class="faq-icon flex-shrink-0 w-8 h-8 rounded-full border border-accent/20 flex items-center justify-center transition-transform duration-300 group-[.is-open]:rotate-180">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
+                    <div class="p-6 pt-0 leading-relaxed">
+                        <p class="mb-3 font-semibold">C’est très simple. Tu peux :</p>
+                        <ul class="list-disc ml-5 mb-4 space-y-1">
+                            <li>utiliser la solution gratuite proposée (site statique, léger, hébergement inclus)</li>
+                            <li>ou héberger ton site où tu veux</li>
+                        </ul>
+                        <p class="mb-4">Tu restes propriétaire à 100 % de ton site.</p>
+                        <div class="p-4 bg-bg-1 rounded-lg border-l-4 border-accent">
+                            <p class="text-sm">L’aide à la mise en ligne et à la connexion de ton nom de domaine est disponible en option.</p>
+                            <button class="calendly-popup-trigger group/link text-accent font-bold mt-2 hover:underline inline-flex items-center">
+                                Besoin d’aide pour la mise en ligne
+                                <svg class="w-4 h-4 ml-1 transform transition-transform group-hover/link:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item group bg-white border border-accent/10 rounded-lg overflow-hidden transition-all duration-300 animate-on-scroll fx-fade-up">
+                <button class="faq-toggle w-full p-6 flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
+                    <span class="text-lg font-bold pr-4">Mon site sera-t-il bien référencé sur Google ?</span>
+                    <div class="faq-icon flex-shrink-0 w-8 h-8 rounded-full border border-accent/20 flex items-center justify-center transition-transform duration-300 group-[.is-open]:rotate-180">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
+                    <div class="p-6 pt-0 leading-relaxed">
+                        <p class="mb-3 font-semibold">Chaque vitrine inclut :</p>
+                        <ul class="list-disc ml-5 mb-4 space-y-1">
+                            <li>une structure propre</li>
+                            <li>un titre et une description</li>
+                            <li>une base saine pour un affichage clair et professionnel sur Google</li>
+                        </ul>
+                        <p class="mb-4">Ce n’est pas une stratégie SEO avancée, mais une fondation solide.</p>
+                        <div class="p-4 bg-bg-1 rounded-lg border-l-4 border-accent">
+                            <p class="text-sm">Le SEO local peut être optimisé ensuite en option.</p>
+                            <button class="calendly-popup-trigger group/link text-accent font-bold mt-2 hover:underline inline-flex items-center">
+                                Optimiser ma visibilité
+                                <svg class="w-4 h-4 ml-1 transform transition-transform group-hover/link:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item group bg-white border border-accent/10 rounded-lg overflow-hidden transition-all duration-300 animate-on-scroll fx-fade-up">
+                <button class="faq-toggle w-full p-6 flex items-center justify-between text-left focus:outline-none" aria-expanded="false">
+                    <span class="text-lg font-bold pr-4">Et si mon activité évolue plus tard ?</span>
+                    <div class="faq-icon flex-shrink-0 w-8 h-8 rounded-full border border-accent/20 flex items-center justify-center transition-transform duration-300 group-[.is-open]:rotate-180">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
+                    <div class="p-6 pt-0 leading-relaxed">
+                        <p class="mb-4 font-semibold">Vitrine Express est un point de départ. Quand ton activité évolue, tu peux :</p>
+                        <ul class="list-disc ml-5 mb-6 space-y-1">
+                            <li>enrichir ton site</li>
+                            <li>améliorer ta visibilité</li>
+                            <li>structurer un parcours client plus avancé</li>
+                        </ul>
+                        <div class="p-4 bg-bg-1 rounded-lg border-l-4 border-accent">
+                            <p class="text-sm">Un accompagnement AM 2.0 sur mesure est disponible pour passer à l’étape suivante.</p>
+                            <button class="calendly-popup-trigger group/link text-accent font-bold mt-2 hover:underline inline-flex items-center">
+                                Passer au niveau supérieur
+                                <svg class="w-4 h-4 ml-1 transform transition-transform group-hover/link:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- MODALE DE PREVIEW -->
+<div id="preview-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/85 backdrop-blur-sm p-4 lg:p-10">
+    <button onclick="closePreview()" class="absolute top-5 right-5 z-[110] bg-white text-black rounded-full p-2 shadow-2xl hover:scale-110 transition-transform">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+    <div class="w-full max-w-5xl h-full bg-white rounded-xl overflow-hidden shadow-2xl relative">
+        <div class="w-full h-full overflow-y-auto">
+            <img src="images/illustrations/visuel-live-vitrine-express-pop-desktop.webp" 
+                 alt="Aperçu complet du modèle" 
+                 class="w-full h-auto block">
+        </div>
+    </div>
+</div>
+<!-- FOOTER -->
+<footer class="bg-bg-2 border-t border-accent pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
+            <div class="lg:col-span-5 space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="relative flex-shrink-0">
+                        <div class="absolute inset-0 bg-gradient-accent rounded-full blur-sm opacity-50"></div>
+                        <img src="images/illustrations/aurore-am20.webp" alt="Ton Nom" class="relative w-20 h-20 aspect-square rounded-full border-2 border-white object-cover shadow-xl">
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold uppercase tracking-widest text-gradient">Ton Partenaire Digital</p>
+                        <p class="text-accent italic">"J'aide les entrepreneurs, indépendants, tpe à lancer leur site web en 15 min"</p>
+                    </div>
+                </div>
+                <p class="text-lg leading-relaxed max-w-md">
+                    Prêt à transformer ton activité ? Choisis ta base, personnalise tes contenus et rayonne enfin sur le web.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="p-2 bg-white shadow-sm border border-accent/10 rounded-lg hover:text-accent hover:-translate-y-1 transition-all">
+                        <span class="sr-only">LinkedIn</span>
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                    <a href="#" class="p-2 bg-white shadow-sm border border-accent/10 rounded-lg hover:text-accent hover:-translate-y-1 transition-all">
+                        <span class="sr-only">Instagram</span>
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849s-.011 3.585-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.849-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849s.012-3.584.07-4.849c.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98.058-1.28.072-1.689.072-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98-1.28-.058-1.689-.072-4.948-.072zM12 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="lg:col-span-3 space-y-6">
+                <h4 class="text-lg font-bold uppercase tracking-widest text-gradient">Lancer mon site</h4>
+                <ul class="space-y-4">
+                    <li>
+                        <a href="#modeles" class="group flex items-center justify-between hover:text-accent transition-all">
+                            <span>Choisir un modèle</span>
+                            <svg class="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#configurateur" class="group flex items-center justify-between hover:text-accent transition-all">
+                            <span>Personnaliser ma vitrine</span>
+                            <svg class="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#faq" class="group flex items-center justify-between hover:text-accent transition-all">
+                            <span>Questions fréquentes</span>
+                            <svg class="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="lg:col-span-4 space-y-6">
+                <div class="p-6 bg-white/50 border border-accent/20 rounded-2xl backdrop-blur-sm shadow-sm">
+                    <h4 class="text-lg font-bold uppercase tracking-widest text-gradient mb-4">Besoin d'un coup de pouce ?</h4>
+                    <ul class="text-sm space-y-3 mb-6">
+                        <li class="flex items-start gap-2">
+                            <span class="text-validate">✦</span> 
+                            <span><strong>Mise en ligne :</strong> Hébergement & Nom de domaine.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-validate">✦</span> 
+                            <span><strong>SEO :</strong> Optimisation pour Google.</span>
+                        </li>
+                    </ul>
+                    <a href="#contact" class="group relative inline-flex items-center gap-3 font-bold text-gradient transition-all hover:scale-105">
+                        <span class="border-b border-accent group-hover:border-accent transition-all">
+                            Discuter des options Premium
+                        </span>
+                        <div class="w-8 h-8 flex items-center justify-center text-accent transition-all flex-shrink-0">
+                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <hr class="border-white mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-slate-500">
+            <div class="flex items-center gap-2">
+                <span class="font-bold">Vitrine Express by AM 2.0</span> 
+                <span>&copy; <span id="current-year"></span> - Tous droits réservés.</span>
+            </div>
+            <div class="flex gap-8">
+                <a href="/mentions-legales" class="hover:text-accent transition-colors underline-offset-4 hover:underline">Mentions légales</a>
+                <a href="/cgv" class="hover:text-accent transition-colors underline-offset-4 hover:underline">CGV</a>
+            </div>
+        </div>
+    </div>
+</footer>
+<script src="script.js" defer></script>
+</body>
+</html>

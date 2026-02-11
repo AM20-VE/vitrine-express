@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ton Kit LinkedIn est prêt - Vitrine Express</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col">
+<header class="header-main">
+    <div class="header-container px-4 sm:px-8"> <a href="index.html" class="logo-group group">
+            <img src="images/logo/logo-am20.webp" alt="Logo AM 2.0" class="logo-img w-8 h-8 sm:w-10 sm:h-10">
+            <div class="logo-text-wrapper">
+                <span class="font-bold text-gradient leading-none text-sm sm:text-base">Vitrine Express</span>
+                <span class="logo-subtitle tracking-wider uppercase text-[8px] sm:text-[10px]">by AM 2.0</span>
+            </div>
+        </a>
+        <button class="btn-export group px-3 py-1.5 sm:px-4 sm:py-2">
+            <span class="font-bold uppercase tracking-tight text-[10px] sm:text-xs text-white">Besoin d'aide ? </span>
+        </button>
+    </div>
+</header>
+<main class="flex-1 flex items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-gradient-accent">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] bg-blue-200/30 rounded-full blur-[80px] sm:blur-[120px] -z-10"></div>
+    <div id="success-card" class="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-10 max-w-lg w-full text-center transition-all duration-700 transform scale-95 opacity-0">
+        <div class="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-6 sm:mb-8 bg-green-100 rounded-full flex items-center justify-center animate-bounce shadow-sm border border-green-200">
+            <svg class="w-8 h-8 sm:w-12 sm:h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-gradient mb-3 sm:mb-4">Paiement Validé !</h1>
+        <p class="text-slate-500 mb-8 sm:mb-10 text-xs sm:text-sm leading-relaxed px-2">
+            Félicitations ! Ton Kit LinkedIn personnalisé est prêt. Tu peux maintenant télécharger tes visuels haute définition.
+        </p>
+        <button onclick="downloadKit()" id="download-btn" class="w-full transition-all hover:scale-[1.02] active:scale-95 group" 
+                style="
+                    background: linear-gradient(white, white) padding-box, 
+                                linear-gradient(to right, #4d0fa5, #22c55e) border-box !important;
+                    border: 3px solid transparent !important;
+                    display: block !important;
+                    padding: 0 !important;
+                    min-height: 3.5rem; /* Changé height en min-height pour la flexibilité */
+                    border-radius: 1rem;
+                    overflow: hidden;
+                    box-shadow: 0 4px 12px rgba(132, 73, 217, 0.2) !important;">
+                <span style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    width: 100%;
+                    min-height: 3.5rem;
+                    background: linear-gradient(135deg, #8449d9 0%, #22c55e 100%);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    color: transparent !important;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    font-size: 12px; 
+                    padding: 0 15px;">
+                    Télécharger mon Kit LinkedIn
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-y-1" style="color: #4d0fa5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                </span>
+            </button>
+        <p class="mt-6 text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+            Inclus : Bannière profil & Vignettes de services
+        </p>
+    </div>
+</main>
+<script>
+    window.onload = () => {
+        const card = document.getElementById('success-card');
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+    };
+
+    function downloadKit() {
+        const btn = document.getElementById('download-btn');
+        btn.innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; height:100%; font-weight:900; color:#4d0fa5; font-size:11px;">
+                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="uppercase tracking-widest">Génération...</span>
+            </div>
+        `;
+        btn.classList.add('pointer-events-none', 'opacity-80');
+        setTimeout(() => {
+            alert("Génération des images HD lancée !");
+        }, 2500);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <style>
+        :root {
+            --color-dark: #2c1c3b;
+            --color-background-light: #F2F4F7; 
+            --color-accent: #971181; 
+            --font-main: 'Segoe UI Rounded', 'Quicksand', 'Ubuntu', 'Jost', system-ui, -apple-system, sans-serif;
+            --radius: 20px; 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-main); background: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .branding-kit-container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 30px; align-items: center; }
+        .asset-group { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .preview-label { font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px; color: var(--color-dark); background: white; padding: 4px 12px; border: 2px solid var(--color-dark); border-radius: 8px; }
+        .banner-wrapper, .vignette-wrapper { width: 100%; background: white; border-radius: var(--radius); border: 4px solid var(--color-dark); overflow: hidden; position: relative; box-shadow: 10px 10px 0px rgba(0,0,0,0.1); }
+        .vignettes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+        #linkedin-banner, .vignette { overflow: hidden; position: absolute; top: 0; left: 0; transform-origin: top left; }
+        #linkedin-banner::before, .vignette::before { content: ""; position: absolute; width: 320px; height: 320px; top: -50px; left: -80px;      background: repeating-linear-gradient(45deg, var(--color-dark), var(--color-dark) 10px, transparent 10px, transparent 20px);           border: 4px solid var(--color-dark); border-radius: 50%; opacity: 0.8; z-index: 1; }
+        #linkedin-banner::after, .vignette::after { content: ""; position: absolute; width: 220px; height: 220px; bottom: -40px; right: 40px;     background: var(--color-background-light); border: 4px solid var(--color-dark); border-radius: 50%; box-shadow: 12px 12px 0px var(--color-dark); z-index: 1; }
+        .li-logo-container { position: absolute; top: 40px; left: 60px; height: 110px; width: fit-content; display: flex; align-items: center;    z-index: 20; }
+        .li-logo-img { max-height: 100%; max-width: 100%; object-fit: contain; background: white; border: 4px solid var(--color-accent);         border-radius: var(--radius); box-shadow: 8px 8px 0px var(--color-background-light); }
+        .li-logo-text { background: white; color: var(--color-dark); padding: 15px 30px; border: 4px solid var(--color-dark);           border-radius: var(--radius); font-weight: 900; text-transform: uppercase; font-size: 2rem; line-height: 1; display: flex;            align-items: center; justify-content: center; text-align: center; box-shadow: 8px 8px 0px var(--color-dark); }
+        .v2-dark { background-color: var(--color-dark) !important; }
+        .v2-dark::before { background: repeating-linear-gradient(45deg, var(--color-accent), var(--color-accent) 10px, transparent 10px, transparent 20px); border-color: var(--color-accent); }
+        .v2-dark::after { background: white; border-color: var(--color-accent); box-shadow: 12px 12px 0px var(--color-accent); }
+        .v2-dark .vignette-title { color: white; text-shadow: 4px 4px 0px var(--color-accent); }
+        .v2-dark .cta-mimic { background: var(--color-background-light); color: var(--color-dark); border-color:var(--color-background-light); box-shadow: 12px 12px 0px var(--color-accent); }
+        #linkedin-banner { width: 1584px; height: 396px; background-color: var(--color-accent); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-left: 500px; padding-right: 100px; z-index: 1; box-sizing: border-box; }
+        .banner-title { position: relative; z-index: 10; color: var(--color-dark); font-size: 56px; font-weight: 900; text-transform: uppercase;  line-height: 1.1; text-shadow: 5px 5px 0px var(--color-background-light); margin-bottom: 25px; max-width: 100%; }
+        .banner-key-figures { display: flex; gap: 20px; flex-wrap: nowrap; position: relative; z-index: 10; width: 100%; }
+        .key-item { background: var(--color-background-light); padding: 15px 25px; border: 3px solid var(--color-dark); border-radius: 15px; box-shadow: 6px 6px 0px var(--color-dark); color: var(--color-dark); font-weight: 800; font-size: 22px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+        .hero-img-frame { width: 480px; height: 300px; border-radius: var(--radius); object-fit: cover; border: 6px solid var(--color-dark); box-shadow: 20px 20px 0px var(--color-dark); position: relative; z-index: 10; background: #eee; }
+        .vignette { width: 1200px; height: 627px; background-color: var(--color-accent); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 100px; }
+        .vignette-title { position: relative; z-index: 10; font-size: 80px; font-weight: 900; margin-bottom: 50px; text-transform: uppercase; line-height: 1; color: var(--color-dark); text-shadow: 4px 4px 0px var(--color-background-light); }
+        .cta-mimic { position: relative; z-index: 10; padding: 30px 60px; background: var(--color-background-light); color: var(--color-dark);    border-radius: var(--radius); font-weight: 900; font-size: 35px; border: 5px solid var(--color-dark); text-transform: uppercase;          box-shadow: 12px 12px 0px var(--color-dark); }
+        @media (max-width: 768px) { .vignettes-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="branding-kit-container"> 
+        <div class="asset-group">
+            <div class="preview-label">Bannière LinkedIn</div>
+            <div class="banner-wrapper" id="b-wrap">
+                <div id="linkedin-banner">
+                    <div id="li-logo-slot" class="li-logo-container"></div>
+                    <div class="decor-circle circle-stripe"></div>
+                    <h1 class="banner-title" id="li-title"></h1>
+                    <div id="li-figures" class="banner-key-figures"></div>
+                </div>
+            </div>
+        </div>
+        <div class="vignettes-grid">
+            <div class="asset-group">
+                <div class="preview-label">Vignette Contact</div>
+                <div class="vignette-wrapper" id="v1-wrap">
+                    <div id="v1" class="vignette v1-light">
+                        <div class="decor-circle circle-white"></div>
+                        <h2 class="vignette-title" id="v1-title">Discutons de votre projet</h2>
+                        <div class="cta-mimic" id="v1-cta"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="asset-group">
+                <div class="preview-label">Vignette Offre</div>
+                <div class="vignette-wrapper" id="v2-wrap">
+                    <div id="v2" class="vignette v2-dark">
+                        <h2 class="vignette-title" id="v2-title">Découvrir mon univers</h2>
+                        <div class="cta-mimic" id="v2-cta">Voir l'offre</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    let CONFIG = {};
+    function rescale() {
+        const bWrap = document.getElementById('b-wrap');
+        const v1Wrap = document.getElementById('v1-wrap');
+        if(!bWrap || !v1Wrap) return;
+        const bScale = bWrap.offsetWidth / 1584;
+        document.getElementById('linkedin-banner').style.transform = `scale(${bScale})`;
+        bWrap.style.height = (396 * bScale) + 'px';
+        const vScale = v1Wrap.offsetWidth / 1200;
+        const v1 = document.getElementById('v1');
+        const v2 = document.getElementById('v2');
+        if(v1) v1.style.transform = `scale(${vScale})`;
+        if(v2) v2.style.transform = `scale(${vScale})`;
+        v1Wrap.style.height = (627 * vScale) + 'px';
+        const v2Wrap = document.getElementById('v2-wrap');
+        if(v2Wrap) v2Wrap.style.height = (627 * vScale) + 'px';
+    }
+    function updateUI(config) {
+        if(!config || !config.colors) return;
+        const r = document.documentElement.style;
+        r.setProperty('--color-accent', config.colors.accent);
+        r.setProperty('--color-dark', config.colors.dark);
+        r.setProperty('--color-background-light', config.colors.bgLight);
+        // GESTION DU LOGO / NOM
+        const logoSlot = document.getElementById('li-logo-slot');
+        if (logoSlot) {
+            const showLogo = config.linkedinKit?.showLogo !== false; 
+            if (!showLogo) {
+                logoSlot.style.display = 'none';
+            } else {
+                logoSlot.style.display = 'flex';
+                logoSlot.innerHTML = '';
+                
+                const h = config.header || {}; 
+                if (h.useTextOnly) {
+                    const txt = document.createElement('div');
+                    txt.className = 'li-logo-text';
+                    txt.textContent = h.companyName || "MON ENTREPRISE";
+                    logoSlot.appendChild(txt);
+                } else if (h.logo) {
+                    const img = document.createElement('img');
+                    img.src = h.logo;
+                    img.className = 'li-logo-img';
+                    logoSlot.appendChild(img);
+                }
+            }
+        }
+        if(document.getElementById('li-title')) {
+            document.getElementById('li-title').textContent = config.hero.title;
+        }
+        if(document.getElementById('v1-title')) {
+            document.getElementById('v1-title').textContent = config.vignette1Title || "Discutons de votre projet";
+        }
+        if(document.getElementById('v1-cta')) {
+            document.getElementById('v1-cta').textContent = config.contact.ctaLabel || "PRENDRE RDV";
+        }
+        if(document.getElementById('v2-title')) {
+            document.getElementById('v2-title').textContent = config.vignette2Title || config.about.title || "Découvrir mon univers";
+        }
+        if(document.getElementById('v2-cta')) {
+            document.getElementById('v2-cta').textContent = config.vignette2Cta || "Voir l'offre";
+        }
+        const figCont = document.getElementById('li-figures');
+        if (figCont) {
+            figCont.replaceChildren();
+            if (config.hero.showFigures && config.hero.figures) {
+                config.hero.figures.forEach(f => {
+                    const item = document.createElement('div');
+                    item.className = 'key-item';
+                    item.innerHTML = `<div class="check-icon"></div> ${f.label}`;
+                    figCont.appendChild(item);
+                });
+            }
+        }
+        rescale();
+    }
+    window.addEventListener('message', (e) => {
+        if(e.data.type === 'UPDATE_CONFIG' || e.data.type === 'SET_INITIAL_CONFIG') {
+            CONFIG = e.data.config;
+            updateUI(CONFIG);
+        }
+    });
+    window.onload = () => {
+        rescale();
+        window.parent.postMessage({ type: 'GET_CONFIG' }, '*');
+    };
+    window.onresize = rescale;
+</script>
+</body>
+</html>
