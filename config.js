@@ -144,12 +144,9 @@ window.handleFinalAction = function() {
         console.error("Erreur : localConfig n'est pas défini.");
         return;
     }
-
     const mode = localConfig.selectedMode;
     let stripeUrl = "";
-
     console.log("Mode sélectionné avant redirection :", mode);
-
     switch (mode) {
         case 'web':
             stripeUrl = "https://buy.stripe.com/test_aFacN46iOgsj2pIgl3frW03";
@@ -164,14 +161,10 @@ window.handleFinalAction = function() {
             alert("Merci de sélectionner un forfait (Web, LinkedIn ou Full) avant de continuer.");
             return;
     }
-
-    // Mise à jour visuelle du bouton
     const finalText = document.getElementById('final-cta-text');
     if (finalText) {
         finalText.innerText = "Redirection vers Stripe...";
     }
-
-    // Petit délai pour laisser l'utilisateur voir le changement de texte
     setTimeout(() => {
         console.log("Redirection vers :", stripeUrl);
         window.location.href = stripeUrl;
