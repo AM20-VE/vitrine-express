@@ -304,7 +304,7 @@ function switchPreview(mode) {
     else if (mode === 'linkedin') {
         webFrame.classList.add('hidden');
         liFrame.classList.remove('hidden');
-        if(protector) protector.classList.remove('hidden'); // On active la protection
+        if(protector) protector.classList.remove('hidden'); 
         liBtn.classList.add(...activeClasses);
         liBtn.classList.remove(...inactiveClasses);
         webBtn.classList.add(...inactiveClasses);
@@ -496,14 +496,10 @@ function sync() {
 }
 // --- PROTECTION ANTIVOL  ---
 document.addEventListener('contextmenu', (e) => {
-    // Si on fait un clic droit et que le mode LinkedIn est actif
     if (localConfig.selectedPreview === 'linkedin') {
-        // On vérifie si le clic vient de l'intérieur du wrapper
         const isInsidePreview = e.target.closest('#preview-wrapper');
-        
         if (isInsidePreview) {
             e.preventDefault();
-            // Optionnel : un petit message 
             console.log("Protection active : Clic droit bloqué.");
             return false;
         }
@@ -2088,6 +2084,33 @@ function checkGlobalValidation() {
         finalTitle.innerText = "Configuration incomplète";
     }
 }
+// --- LIENS VERS PAIEMENT ---
+function handleFinalAction() {
+    const mode = localConfig.selectedMode;
+    let stripeUrl = "";
+    switch (mode) {
+        case 'web':
+            stripeUrl = "https://buy.stripe.com/test_aFacN46iOgsj2pIgl3frW03";
+            break;
+        case 'linkedin':
+            stripeUrl = "https://buy.stripe.com/test_bJedR8fTo1xp9Sa4ClfrW05";
+            break;
+        case 'full':
+            stripeUrl = "https://buy.stripe.com/test_bJe8wOfTob7Z8O67OxfrW04";
+            break;
+        default:
+            alert("Erreur : Aucun mode sélectionné.");
+            return;
+    }
+    const finalText = document.getElementById('final-cta-text');
+    if (finalText) {
+        finalText.innerText = "Redirection vers Stripe...";
+    }
+    setTimeout(() => {
+        window.location.href = stripeUrl;
+    }, 800);
+}
+
 // --- LOGIQUE DEDIEE A L'ASSISTANCE IA ---
 const PROMPTS = {
     hero: `Tu es un expert en copywriting web orienté conversion et clarté.

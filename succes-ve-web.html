@@ -53,20 +53,119 @@
         card.classList.add('scale-100', 'opacity-100');
     };
 
-    function startDeployment() {
+    async function startDeployment() {
         const btn = document.getElementById('deploy-btn');
+        const originalContent = btn.innerHTML;
+
+        // 1. Animation de chargement
         btn.innerHTML = `
-            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span class="uppercase tracking-widest text-xs sm:text-sm font-black">Déploiement...</span>
+            <span class="uppercase tracking-widest text-xs sm:text-sm font-black">Génération de la vitrine...</span>
         `;
         btn.classList.add('pointer-events-none', 'opacity-80');
-        setTimeout(() => {
-            alert("C'est ici que la magie opère : envoi du code à Netlify !");
-        }, 2000);
+
+        try {
+            // 2. Récupération des données sauvegardées
+            const savedData = localStorage.getItem('vitrine_express_progression');
+            if (!savedData) throw new Error("Aucune configuration trouvée.");
+            const config = JSON.parse(savedData);
+
+            // --- CORRECTIF ANTI-VALEUR PAR DÉFAUT ---
+            // Si l'utilisateur a oublié de changer "[RAISON SOCIALE]"
+            if (config.legal.companyName.includes("[") || config.legal.companyName.trim() === "") {
+                config.legal.companyName = "Ma Vitrine " + Math.floor(Math.random() * 999);
+            }
+
+            // 3. Construction du HTML final (on injecte les données dans le template)
+            const finalHTML = await buildClientSite(config);
+
+            // 4. Envoi vers la fonction Netlify (le "cerveau" serveur)
+            const response = await fetch('/.netlify/functions/deploy-client-site', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    html: finalHTML,
+                    config: config,
+                    siteName: `vitrine-${Date.now()}` // Nom technique unique
+                })
+            });
+
+            if (!response.ok) throw new Error("Erreur lors de l'envoi vers Netlify");
+
+            const result = await response.json();
+
+            // 5. Succès ! Redirection vers le site en ligne
+            btn.innerHTML = "✨ VITRINE EN LIGNE !";
+            btn.style.background = "linear-gradient(to right, #22c55e, #16a34a)";
+            
+            setTimeout(() => {
+                window.location.href = result.deployUrl; 
+            }, 1500);
+
+        } catch (error) {
+            console.error(error);
+            alert("Erreur : " + error.message);
+            btn.innerHTML = originalContent;
+            btn.classList.remove('pointer-events-none', 'opacity-80');
+        }
     }
+
+    // FONCTION MAGIQUE : Elle construit le fichier que le client va posséder
+   async function buildClientSite(config) {
+    try {
+        const templateId = config.meta?.template || 'moderne';
+        
+        // 1. Récupération du code source du template choisi
+        const response = await fetch(`template-${templateId}.html`);
+        if (!response.ok) throw new Error("Template introuvable");
+        let html = await response.text();
+
+        // --- INJECTION SEO & MÉTA-DONNÉES ---
+        const companyName = config.header?.companyName || "Ma Vitrine";
+        // On remplit la balise <title> et la meta description
+        html = html.replace('id="meta-title"></title>', `id="meta-title">${config.hero.title} | ${companyName}</title>`);
+        html = html.replace('id="meta-desc" content="">', `id="meta-desc" content="${config.hero.desc}">`);
+
+        // --- INJECTION VISUELLE RAPIDE (Anti-Flash vide) ---
+        // On injecte les textes principaux pour qu'ils soient là avant même le JS
+        html = html.replace('id="hero-title"></h1>', `id="hero-title">${config.hero.title}</h1>`);
+        html = html.replace('id="hero-desc"></p>', `id="hero-desc">${config.hero.desc}</p>`);
+        html = html.replace('id="hero-cta-btn" class="cta-button"></a>', `id="hero-cta-btn" class="cta-button">${config.hero.ctaLabel}</a>`);
+        html = html.replace('id="header-cta" class="cta-button"></a>', `id="header-cta" class="cta-button">${config.contact.ctaLabel || 'Contact'}</a>`);
+
+        // --- INJECTION DES COULEURS (CSS Variables) ---
+        const rootColors = `
+    <style>
+        :root {
+            --color-accent: ${config.colors.accent} !important;
+            --color-dark: ${config.colors.dark} !important;
+            --color-background-light: ${config.colors.bgLight} !important;
+        }
+    </style>`;
+        html = html.replace('</head>', `${rootColors}</head>`);
+
+        // --- INJECTION DU BLOC CONFIG (La "Boîte Noire" pour les modifs futures) ---
+        // On injecte tout l'objet config dans le script dédié
+        // C'est ce bloc que ton configurateur lira si l'utilisateur veut modifier son site
+        html = html.replace('/*CONFIG_EXPORT*/', JSON.stringify(config));
+
+        // --- NETTOYAGE FINAL ---
+        // On retire absolument toute trace du script de configuration privé
+        html = html.replace(/<script src="config\.js"><\/script>/g, '');
+        
+        // On s'assure que le chemin des images est correct (si tes images sont dans un dossier spécifique)
+        // html = html.replace('src="images/', 'src="https://ton-domaine.com/images/'); 
+
+        return html;
+
+    } catch (error) {
+        console.error("Erreur lors de la génération du site :", error);
+        throw error;
+    }
+}
 </script>
 </body>
 </html>
