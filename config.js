@@ -124,13 +124,59 @@ let localConfig = {
         vignette2Cta: "Sélectionner"
     },
 };
+// On récupère la frame (déjà fait plus haut dans ton code normalement)
 const frame = document.getElementById('preview-frame');
-let currentActiveSectionId = 'section-accueil';
-const STEPS_ORDER = ['hero', 'services', 'testimonials', 'social-proof', 'about', 'practical', 'faq', 'contact', 'footer'];
-frame.onload = () => {
-    sync();
-};
 
+// PROTECTION LIGNE 130 :
+if (frame) {
+    frame.onload = () => {
+        sync();
+    };
+} else {
+    // Si la frame n'est pas là, on ne plante pas le script
+    console.warn("Ligne 130 : 'preview-frame' introuvable. On continue sans sync.");
+}
+// --- LIENS VERS PAIEMENT ---
+// On l'attache à window pour garantir son accessibilité globale
+window.handleFinalAction = function() {
+    // Vérification de sécurité pour localConfig
+    if (typeof localConfig === 'undefined') {
+        console.error("Erreur : localConfig n'est pas défini.");
+        return;
+    }
+
+    const mode = localConfig.selectedMode;
+    let stripeUrl = "";
+
+    console.log("Mode sélectionné avant redirection :", mode);
+
+    switch (mode) {
+        case 'web':
+            stripeUrl = "https://buy.stripe.com/test_aFacN46iOgsj2pIgl3frW03";
+            break;
+        case 'linkedin':
+            stripeUrl = "https://buy.stripe.com/test_bJedR8fTo1xp9Sa4ClfrW05";
+            break;
+        case 'full':
+            stripeUrl = "https://buy.stripe.com/test_bJe8wOfTob7Z8O67OxfrW04";
+            break;
+        default:
+            alert("Merci de sélectionner un forfait (Web, LinkedIn ou Full) avant de continuer.");
+            return;
+    }
+
+    // Mise à jour visuelle du bouton
+    const finalText = document.getElementById('final-cta-text');
+    if (finalText) {
+        finalText.innerText = "Redirection vers Stripe...";
+    }
+
+    // Petit délai pour laisser l'utilisateur voir le changement de texte
+    setTimeout(() => {
+        console.log("Redirection vers :", stripeUrl);
+        window.location.href = stripeUrl;
+    }, 600);
+};
 // --- TRACKING MAIL & AFFICHAGE CONDITIONNEL ---
 const emailInput = document.getElementById("lead-email");
 const validateBtn = document.getElementById("lead-email-validate");
@@ -290,25 +336,41 @@ function switchPreview(mode) {
     const protector = document.getElementById('linkedin-protector');
     const webBtn = document.getElementById('toggle-web-btn');
     const liBtn = document.getElementById('toggle-li-btn');
+
+    // On vérifie que les éléments vitaux existent
+    if (!webFrame || !liFrame) {
+        console.warn("Une des iframes est manquante dans le HTML.");
+        return; 
+    }
+
     const activeClasses = ['bg-white', 'shadow-sm', 'border-slate-200', 'text-[#8449d9]'];
     const inactiveClasses = ['bg-slate-50/50', 'border-transparent', 'text-slate-500'];
+
     if (mode === 'web') {
         webFrame.classList.remove('hidden');
         liFrame.classList.add('hidden');
         if(protector) protector.classList.add('hidden');
-        webBtn.classList.add(...activeClasses);
-        webBtn.classList.remove(...inactiveClasses);
-        liBtn.classList.add(...inactiveClasses);
-        liBtn.classList.remove(...activeClasses);
+        if(webBtn) {
+            webBtn.classList.add(...activeClasses);
+            webBtn.classList.remove(...inactiveClasses);
+        }
+        if(liBtn) {
+            liBtn.classList.add(...inactiveClasses);
+            liBtn.classList.remove(...activeClasses);
+        }
     } 
     else if (mode === 'linkedin') {
         webFrame.classList.add('hidden');
         liFrame.classList.remove('hidden');
         if(protector) protector.classList.remove('hidden'); 
-        liBtn.classList.add(...activeClasses);
-        liBtn.classList.remove(...inactiveClasses);
-        webBtn.classList.add(...inactiveClasses);
-        webBtn.classList.remove(...activeClasses);
+        if(liBtn) {
+            liBtn.classList.add(...activeClasses);
+            liBtn.classList.remove(...inactiveClasses);
+        }
+        if(webBtn) {
+            webBtn.classList.add(...inactiveClasses);
+            webBtn.classList.remove(...activeClasses);
+        }
     }
     localConfig.selectedPreview = mode;
 }
@@ -2084,47 +2146,7 @@ function checkGlobalValidation() {
         finalTitle.innerText = "Configuration incomplète";
     }
 }
-// --- LIENS VERS PAIEMENT ---
-// On l'attache à window pour garantir son accessibilité globale
-window.handleFinalAction = function() {
-    // Vérification de sécurité pour localConfig
-    if (typeof localConfig === 'undefined') {
-        console.error("Erreur : localConfig n'est pas défini.");
-        return;
-    }
 
-    const mode = localConfig.selectedMode;
-    let stripeUrl = "";
-
-    console.log("Mode sélectionné avant redirection :", mode);
-
-    switch (mode) {
-        case 'web':
-            stripeUrl = "https://buy.stripe.com/test_aFacN46iOgsj2pIgl3frW03";
-            break;
-        case 'linkedin':
-            stripeUrl = "https://buy.stripe.com/test_bJedR8fTo1xp9Sa4ClfrW05";
-            break;
-        case 'full':
-            stripeUrl = "https://buy.stripe.com/test_bJe8wOfTob7Z8O67OxfrW04";
-            break;
-        default:
-            alert("Merci de sélectionner un forfait (Web, LinkedIn ou Full) avant de continuer.");
-            return;
-    }
-
-    // Mise à jour visuelle du bouton
-    const finalText = document.getElementById('final-cta-text');
-    if (finalText) {
-        finalText.innerText = "Redirection vers Stripe...";
-    }
-
-    // Petit délai pour laisser l'utilisateur voir le changement de texte
-    setTimeout(() => {
-        console.log("Redirection vers :", stripeUrl);
-        window.location.href = stripeUrl;
-    }, 600);
-};
 
 // --- LOGIQUE DEDIEE A L'ASSISTANCE IA ---
 const PROMPTS = {
