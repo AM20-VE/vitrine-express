@@ -696,7 +696,7 @@ try {
         Object.assign(CONFIG, parsed);
     }
 } catch(e) { console.error("Erreur import", e); }
-renderTemplate();
+ renderTemplate();
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 function toggleLegal(id) {
     const target = document.getElementById('legal-' + id);
