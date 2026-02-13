@@ -71,9 +71,20 @@ exports.handler = async (event) => {
       }
     }
 
-    // 3. PRÉPARATION DU ZIP (index.html)
+    // 3. PRÉPARATION DU ZIP (index.html + fichier de configuration)
     const zip = new AdmZip();
+    
+    // Ton fichier HTML
     zip.addFile("index.html", Buffer.from(html, "utf8"));
+    
+    // ON AJOUTE UN FICHIER _headers POUR FORCER LE TYPE HTML
+    // Cela dit à Netlify : "Tous les fichiers de ce site doivent être lus comme du HTML"
+    const headersContent = `/*
+  Content-Type: text/html; charset=utf-8
+  X-Content-Type-Options: nosniff
+`;
+    zip.addFile("_headers", Buffer.from(headersContent, "utf8"));
+
     const zipBuffer = zip.toBuffer();
 
     // 4. DÉPLOIEMENT DES FICHIERS
