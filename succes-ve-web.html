@@ -72,8 +72,8 @@
             const config = JSON.parse(savedData);
         // --- CORRECTIF ANTI-VALEUR PAR DÉFAUT ---
             // Si l'utilisateur a oublié de changer "[RAISON SOCIALE]"
-            if (config.legal.companyName.includes("[") || config.legal.companyName.trim() === "") {
-                config.legal.companyName = "Ma Vitrine " + Math.floor(Math.random() * 999);
+            if (config.legal.legalName.includes("[") || config.legal.legalName.trim() === "") {
+                config.legal.legalName = "Ma Vitrine " + Math.floor(Math.random() * 999);
             }
         // 3. Construction du HTML final (on injecte les données dans le template)
             const finalHTML = await buildClientSite(config);

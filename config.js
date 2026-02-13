@@ -103,7 +103,7 @@ let localConfig = {
     },
     legal: {
         editor: "[NOM PRÉNOM]",
-        companyName: "[RAISON SOCIALE]",
+        legalName: "[RAISON SOCIALE]",
         address: "[ADRESSE COMPLÈTE]",
         siren: "[VOTRE SIREN]",
         siret: "[VOTRE SIRET]",
@@ -825,15 +825,15 @@ function updateServiceCard(index, key, value) {
 // --- LOGIQUE D'AFFICHAGE LOGO ---
 function toggleLogoMode(noLogo) {
     const uploadZone = document.getElementById('container-logo-upload');
-    const nameZone = document.getElementById('container-company-name');
     localConfig.header.useTextOnly = noLogo;
     if (noLogo) {
-        uploadZone.classList.add('hidden');
-        nameZone.classList.remove('hidden');
+        uploadZone.style.opacity = "0.5";
+        uploadZone.style.pointerEvents = "none";
     } else {
-        uploadZone.classList.remove('hidden');
-        nameZone.classList.add('hidden');
+        uploadZone.style.opacity = "1";
+        uploadZone.style.pointerEvents = "auto";
     }
+    resetIdentiteValidation()
     sync(); 
 }
 // ---  GÉNÉRATION DU FAVICON DYNAMIQUE ---
@@ -1519,7 +1519,7 @@ function updateLegal(key, val) {
         localConfig.legal = {
             firstName: "",
             lastName: "",
-            companyName: "",
+            legalName: "",
             address: "",
             id1: "",
             id2: "",
@@ -1604,22 +1604,23 @@ function getIdentiteBtn() {
     return document.querySelector('#section-identite .btn-save-step');
 }
 function checkIdentiteValidity() {
-    const btn = getIdentiteBtn();
+    const btn = document.getElementById('btn-validate-identite');
     if (!btn) return;
     const noLogo = localConfig.header?.useTextOnly;
     const hasLogoImg = !!localConfig.header?.logo;
     const companyName = (localConfig.header?.companyName || "").trim();
     let isValid = false;
-    if (noLogo && companyName.length > 0) isValid = true;
-    if (!noLogo && hasLogoImg) isValid = true;
+    if (companyName.length > 0) {
+        if (noLogo || hasLogoImg) {
+            isValid = true;
+        }
+    }
     if (isValid) {
         btn.disabled = false;
-        btn.style.opacity = "1";
-        btn.style.pointerEvents = "auto";
+        btn.classList.remove('opacity-40', 'pointer-events-none');
     } else {
         btn.disabled = true;
-        btn.style.opacity = "0.4";
-        btn.style.pointerEvents = "none";
+        btn.classList.add('opacity-40', 'pointer-events-none');
     }
 }
 function resetIdentiteValidation() {
@@ -2038,7 +2039,7 @@ function checkLegalValidity() {
     const isValid =
         l.firstName && l.firstName.trim().length > 1 &&
         l.lastName && l.lastName.trim().length > 1 &&
-        l.companyName && l.companyName.trim().length > 1 &&
+        l.legalName && l.legalName.trim().length > 1 &&
         l.address && l.address.trim().length > 5 &&
         l.id1 && l.id1.trim().length > 3 &&
         l.contactValue && l.contactValue.trim().length > 5;

@@ -122,7 +122,7 @@
     .legal-btn { background: none; border: none; color: #e9e3e3; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; margin: 5px; }
     .legal-content { background: var(--color-dark); text-align: left; transition: max-height 0.4s ease-out; max-height: 0; overflow: hidden; font-size: 0.85rem; }
     .legal-content.open { max-height: 1200px; padding: 30px; border: 1px solid #333; margin-top: 10px; }
-    .legal-content h4 { color: var(--color-accent); margin: 20px 0 10px; text-transform: uppercase; font-size: 0.9rem; }
+    .legal-content h3 { color: var(--color-accent); margin: 20px 0 10px; text-transform: uppercase; font-size: 0.9rem; }
     .legal-content p { margin-bottom: 10px; color: #ccc; line-height: 1.6; }
     .footer-copy { font-size: 0.75rem; color: #e9e3e3; margin-top: 30px; }
     .footer-credit { font-size: 0.75rem; color: #e9e3e3; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
@@ -255,18 +255,28 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
 }, { threshold: 0.1 });
 function addPrivacyParagraph(parent, title, text) {
-    const h4 = document.createElement('h4');
-    h4.textContent = title;
+    const h3 = document.createElement('h3');
+    h3.textContent = title;
     const p = document.createElement('p');
     p.textContent = text;
-    parent.append(h4, p);
+    parent.append(h3, p);
 }
 function renderTemplate() {
 // --- 0. Meta tags & Favicon Setup ---
-const companyName = CONFIG.header.companyName || CONFIG.legal.companyName || "Entreprise";
-document.title = CONFIG.meta.title || companyName;
-const metaDesc = document.getElementById('meta-desc');
-if (metaDesc) metaDesc.setAttribute('content', CONFIG.meta.description || `Bienvenue sur le site de ${companyName}`);
+// On récupère le nom commercial pour les fallback
+    const companyName = CONFIG.header.companyName || "Entreprise";
+
+    // Injection du TITRE (Priorité au SEO saisi, sinon Nom Commercial)
+    const titleTag = document.getElementById('meta-title'); // On cible l'ID spécifique
+    const finalTitle = CONFIG.meta.title || companyName;
+    if (titleTag) titleTag.textContent = finalTitle; 
+    document.title = finalTitle; // Met aussi à jour l'onglet du navigateur
+
+    // Injection de la DESCRIPTION (Priorité au SEO saisi, sinon phrase générique)
+    const metaDesc = document.getElementById('meta-desc');
+    if (metaDesc) {
+        metaDesc.setAttribute('content', CONFIG.meta.description || `Découvrez les services de ${companyName}.`);
+    }
 const r = document.documentElement.style;
 const accentColor = CONFIG.colors.accent || '#1ECAD3';
 r.setProperty('--color-accent', accentColor);
@@ -316,7 +326,9 @@ if (CONFIG.header.logo && CONFIG.header.logo.trim() !== "" && !CONFIG.header.use
     document.getElementById('about-title').textContent = CONFIG.about.title;
     document.getElementById('about-desc').textContent = CONFIG.about.desc;
     document.getElementById('about-img').src = CONFIG.about.img || P_IMG;
+    document.getElementById('about-img').alt = `Présentation en image de ${companyName}`;
     document.getElementById('hero-img').src = CONFIG.hero.img || P_IMG;
+    document.getElementById('hero-img').alt = `Image de couverture de ${companyName}`;
     document.getElementById('contact-title').textContent = CONFIG.contact.title;
     document.getElementById('contact-desc').textContent = CONFIG.contact.desc;
 // 3. CTA dynamique (Header & Contact)
@@ -473,20 +485,24 @@ if (CONFIG.testimonials && CONFIG.testimonials.show) {
     if (testSection) testSection.style.display = "none"; 
 }
 // 7. Galerie
-    const galGrid = document.getElementById('gallery-grid');
-    galGrid.replaceChildren();
-    CONFIG.gallery.images.forEach(imgData => {
-        const item = document.createElement('div');
-        item.className = 'gallery-item';
-        const img = document.createElement('img');
-        img.src = imgData.src || P_IMG;
-        img.loading = "lazy";
-        const cap = document.createElement('div');
-        cap.className = "gallery-caption";
-        cap.textContent = imgData.cap;
-        item.append(img, cap);
-        galGrid.appendChild(item);
-    });
+const galGrid = document.getElementById('gallery-grid');
+galGrid.replaceChildren();
+CONFIG.gallery.images.forEach((imgData, i) => { // Ajoute "i" ici
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    const img = document.createElement('img');
+    img.src = imgData.src || P_IMG;
+    img.loading = "lazy";
+    
+    // --- LE FIX ALT ICI ---
+    img.alt = imgData.cap || `Réalisation ${i + 1} de ${companyName}`;
+    
+    const cap = document.createElement('div');
+    cap.className = "gallery-caption";
+    cap.textContent = imgData.cap;
+    item.append(img, cap);
+    galGrid.appendChild(item);
+});
 // 8. Infos Pratiques 
 const practicalSection = document.getElementById('practical');
 if (CONFIG.practical && CONFIG.practical.show) {
@@ -513,7 +529,7 @@ if (CONFIG.practical && CONFIG.practical.show) {
             const img = document.createElement('img');
             img.src = CONFIG.practical.hoursImg || P_IMG;
             img.className = "planning-img";
-            img.alt = "Planning";
+            img.alt = `Planning détaillé de ${companyName}`;
             img.loading = "lazy";
             hoursContent.appendChild(img);
         } else {
@@ -583,12 +599,21 @@ if (CONFIG.faq && CONFIG.faq.show && CONFIG.faq.items.length > 0) {
     socLinks.replaceChildren();
     socHead.textContent = CONFIG.socials.title || "Suivez-nous";
 
+    const socialLabels = {
+    linkedin: "Visitez mon profil LinkedIn",
+    facebook: "Visitez notre page Facebook",
+    instagram: "Visitez notre compte Instagram"
+};
+
     let hasSocial = false;
     for (const [key, url] of Object.entries(CONFIG.socials)) {
         if (key !== "title" && url && url.trim() !== "" && url !== "#") {
             hasSocial = true;
             const a = document.createElement('a');
             a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
+        if (socialLabels[key]) {
+            a.setAttribute('aria-label', socialLabels[key]);
+        }
             a.innerHTML = SVGS[key]; 
             socLinks.appendChild(a);
         }
@@ -600,9 +625,9 @@ if (m) {
     m.replaceChildren();
 
     const addLegalSection = (parent, title, lines) => {
-        const h4 = document.createElement('h4');
-        h4.textContent = title;
-        parent.appendChild(h4);
+        const h3 = document.createElement('h3');
+        h3.textContent = title;
+        parent.appendChild(h3);
         lines.forEach(line => {
             // On affiche la ligne si la valeur existe OU si on veut forcer l'affichage
             const displayVal = (line.val && line.val.trim() !== "") ? line.val : "Non renseigné";
@@ -648,7 +673,7 @@ if (m) {
     // Construction du tableau (Toutes les lignes sont présentes par défaut)
     const editionLines = [
         { label: "Éditeur", val: editorFullName },
-        { label: entityLabel, val: leg.companyName },
+        { label: entityLabel, val: leg.legalName },
         { label: "Adresse", val: leg.address },
         { label: "Contact", val: contactDisplay },
         { label: labelID1, val: leg.id1 },
