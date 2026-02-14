@@ -70,14 +70,10 @@
             const savedData = localStorage.getItem('vitrine_express_progression');
             if (!savedData) throw new Error("Aucune configuration trouvée.");
             const config = JSON.parse(savedData);
-        // --- CORRECTIF ANTI-VALEUR PAR DÉFAUT ---
-            // Si l'utilisateur a oublié de changer "[RAISON SOCIALE]"
-            if (config.legal.legalName.includes("[") || config.legal.legalName.trim() === "") {
-                config.legal.legalName = "Ma Vitrine " + Math.floor(Math.random() * 999);
-            }
+        
         // 3. Construction du HTML final (on injecte les données dans le template)
             const finalHTML = await buildClientSite(config);
-            console.log(typeof finalHTML);
+            console.log("HTML généré avec succès");
         // 4. Envoi vers la fonction Netlify (le "cerveau" serveur)
             const response = await fetch('/.netlify/functions/deploy-client-site', {
                 method: 'POST',
@@ -85,7 +81,6 @@
                 body: JSON.stringify({
                     html: finalHTML,
                     config: config,
-                    siteName: `vitrine-${Date.now()}` // Nom technique unique
                 })
             });
             if (!response.ok) throw new Error("Erreur lors de l'envoi vers Netlify");
@@ -113,8 +108,8 @@
         const companyName = config.header?.companyName || "Ma Vitrine";
     // --- 1. INJECTION SEO ---
         // On cible la balise title peu importe ce qu'il y a dedans
-        html = html.replace(/<title>.*?<\/title>/, `<title>${config.hero.title} | ${companyName}</title>`);
-        html = html.replace(/id="meta-desc" content=".*?"/, `id="meta-desc" content="${config.hero.desc}"`);
+        html = html.replace(/<title>.*?<\/title>/, `<title>${config.meta.title} | ${companyName}</title>`);
+        html = html.replace(/id="meta-desc" content=".*?"/, `id="meta-desc" content="${config.meta.description}"`);
     // --- 2. INJECTION DES TEXTES (Anti-Flash vide) ---
         // On utilise des Regex pour ignorer les espaces ou contenus existants
         html = html.replace(/id="hero-title">.*?<\/h1>/, `id="hero-title">${config.hero.title}</h1>`);

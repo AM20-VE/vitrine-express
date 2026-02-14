@@ -23,7 +23,7 @@ exports.handler = async (event) => {
     const accountId = process.env.NETLIFY_ACCOUNT_ID;
 
     // 1. Préparation du nom de domaine
-    const companyName = config.legal?.companyName || "Ma Vitrine";
+    const companyName = config.header?.companyName || "Ma Vitrine";
     let siteSlug = slugify(companyName);
     let finalDomain = `${siteSlug}.vitrine-express.net`;
     
