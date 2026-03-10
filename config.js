@@ -1185,14 +1185,21 @@ async function generateWithAI() {
         const result = await response.json();
 // --- Gestion erreurs serveur ou IA ---
         if (!response.ok || result.error) {
-            console.warn("Détails technique de l'erreur :", result.error || "Erreur réseau");
-            showAlerteIA(
-                "Service momentanément indisponible", 
-                "Désolé, l'assistance est momentanément indisponible.<br>Tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran ou revenir plus tard."
-            );
+            if (result.error === "SOLDE_EPUISE") {
+                showAlerteIA(
+                    "Service temporairement indisponible",
+                    "L'assistance IA est momentanément saturée. Tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran ou réessayer plus tard."
+                );
+            } else {
+                console.warn("Détails technique de l'erreur :", result.error || "Erreur réseau");
+                showAlerteIA(
+                    "Service momentanément indisponible", 
+                    "Désolé, l'assistance est momentanément indisponible.<br>Tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran ou revenir plus tard."
+                );
+            }
             btnText.innerHTML = originalContent;
             btnText.parentElement.disabled = false;
-            return; 
+            return;
         }
 // --- INCRÉMENTATION DU COMPTEUR ---
         usage.count++;
@@ -1339,7 +1346,13 @@ function sendProgressToNetlify(isFinal = false) {
     if (sessionStorage.getItem('lead_sent_final')) return;
     if (!isFinal && sessionStorage.getItem('lead_sent_progress')) return;
     const lastStep = localConfig.lastStep || "section-ia";
-    const SEQUENCE = ['section-vitrine','section-model','section-couleurs','section-identite','section-ia','section-accueil','section-services','section-avis','section-gallery','section-about','section-practical','section-faq','section-contact','section-social','section-seo','section-legale','section-hebergement','section-linkedin-kit','section-finale'];
+    const SEQUENCE = [
+        'section-vitrine','section-model','section-couleurs','section-identite',
+        'section-ia','section-accueil','section-services','section-avis',
+        'section-gallery','section-about','section-practical','section-faq',
+        'section-contact','section-social','section-seo','section-legale',
+        'section-hebergement','section-linkedin-kit','section-finale'
+    ];
     const stepIndex = SEQUENCE.indexOf(lastStep);
     const progress = Math.round(((stepIndex + 1) / SEQUENCE.length) * 100);
     const formData = new FormData();
@@ -1350,10 +1363,14 @@ function sendProgressToNetlify(isFinal = false) {
     formData.append("progress", progress + "%");
     if (isFinal) {
         sessionStorage.setItem('lead_sent_final', 'true');
-        fetch("/", { method: "POST", body: formData });
+        fetch("/", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams(formData).toString()
+        });
     } else {
         sessionStorage.setItem('lead_sent_progress', 'true');
-        const params = new URLSearchParams(formData);
+        const params = new URLSearchParams(formData).toString();
         navigator.sendBeacon("/", params);
     }
 }
@@ -3563,40 +3580,45 @@ function closeHelp() {
     const modal = document.getElementById('help-modal');
     if (modal) modal.classList.add('hidden');
 }
-// Interception de l'envoi du formulaire pour Netlify
-document.getElementById('help-form')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const form = e.target;
-    const btn = form.querySelector('button[type="submit"]');
-    const originalBtnText = btn.innerText;
-    btn.disabled = true;
-    btn.innerText = "Envoi en cours...";
-    btn.style.opacity = "0.7";
-    const formData = new FormData(form);
-// Envoi AJAX vers Netlify
-    fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(formData).toString(),
-    })
-    .then((response) => {
-        if (response.ok) {
-// Succès : On masque le formulaire et on montre le message de réussite
-            form.classList.add('hidden');
-            document.getElementById('help-success').classList.remove('hidden');
-        } else {
-            throw new Error("Réponse serveur incorrecte");
-        }
-    })
-    .catch((error) => {
-        alert("Oups ! Une erreur est survenue lors de l'envoi. Merci de réessayer.");
-        console.error("Erreur Netlify:", error);
-    })
-    .finally(() => {
-        btn.disabled = false;
-        btn.innerText = originalBtnText;
-        btn.style.opacity = "1";
-    });
+// --- INTERCEPTION SUBMIT POUR NETLIFY ---
+function encode(data) {
+  return Object.keys(data)
+    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
+    .join("&");
+}
+document.getElementById("help-form")?.addEventListener("submit", function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = form.querySelector('button[type="submit"]');
+  const originalBtnText = btn.innerText;
+  btn.disabled = true;
+  btn.innerText = "Envoi en cours...";
+  btn.style.opacity = "0.7";
+  const formData = new FormData(form);
+  const data = {};
+  formData.forEach((value, key) => (data[key] = value));
+  fetch("/", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: encode(data),
+  })
+  .then(res => {
+    if (res.ok) {
+      form.classList.add("hidden");
+      document.getElementById("help-success").classList.remove("hidden");
+    } else {
+      throw new Error("Erreur serveur");
+    }
+  })
+  .catch(err => {
+    alert("Oups ! Une erreur est survenue lors de l'envoi. Merci de réessayer.");
+    console.error("Erreur Netlify:", err);
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.innerText = originalBtnText;
+    btn.style.opacity = "1";
+  });
 });
 // --- NEUTRALISATION EN MODE MODIF ---
 document.addEventListener('DOMContentLoaded', () => {

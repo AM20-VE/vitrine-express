@@ -71,32 +71,45 @@ Si mode='web', 'linkedin' est null. Si mode='linkedin', 'hero' et 'seo' sont nul
 // --- 4. Appel API ---
         const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
         const msg = await anthropic.messages.create({
-            model: "claude-3-5-sonnet-20241022",
-            max_tokens: 3500,
+            model: "claude-3-5-sonnet-latest",
+            max_tokens: 2500,
             temperature: 0.7,
             system: systemPrompt,
             messages: [{
                 role: "user",
                 content: `Génère les textes pour un ${expertise}. Problème : ${probleme}. Services : ${servicesText}. Bénéfice : ${benefice}. Mode : ${mode}.`
             }],
+            timeout: 20000
         });
-// --- 5. Récupération et Envoi ---
-        const aiResponse = msg.content[0].text;
+// --- 5. Récupération et nettoyage de la réponse ---
+    let aiResponse = msg?.content?.[0]?.text || "";
+        aiResponse = aiResponse.replace(/```json|```/g, '').trim();
+        const jsonStart = aiResponse.indexOf("{");
+        const jsonEnd = aiResponse.lastIndexOf("}");
+        if (jsonStart === -1 || jsonEnd === -1) {
+            throw new Error("Invalid JSON returned by Claude");
+        }
+        const parsed = JSON.parse(aiResponse.slice(jsonStart, jsonEnd + 1));
         return {
             statusCode: 200,
             headers: { "Content-Type": "application/json" },
-            body: aiResponse
+            body: JSON.stringify(parsed)
         };
-    } catch (error) {
-    console.error("Erreur Anthropic:", error);
-    const isQuotaError = error.message.includes("over_quota") || 
-                         error.message.includes("credit") || 
-                         error.status === 402;
-    return { 
-        statusCode: 500, 
-        body: JSON.stringify({ 
-            error: isQuotaError ? "SOLDE_EPUISE" : "ERREUR_TECHNIQUE",
-            details: error.message 
-        }) 
-    };
-}}
+        } catch (error) {
+            console.error("Erreur Anthropic:", error);
+            const message = error?.message || "";
+            const isQuotaError =
+            message.includes("over_quota") ||
+            message.includes("credit") ||
+            message.includes("quota") ||
+            message.includes("insufficient") ||
+            error?.status === 402;
+        return {
+            statusCode: 500,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                error: isQuotaError ? "SOLDE_EPUISE" : "ERREUR_TECHNIQUE",
+                details: message
+            })
+        };
+    }}
