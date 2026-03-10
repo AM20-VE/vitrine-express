@@ -8,149 +8,147 @@
     <meta name="description" id="meta-desc" content="">
     <link id="favicon" rel="icon" type="image/webp" href="">
     <link id="favicon-apple" rel="apple-touch-icon" href="">
+<!-- og -->
+<script id="schema-site" type="application/ld+json"></script>
 <style>
     :root {
-        --color-dark: #2c1c3b;
+        --color-dark: #0E1B2A;
         --color-background-light: #F2F4F7; 
-        --color-accent: #eb6b15; 
+        --color-accent: #4F8CFF; 
         --color-light-text: #f0e8e8;
         --color-dark-text: #050505;
-       --font-main: 'Jost', 'Quicksand', 'Segoe UI Rounded', 'SF Pro Rounded', 'Ubuntu', system-ui, sans-serif;
-        --radius: 8px; 
+        --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+        --radius: 24px; 
         --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; font-size: 16px;}
-    body { font-family: var(--font-main); background-color: var(--color-background-light); color: var(--color-dark-text); line-height: 1.6; overflow-x: hidden; }
-/* Layout général */
-    .section { width: 100%; padding: 80px 5%; background: var(--color-background-light); border-bottom: 1px solid rgba(0,0,0,0.05); }
-    .bg-accent { background-color: var(--color-accent); }
-    .bg-dark { background-color: var(--color-dark); color: var(--color-light-text); }
+    body { font-family: var(--font-main); background-color: var(--color-dark); color: var(--color-dark-text); line-height: 1.6; overflow-x: hidden; }
+/* --- Layout --- */
+    .section { padding: 60px 5%; max-width: 1600px; margin: 20px auto; background: white; border-radius: var(--radius); border: var(--border);   box-shadow: var(--shadow); }
+    #hero, #services, #testimonials, #social-proof, #about, #practical, #faq, #contact { width: 94%; }
+    .bg-dark { background-color: var(--color-dark) !important; color: white; border: none; }
+    .bg-accent { background-color: var(--color-accent) !important; border: none; }
 /* Typographies */
-    h1, h2, h3 { font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; }
-    h1 { font-size: clamp(2.5rem, 8vw, 5rem); margin-bottom: 2rem; color: var(--color-dark); margin-bottom: 5rem;}
-    h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 3rem; text-align: center; color: var(--color-dark); margin-bottom: 100px; }
-    h3 { font-size: 1.8rem; margin-bottom: 1rem; }
-/* Boutons */
-    .cta-button { display: inline-block; padding: 16px 32px; background: var(--color-background-light); color: var(--color-dark); border-radius: var(--radius); font-weight: 700; text-decoration: none; cursor: pointer; }
-    .cta-button:hover { transform: translate(-2px, -2px); box-shadow: 12px 12px 0px var(--color-dark); }
-/* Header */
-    header { position: sticky; top: 0; z-index: 1000; padding: 15px 5%; background: var(--color-background-light); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-dark); }
-    .logo-container { height: 50px; width: 150px; display: flex; align-items: center; justify-content: flex-start; }
+    h1, h2, h3 { font-weight: 800; letter-spacing: -0.04em; }
+    h1 { font-size: clamp(2.5rem, 4vw, 3rem); line-height: 1; margin-bottom: 24px; color: var(--color-dark);}
+    h2 { font-size: clamp(2rem, 4vw, 3rem); text-align: center; margin-bottom: 40px; color: var(--color-dark) }
+/* --- Boutons --- */
+    .cta-button { background: var(--color-accent); color: var(--color-dark-text); padding: 14px 28px; border-radius: 14px; font-weight: 700; 
+    text-decoration: none; display: inline-flex; align-items: center; justify-content: center; text-align: center; transition: 0.3s; 
+    border: none; width: auto; }
+    .cta-button:hover { transform: translateY(-2px); filter: brightness(1.1); }
+/* --- Header --- */
+    header { position: sticky; top: 15px; z-index: 1000; padding: 10px 20px; width: 94%; background: var(--color-background-light);    border-radius: 20px; display: flex; justify-content: space-between; align-items: center; margin: 20px auto; max-width: 1600px; }
+    #header-cta { padding: 10px 18px; font-size: 0.9rem; white-space: nowrap; }
+    .logo-text { color: var(--color-dark); font-weight: 900; text-transform: uppercase; }
     .logo-img { height: 60px; max-width: 60px; object-fit: contain; }
-    .logo-text { color: var(--color-dark); padding: 5px; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; line-height: 1; display: flex; align-items: center; justify-content: center; text-align: center; width: 100%; height: 100%; overflow: hidden; word-break: break-word; }
-    #header-cta { padding: 10px 28px; background: var(--color-dark); color: var(--color-background-light); font-weight: 700; text-decoration: none; cursor: pointer; }
-/* Hero */
-    #hero { background: var(--color-background-light); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 60px 5%; z-index: 1; text-align: center; }
-    #hero::before { content: ""; position: absolute; top: -150px; left: -100px; width: 600px; height: 500px; border: 1px solid var(--color-accent); box-shadow: inset 40px 40px 0 rgba(235, 107, 21, 0.1), 20px 20px 0 rgba(44, 28, 59, 0.05); border-radius: 60% 40% 70% 30% / 50% 30% 70% 50%;    opacity: 0.4; z-index: -1; transform: rotate(-10deg); }
-    #hero::after { content: ""; position: absolute; bottom: -200px; right: -100px; width: 700px; height: 600px; border: 1px solid var(--color-dark); box-shadow: inset -30px -30px 0 rgba(44, 28, 59, 0.03), -50px -50px 0 rgba(235, 107, 21, 0.05); border-radius: 30% 70% 40% 60% / 60% 40% 60% 40%; opacity: 0.2; z-index: -1; transform: rotate(15deg); }
-    .hero-container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; justify-content: center;margin: 0 auto; position: relative; z-index: 2; }
-    .hero-text-side { width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; text-align: center; margin: 0 auto; }
-    #hero-desc { font-size: 1.25rem; color: var(--color-dark); margin-bottom: 5rem; font-weight: 400; max-width: 1200px; line-height: 1.6; text-align: center; }
-/* Chiffres clés */
-    #figures-container { width: 100%; display: flex; justify-content: center; margin: 50px; }
-    .key-figures { display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; }
-    .figure { padding: 0 10px 15px 10px; border-bottom: 1px solid rgba(44, 28, 59, 0.15); min-width: 130px; }
-    .figure-num { font-size: 2.8rem; color: var(--color-accent); font-weight: 300; }
-    .figure small { font-weight: 600; text-transform: uppercase; font-size: 0.7rem; color: var(--color-dark); letter-spacing: 2px; }
-/* CTA Bouton */
-    .cta-button { background: var(--color-dark); color: white; padding: 20px 50px; border-radius: 100px; font-weight: 500; transition: all 0.4s ease; }
-    .cta-button:hover { background: var(--color-accent); transform: translateY(-3px); box-shadow: 0 15px 30px rgba(102, 100, 100, 0.158); }
-/* Services */
-    .services-grid { display: flex; flex-direction: column; gap: 80px; max-width: 1200px; margin: 60px auto; width: 100%; padding: 0 5%; }
-    .service-card { background: none; border: none; border-bottom: 1px solid rgba(44, 28, 59, 0.15); padding: 0 0 40px 0; width: 100%; display: flex;  flex-direction: column; align-items: center; text-align: center; transition: all 0.5s ease; }
-    .service-card h3 { font-size: 1.8rem; font-weight: 300; color: var(--color-dark); margin-bottom: 1rem; letter-spacing: -0.02em; }
-    .service-card p { font-size: 1.05rem; color: var(--color-dark-text); line-height: 1.6; margin-bottom: 15px; }
-    .price-tag { display: inline-block; color: var(--color-accent); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; }
-/* --- Testimonials --- */
-    #testimonials-grid { display: grid; grid-template-columns: 1fr; gap: 25px; max-width: 1200px; margin: 0 auto; align-items: stretch; }
-    .testimonial-card { background: white; padding: 40px 30px; border: 1px solid rgba(44, 28, 59, 0.15); border-radius: var(--radius); display: flex; flex-direction: column; text-align: center; transition: all 0.3s ease; }
-    .testimonial-card:hover { border-color: var(--color-accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-    .testimonial-stars { color: var(--color-accent); font-size: 0.8rem; letter-spacing: 4px; margin-bottom: 20px; }
-    .testimonial-text { font-size: 1.05rem; font-weight: 300; color: var(--color-dark); line-height: 1.6; margin-bottom: 30px;flex: 1; }
-    .testimonial-author { display: flex; flex-direction: column; gap: 4px; padding-top: 20px; border-top: 1px solid rgba(44, 28, 59, 0.05); }
-    .author-name { font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; color: var(--color-dark); }
-    .author-role { font-size: 0.7rem; color: var(--color-accent); text-transform: uppercase; font-weight: 500; }
-    .testimonials-footer-cta { margin-top: 80px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .testimonials-cta-phrase { font-size: 1.6rem; font-weight: 300; margin-bottom: 30px; color: var(--color-dark); max-width: 600px;        margin-left: auto; margin-right: auto; }
+/* --- Hero  --- */
+    #hero { display: flex; justify-content: center; margin: 20px auto; padding: 0; }
+    .hero-container { display: grid !important; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 1600px; }
+    .hero-text-side { background: white; padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: left;        display: flex; flex-direction: column; }
+    #hero-cta-btn { align-self: flex-start; width: auto; margin-top: 20px; }
+    .hero-image-side { height: 350px; border-radius: var(--radius); overflow: hidden; border: var(--border); }
+    .hero-img { width: 100%; height: 100%; object-fit: cover; }
+/* Chiffres Clés */
+    .key-figures { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 30px; width: 100% !important; }
+    .figure { background: var(--color-background-light); padding: 15px; border-radius: 16px; border: 1px solid var(--color-accent);       text-align: center; }
+    .figure:nth-child(3) { grid-column: span 2; }
+    .figure-num { font-size: 1.8rem; font-weight: 900; color: var(--color-dark); display: block; }
+    .figure small { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #666; }
+/* --- Services --- */
+    #services { background: var(--color-accent); }
+    #services h3 { color: var(--color-accent); }
+    .services-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; }
+    .service-card { padding: 40px; width: 100%; max-width: none; border-radius: var(--radius); background: var(--color-background-light);         box-shadow: var(--shadow); border: 2px solid transparent; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex;        flex-direction: column; justify-content: space-between; }
+    .service-card:hover { transform: translateY(-5px); border: 2px solid var(--color-dark); box-shadow: none; }
+    .price-tag { display: inline-block; align-self: flex-start; margin-top: 20px; padding: 8px 16px; background: var(--color-accent);        color: var(--color-dark); border-radius: 12px; font-weight: 700; border: none; }
+/* Testimonials */
+    #testimonials-title {color: var(--color-dark); }
+    .testimonials-grid { display: grid; grid-template-columns: 1fr; gap: 30px; max-width: 1200px; margin: 0 auto; }
+    .testimonial-card { background: white; padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--color-accent); display: flex; flex-direction: column; justify-content: space-between; }
+    .testimonial-card:hover { transform: translateY(-8px) scale(1.01); border-color: var(--color-light-text); box-shadow: 0 15px 35px rgba(14, 27, 42, 0.1); }
+    .testimonial-stars { color: #FFD700; margin-bottom: 15px; font-size: 1.2rem; }
+    .testimonial-text { font-style: italic; color: var(--color-dark-text); margin-bottom: 20px; font-size: 0.95rem; }
+    .testimonial-author { border-top: 1px solid #eee; padding-top: 15px; }
+    .author-name { display: block; font-weight: 800; color: var(--color-dark); font-size: 0.9rem; text-transform: uppercase; }
+    .author-role { display: block; font-size: 0.8rem; color: var(--color-accent); font-weight: 600; }
+    .testimonials-footer-cta { margin-top: 50px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px;}
+    .testimonials-cta-phrase { font-size: 1.1rem; font-weight: 700; color: var(--color-dark); max-width: 600px; line-height: 1.4; }
 /* Social Proof */
-    #social-proof {padding: 80px 5%; background: var(--color-dark); }
-    #gallery-title { color: var(--color-background-light); }
-    .gallery-grid { display: flex; flex-direction: column; gap: 60px; width: 100%; }
-    .gallery-item { width: 100%; display: flex; flex-direction: column; align-items: center; }
-    .gallery-item img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 2px; display: block; }
-    .gallery-caption { width: 100%; padding: 15px 0; color: var(--color-light-text); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); text-align: center; }
+    #gallery-title {color: var(--color-dark); }
+    #social-proof { background: white; }
+    .gallery-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+    .gallery-item { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; aspect-ratio: 4/5;         border: var(--border); background: var(--color-dark); }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover;  }
+    .gallery-caption { position: absolute;  bottom: 12px; left: 12px; right: 12px; background: rgba(14, 27, 42, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--color-light-text); padding: 15px; font-size: 0.85rem; font-weight: 500;       line-height: 1.4; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 1;        transform: translateY(0); }
 /* About */
-    #about { display: flex; flex-direction: column; align-items: center; padding: 60px 5%; }
-    .about-flex { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1100px; }
-    .about-img { width: 250px; height: 250px; border-radius: 50%; object-fit: cover;  border: none; box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
-    .about-text { width: 100%; text-align: center; }
-    #about-desc { font-size: 1.1rem; line-height: 1.8; color: var(--color-dark); }
-/* Infos pratiques */
-    .practical-container { display: flex; flex-direction: column; gap: 60px; max-width: 1100px; margin: 0 auto; }
-    .practical-info, .practical-hours { width: 100%; text-align: center; }
-    .practical-container h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: var(--color-dark); margin-bottom: 30px;  font-weight: 700; }
-    #practical-address { font-size: 1.8rem; font-weight: 300; color: var(--color-dark); line-height: 1.2; margin-bottom: 40px; }
-    .hours-list { list-style: none; max-width: 500px; margin: 0 auto; }
-    .hours-list li { display: flex; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid rgba(44, 28, 59, 0.1);       font-weight: 400; color: var(--color-dark-text); }
-    .hours-list li span:first-child { text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: var(--color-dark);      font-weight: 600; }
+    #about-title {color: var(--color-dark);}
+    .about-img { width: 100%; max-width: 500px; height: 400px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 40px; object-fit: cover; }
+/* --- Infos pratiques --- */
+    #practical { background: white; position: relative; }
+    #practical::before { content: ""; position: absolute; width: 200px; height: 200px; background: var(--color-accent); filter: blur(100px); opacity: 0.1; bottom: 0; right: 0; z-index: 0;}
+    .practical-container { display: flex; flex-direction: column; gap: 30px; max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+    .practical-info, .practical-hours { padding: 40px; background: var(--color-background-light); border: 1px solid var(--color-accent); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .practical-container h3 { font-size: 0.9rem; color: var(--color-accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px;  font-weight: 800; }
+    #practical-address { font-size: 1.6rem; font-weight: 700; color: var(--color-dark); line-height: 1.3; margin-bottom: 30px; }
+    .hours-list { list-style: none; }
+    .hours-list li { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid rgba(0, 0, 0, 0.05); font-weight: 500; color: var(--color-dark-text); }
+    .hours-list li span:first-child { color: var(--color-dark); font-weight: 700; }
     .hours-list li:last-child { border-bottom: none; }
-    .planning-img { width: 100%; max-width: 600px; height: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
-/* --- Faq --- */
-    #faq-container { max-width: 800px; margin: 0 auto; }
-    .faq-item { border-bottom: 1px solid rgba(44, 28, 59, 0.15); transition: all 0.4s ease; }
-    .faq-question { width: 100%; padding: 35px 0; background: none; border: none; text-align: left; font-family: var(--font-main);       font-size: 1.2rem; font-weight: 400; color: var(--color-dark); cursor: pointer; display: flex; justify-content: space-between;        align-items: center; transition: color 0.3s ease; }
-    .faq-question::after { content: '→'; font-weight: 300; font-size: 1.2rem; color: var(--color-accent); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-    .faq-item.open .faq-question { color: var(--color-accent); }
-    .faq-item.open .faq-question::after { transform: rotate(90deg); }
-    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-    .faq-item.open .faq-answer { max-height: 400px; }
-    .faq-answer p { padding-bottom: 35px; color: var(--color-dark-text); font-size: 1.05rem; line-height: 1.7; font-weight: 300; }
+    .planning-img { width: 100%; height: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+/* FAQ */
+    #faq-title {color: var(--color-dark); max-width: 800px; margin: 60px auto; }
+    .faq-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+    .faq-item { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--color-accent); transition: all 0.3s ease; }
+    .faq-question { width: 100%; padding: 20px 25px; background: none; border: none; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-align: left; font-weight: 700; color: var(--color-dark); font-family: var(--font-main); font-size: 1.1rem; }
+    .faq-question::after { content: '+'; font-size: 1.5rem; color: var(--color-accent); transition: transform 0.3s ease; }
+    .faq-item.open .faq-question::after { transform: rotate(45deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; padding: 0 25px; color: var(--color-dark-text); font-size: 0.95rem; line-height: 1.6; }
+    .faq-item.open .faq-answer { max-height: 500px; padding-bottom: 25px; }
 /* Contact Section */
-    #contact { text-align: center;}
+    #contact-title {color: var(--color-dark);}
+    #contact { text-align: center; }
     #contact-cta-btn { margin: 40px auto 0 auto; display: inline-block; }
 /* Footer & Socials */
     footer { padding: 50px 5%; background: var(--color-dark); color: white; text-align: center; }
-    .social-title { font-weight: 500; text-transform: uppercase; margin-bottom: 20px; font-size: 1.2rem; color: var(--color-accent); }
+    .social-title { font-weight: 900; text-transform: uppercase; margin-bottom: 20px; font-size: 1.2rem; color: var(--color-accent); }
     .social-links { margin-bottom: 35px; display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
-    .social-links a { display: block; width: 30px; height: 30px; fill: var(--color-accent); transition: transform 0.2s ease; }
+    .social-links a { display: block; width: 40px; height: 40px; fill: var(--color-accent); transition: transform 0.2s ease; }
     .social-links a:hover { transform: scale(1.15); }
 /* Mentions Légales */
     .legal-btn { background: none; border: none; color: #e9e3e3; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; margin: 5px; }
     .legal-content { background: var(--color-dark); text-align: left; transition: max-height 0.4s ease-out; max-height: 0; overflow: hidden; font-size: 0.85rem; }
     .legal-content.open { max-height: 1200px; padding: 30px; border: 1px solid #333; margin-top: 10px; }
-    .legal-content h4 { color: var(--color-accent); margin: 20px 0 10px; text-transform: uppercase; font-size: 0.9rem; }
+    .legal-content h3 { color: var(--color-accent); margin: 20px 0 10px; text-transform: uppercase; font-size: 0.9rem; }
     .legal-content p { margin-bottom: 10px; color: #ccc; line-height: 1.6; }
     .footer-copy { font-size: 0.75rem; color: #e9e3e3; margin-top: 30px; }
     .footer-credit { font-size: 0.75rem; color: #e9e3e3; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
     .footer-credit a { color: #e9e3e3; text-decoration: none; border-bottom: 1px solid var(--color-accent); }
 /* Responsive */
     @media (min-width: 768px) {
-        .section { padding: 120px 10%; }
-        .services-grid { gap: 150px; margin: 120px auto; }
-        .service-card { max-width: 550px; }
-        .service-card:nth-child(odd) { align-self: flex-start; align-items: flex-start; text-align: left; }
-        .service-card:nth-child(even) { align-self: flex-end; align-items: flex-end; text-align: right; }
-        .service-card h3 { font-size: 2.5rem; }
-        .service-card:hover { border-bottom-color: var(--color-accent); transform: translateY(-5px); }
-        .gallery-grid { gap: 100px; }
-        .gallery-item { width: 45%; }
-        .gallery-item:nth-child(3n+1) { align-self: flex-start; }
-        .gallery-item:nth-child(3n+1) .gallery-caption { text-align: left; }
-        .gallery-item:nth-child(3n+2) { align-self: flex-end; }
-        .gallery-item:nth-child(3n+2) .gallery-caption { text-align: right; }
-        .gallery-item:nth-child(3n) { align-self: center; width: 55%; }
-        .gallery-item:nth-child(3n) .gallery-caption { text-align: center; }
-        .about-flex { flex-direction: row; justify-content: center; align-items: center; gap: 150px; }
-        .about-img { width: 450px; height: 450px; margin-bottom: 0; flex-shrink: 0; }
-        .about-text { text-align: left; flex: 1; }
-        #about-desc { text-align: left; }
-        #testimonials-grid { grid-template-columns: repeat(3, 1fr); gap: 30px;}
-        .practical-container { flex-direction: row; align-items: flex-start; gap: 100px; }
-        .practical-info, .practical-hours { flex: 1; text-align: left; }
-        .practical-info { border-right: 1px solid rgba(44, 28, 59, 0.1); padding-right: 100px; }
-        .hours-list { margin: 0; }
-        #practical-address { font-size: 2.2rem; }}
+    .hero-container { grid-template-columns: 1.6fr 1fr; grid-template-rows: 600px; }
+    .hero-text-side { height: 100%; justify-content: center;  }
+    .hero-image-side { height: 100%; }
+    .services-grid { grid-template-columns: 1.2fr 1fr; grid-template-rows: repeat(2, 1fr); gap: 25px; }
+    .service-card:nth-child(1) { grid-column: 1; grid-row: 1 / span 2; justify-content: center; text-align: left;  }
+    .service-card:nth-child(1) .price-tag { align-self: center; }
+    .service-card:nth-child(2) { grid-column: 2; grid-row: 1; }
+    .service-card:nth-child(3) { grid-column: 2; grid-row: 2; }
+    .price-tag { display: inline-block; align-self: flex-start; margin-top: 20px;  padding: 8px 16px; background: var(--color-accent);         color: var(--color-dark); border-radius: 12px; font-weight: 700;  }
+    .testimonials-grid { grid-template-columns: repeat(3, 1fr); }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .gallery-item { aspect-ratio: 16/9; }
+    .gallery-item:nth-child(3n) { grid-column: span 2; aspect-ratio: 21/7; }
+    .gallery-caption { bottom: 20px; left: 20px; right: 20px; padding: 20px; opacity: 0; transform: translateY(20px); transition: all 0.4s  cubic-bezier(0.16, 1, 0.3, 1); }
+    .gallery-item:hover .gallery-caption { opacity: 1; transform: translateY(0); }
+    .gallery-item img { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    .gallery-item:hover img { transform: scale(1.08); }
+    #about-title {text-align: left;}
+    .about-flex { display: flex; align-items: center; gap: 80px; }
+    .about-img { margin-bottom: 0; }
+    .practical-container { flex-direction: row; align-items: stretch; gap: 40px; }
+    .practical-info, .practical-hours { flex: 1; } }
 /* Animations */
     .reveal { opacity: 0; transform: translateY(20px); transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
     .reveal.active { opacity: 1; transform: translateY(0); }
@@ -170,11 +168,14 @@
                 <a href="#services" id="hero-cta-btn" class="cta-button"></a>
                 <div id="figures-container" class="key-figures"></div>
             </div>
+            <div class="hero-image-side reveal">
+                <img id="hero-img" src="" alt="Hero Image" class="hero-img" loading="lazy">
+            </div>
         </div>
     </section>
     <section id="services" class="section reveal">
         <h2 id="services-title"></h2>
-        <div id="services-grid" class="services-grid"></div>
+        <div id="services-grid" class="services-grid reveal"></div>
     </section>
     <section id="testimonials" class="section reveal">
         <h2 id="testimonials-title"></h2>
@@ -183,20 +184,20 @@
             <p id="testimonials-cta-text"></p>
         </div>
     </section>
-    <section id="social-proof" class="section bg-dark">
+    <section id="social-proof" class="section">
         <h2 id="gallery-title"></h2>
         <div id="gallery-grid" class="gallery-grid"></div>
     </section>
-    <section id="about" class="section reveal">
-        <h2 id="about-title"></h2> 
-        <div class="about-flex">            
+    <section id="about" class="section bg-accent reveal">
+        <div class="about-flex">
             <img id="about-img" src="" alt="About" class="about-img" loading="lazy">
-            <div class="about-text">           
+            <div class="about-text">
+                <h2 id="about-title"></h2>
                 <p id="about-desc"></p>
             </div>
         </div>
     </section>
-    <section id="practical" class="section bg-accent">
+    <section id="practical" class="section">
     <h2 id="practical-title"></h2>
     <div class="practical-container">
         <div class="practical-info">
@@ -232,7 +233,7 @@
     <div id="legal-m" class="legal-content"></div>
     <div id="legal-c" class="legal-content"></div>
     <p class="footer-copy">&copy; <span id="current-year"></span> - TOUS DROITS RÉSERVÉS.</p> 
-    <p class="footer-credit">Vitrine Express réalisée avec <a href="https://www.am20.fr" target="_blank">AM 2.0</a></p>
+    <p class="footer-credit">Réalisé avec <a href="https://www.vitrine-express.net" target="_blank">Vitrine Express</a></p>
 </footer>
 <script src="config.js"></script>
 <script id="export-data" type="application/json">
@@ -240,7 +241,6 @@
 </script>
 <script>
 const P_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='20' fill='%23999'%3EIMAGE%3C/text%3E%3C/svg%3E";
-
 const SVGS = {
     linkedin: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M196.3 512L103.4 512L103.4 212.9L196.3 212.9L196.3 512zM149.8 172.1C120.1 172.1 96 147.5 96 117.8C96 103.5 101.7 89.9 111.8 79.8C121.9 69.7 135.6 64 149.8 64C164 64 177.7 69.7 187.8 79.8C197.9 89.9 203.6 103.6 203.6 117.8C203.6 147.5 179.5 172.1 149.8 172.1zM543.9 512L451.2 512L451.2 366.4C451.2 331.7 450.5 287.2 402.9 287.2C354.6 287.2 347.2 324.9 347.2 363.9L347.2 512L254.4 512L254.4 212.9L343.5 212.9L343.5 253.7L344.8 253.7C357.2 230.2 387.5 205.4 432.7 205.4C526.7 205.4 544 267.3 544 347.7L544 512L543.9 512z"/></svg>`,
     facebook: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M240 363.3L240 576L356 576L356 363.3L442.5 363.3L460.5 265.5L356 265.5L356 230.9C356 179.2 376.3 159.4 428.7 159.4C445 159.4 458.1 159.8 465.7 160.6L465.7 71.9C451.4 68 416.4 64 396.2 64C289.3 64 240 114.5 240 223.4L240 265.5L174 265.5L174 363.3L240 363.3z"/></svg>`,
@@ -251,18 +251,23 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
 }, { threshold: 0.1 });
 function addPrivacyParagraph(parent, title, text) {
-    const h4 = document.createElement('h4');
-    h4.textContent = title;
+    const h3 = document.createElement('h3');
+    h3.textContent = title;
     const p = document.createElement('p');
     p.textContent = text;
-    parent.append(h4, p);
+    parent.append(h3, p);
 }
 function renderTemplate() {
 // --- 0. Meta tags & Favicon Setup ---
-const companyName = CONFIG.header.companyName || CONFIG.legal.companyName || "Entreprise";
-document.title = CONFIG.meta.title || companyName;
+const companyName = CONFIG.header.companyName || "Entreprise";
+const titleTag = document.getElementById('meta-title'); 
+const finalTitle = CONFIG.meta.title || companyName;
+if (titleTag) titleTag.textContent = finalTitle; 
+document.title = finalTitle; 
 const metaDesc = document.getElementById('meta-desc');
-if (metaDesc) metaDesc.setAttribute('content', CONFIG.meta.description || `Bienvenue sur le site de ${companyName}`);
+if (metaDesc) {
+    metaDesc.setAttribute('content', CONFIG.meta.description || `Découvrez les services de ${companyName}.`);
+}
 const r = document.documentElement.style;
 const accentColor = CONFIG.colors.accent || '#1ECAD3';
 r.setProperty('--color-accent', accentColor);
@@ -274,7 +279,7 @@ const fav = document.getElementById('favicon');
 const favApple = document.getElementById('favicon-apple');
 logoSlot.replaceChildren();
 if (CONFIG.header.logo && CONFIG.header.logo.trim() !== "" && !CONFIG.header.useTextOnly) {
-    // CAS A : LOGO ACTIF
+    // LOGO ACTIF
     const img = document.createElement('img');
     img.src = CONFIG.header.logo; 
     img.className = "logo-img";
@@ -284,7 +289,7 @@ if (CONFIG.header.logo && CONFIG.header.logo.trim() !== "" && !CONFIG.header.use
     if (fav) fav.href = CONFIG.header.logo;
     if (favApple) favApple.href = CONFIG.header.logo;
 } else {
-    // CAS B : TEXTE UNIQUEMENT (ou pas de logo fourni)
+    // TEXTE UNIQUEMENT 
     const div = document.createElement('div');
     div.className = "logo-text"; 
     div.textContent = companyName;
@@ -312,6 +317,9 @@ if (CONFIG.header.logo && CONFIG.header.logo.trim() !== "" && !CONFIG.header.use
     document.getElementById('about-title').textContent = CONFIG.about.title;
     document.getElementById('about-desc').textContent = CONFIG.about.desc;
     document.getElementById('about-img').src = CONFIG.about.img || P_IMG;
+    document.getElementById('about-img').alt = `Présentation en image de ${companyName}`;
+    document.getElementById('hero-img').src = CONFIG.hero.img || P_IMG;
+    document.getElementById('hero-img').alt = `Image de couverture de ${companyName}`;
     document.getElementById('contact-title').textContent = CONFIG.contact.title;
     document.getElementById('contact-desc').textContent = CONFIG.contact.desc;
 // 3. CTA dynamique (Header & Contact)
@@ -329,7 +337,6 @@ contactBtns.forEach(btn => {
 
         if (type === "EMAIL") {
             e.preventDefault();
-            // Décodage si c'est de l'alternatif (base64) sinon direct
             try { if (val.includes('==')) val = atob(val); } catch(err) {}
             window.location.href = `mailto:${val}`;
         } 
@@ -365,7 +372,6 @@ contactBtns.forEach(btn => {
 const servGrid = document.getElementById('services-grid');
 if (servGrid && CONFIG.services && CONFIG.services.items) {
     servGrid.replaceChildren();
-
     CONFIG.services.items.forEach(s => {
         const card = document.createElement('div');
         card.className = 'service-card reveal';
@@ -380,9 +386,7 @@ if (servGrid && CONFIG.services && CONFIG.services.items) {
             const priceTag = document.createElement('div');
             priceTag.className = "price-tag";   
             let textParts = [];   
-            
             if (hasVisiblePrefix) textParts.push(s.prefix.trim());  
-            
             if (hasVisiblePrice) {
                 const valPrix = s.price.trim();
                 const isNumeric = !isNaN(parseFloat(valPrix)) && isFinite(valPrix);
@@ -398,12 +402,10 @@ if (servGrid && CONFIG.services && CONFIG.services.items) {
 // 6. Testimonials
 const testSection = document.getElementById('testimonials');
 const testGrid = document.getElementById('testimonials-grid');
-
 if (CONFIG.testimonials && CONFIG.testimonials.show) {
     testSection.style.display = "block"; 
     document.getElementById('testimonials-title').textContent = CONFIG.testimonials.title;
     testGrid.replaceChildren();
-    
     CONFIG.testimonials.items.forEach(t => {
         const card = document.createElement('div');
         card.className = 'testimonial-card reveal';
@@ -468,20 +470,27 @@ if (CONFIG.testimonials && CONFIG.testimonials.show) {
     if (testSection) testSection.style.display = "none"; 
 }
 // 7. Galerie
-    const galGrid = document.getElementById('gallery-grid');
+const gallerySection = document.getElementById('social-proof');
+const galGrid = document.getElementById('gallery-grid');
+if (CONFIG.gallery && CONFIG.gallery.show !== false) {
+    gallerySection.style.display = "block";
     galGrid.replaceChildren();
-    CONFIG.gallery.images.forEach(imgData => {
+    CONFIG.gallery.images.forEach((imgData, i) => { 
         const item = document.createElement('div');
         item.className = 'gallery-item';
         const img = document.createElement('img');
         img.src = imgData.src || P_IMG;
         img.loading = "lazy";
+        img.alt = imgData.cap || `Réalisation ${i + 1} de ${companyName}`;
         const cap = document.createElement('div');
         cap.className = "gallery-caption";
         cap.textContent = imgData.cap;
         item.append(img, cap);
         galGrid.appendChild(item);
     });
+} else {
+    if (gallerySection) gallerySection.style.display = "none";
+}
 // 8. Infos Pratiques 
 const practicalSection = document.getElementById('practical');
 if (CONFIG.practical && CONFIG.practical.show) {
@@ -508,7 +517,7 @@ if (CONFIG.practical && CONFIG.practical.show) {
             const img = document.createElement('img');
             img.src = CONFIG.practical.hoursImg || P_IMG;
             img.className = "planning-img";
-            img.alt = "Planning";
+            img.alt = `Planning détaillé de ${companyName}`;
             img.loading = "lazy";
             hoursContent.appendChild(img);
         } else {
@@ -543,7 +552,6 @@ if (CONFIG.practical && CONFIG.practical.show) {
 // 9. FAQ
 const faqSection = document.getElementById('faq');
 const faqCont = document.getElementById('faq-container');
-
 if (CONFIG.faq && CONFIG.faq.show && CONFIG.faq.items.length > 0) {
     faqSection.style.display = "block";
     document.getElementById('faq-title').textContent = CONFIG.faq.title;
@@ -565,7 +573,6 @@ if (CONFIG.faq && CONFIG.faq.show && CONFIG.faq.items.length > 0) {
             document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
             if (!isOpen) div.classList.add('open');
         };
-
         div.append(btn, ans);
         faqCont.appendChild(div);
     });
@@ -577,13 +584,20 @@ if (CONFIG.faq && CONFIG.faq.show && CONFIG.faq.items.length > 0) {
     const socLinks = document.getElementById('social-links');
     socLinks.replaceChildren();
     socHead.textContent = CONFIG.socials.title || "Suivez-nous";
-
+    const socialLabels = {
+    linkedin: "Visitez mon profil LinkedIn",
+    facebook: "Visitez notre page Facebook",
+    instagram: "Visitez notre compte Instagram"
+};
     let hasSocial = false;
     for (const [key, url] of Object.entries(CONFIG.socials)) {
         if (key !== "title" && url && url.trim() !== "" && url !== "#") {
             hasSocial = true;
             const a = document.createElement('a');
             a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
+        if (socialLabels[key]) {
+            a.setAttribute('aria-label', socialLabels[key]);
+        }
             a.innerHTML = SVGS[key]; 
             socLinks.appendChild(a);
         }
@@ -593,15 +607,12 @@ if (CONFIG.faq && CONFIG.faq.show && CONFIG.faq.items.length > 0) {
 const m = document.getElementById('legal-m');
 if (m) {
     m.replaceChildren();
-
     const addLegalSection = (parent, title, lines) => {
-        const h4 = document.createElement('h4');
-        h4.textContent = title;
-        parent.appendChild(h4);
+        const h3 = document.createElement('h3');
+        h3.textContent = title;
+        parent.appendChild(h3);
         lines.forEach(line => {
-            // On affiche la ligne si la valeur existe OU si on veut forcer l'affichage
             const displayVal = (line.val && line.val.trim() !== "") ? line.val : "Non renseigné";
-            
             const p = document.createElement('p');
             const strong = document.createElement('strong');
             strong.textContent = line.label + " : ";
@@ -610,15 +621,11 @@ if (m) {
             parent.appendChild(p);
         });
     };
-
     const leg = CONFIG.legal || {};
     const country = leg.country || 'FR';
     const type = leg.entityType || 'pro';
-    
-    // Définition des libellés selon le pays
     let labelID1 = "SIRET";
     let labelID2 = "SIREN";
-
     if (country === 'FR') {
         labelID1 = (type === 'asso') ? "N° RNA" : "SIRET";
         labelID2 = "SIRET (si applicable)";
@@ -629,29 +636,21 @@ if (m) {
         labelID1 = "N° RCS"; 
         labelID2 = "N° Matricule";
     }
-
     const entityLabel = (type === 'asso') ? "Nom de l'association" : "Raison Sociale";
-
-    // Préparation des données avec fallback
     let contactDisplay = "";
     if (leg.contactValue) {
         try { contactDisplay = atob(leg.contactValue); } catch(e) { contactDisplay = leg.contactValue; }
     }
-
     const editorFullName = `${leg.firstName || ''} ${leg.lastName || ''}`.trim();
-
-    // Construction du tableau (Toutes les lignes sont présentes par défaut)
     const editionLines = [
         { label: "Éditeur", val: editorFullName },
-        { label: entityLabel, val: leg.companyName },
+        { label: entityLabel, val: leg.legalName },
         { label: "Adresse", val: leg.address },
         { label: "Contact", val: contactDisplay },
         { label: labelID1, val: leg.id1 },
         { label: labelID2, val: leg.id2 }
     ];
-
     addLegalSection(m, "Édition du site", editionLines);
-
     addLegalSection(m, "Hébergement", [
         { label: "Hébergeur", val: "Netlify Inc." },
         { label: "Adresse", val: "610 22nd Street, San Francisco, CA 94107, USA" }
@@ -663,7 +662,6 @@ if (m) {
     addPrivacyParagraph(c, "Protection des données (RGPD)", "Ce site est purement informatif. Il ne contient aucun formulaire de contact ou d'inscription. Par conséquent, aucune donnée personnelle n'est collectée, stockée ou traitée par ce site.");
     addPrivacyParagraph(c, "Cookies et traceurs", "Ce site est une page statique. Nous n'utilisons aucun cookie de suivi, de profilage ou de publicité. Aucun traceur tiers n'est installé sur votre navigateur lors de votre visite.");
     addPrivacyParagraph(c, "Liens tiers", "Si vous cliquez sur les boutons de contact (ex: 'Prendre RDV'), vous serez redirigé vers une plateforme externe. Dès lors que vous quittez ce site, seule la politique de confidentialité de la plateforme de destination s'applique.");
-
     document.getElementById('current-year').textContent = new Date().getFullYear();
 }
 window.addEventListener('message', (event) => {

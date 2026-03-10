@@ -1,48 +1,41 @@
 document.addEventListener("DOMContentLoaded", () => {
-    
-    // --- FONCTIONS UTILITAIRES ---
+// --- FONCTIONS UTILITAIRES ---
     const DESKTOP_BREAKPOINT = 1024;
     const isMobile = () => window.innerWidth < DESKTOP_BREAKPOINT;
-
-    // --- CONSTANTES GLOBALES ---
+// --- MAJ DATE FOOTER ---
     const currentYearElement = document.getElementById("current-year");
-    const previewModal = document.getElementById('preview-modal');
-
-    // Mise à jour automatique de l'année au pied de page
     if (currentYearElement) {
         currentYearElement.textContent = new Date().getFullYear();
     }
-
-    // --- GESTION DE LA MODALE PREVIEW ---
-    const openPreview = () => {
-        if (!previewModal) return;
-        previewModal.classList.remove('hidden');
-        previewModal.classList.add('flex');
-        document.body.style.overflow = 'hidden';
-    };
-
-    const closePreview = () => {
-        if (!previewModal) return;
-        previewModal.classList.add('hidden');
-        previewModal.classList.remove('flex');
-        document.body.style.overflow = '';
-    };
-
-    // Export global pour les onclick du HTML
-    window.openPreview = openPreview;
-    window.closePreview = closePreview;
-
-    if (previewModal) {
-        previewModal.addEventListener('click', (e) => {
-            if (e.target === previewModal) closePreview();
-        });
-    }
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closePreview();
+// --- GESTION DE LA MODALE PREVIEW ---
+const previewModal = document.getElementById('preview-modal');
+const previewImg = document.getElementById('preview-img'); 
+const openPreview = (imagePath) => {
+    if (!previewModal || !previewImg) return;
+    previewImg.src = imagePath;
+    const scrollContainer = previewModal.querySelector('.overflow-y-auto');
+    if (scrollContainer) scrollContainer.scrollTop = 0;
+    previewModal.classList.remove('hidden');
+    previewModal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+};
+const closePreview = () => {
+    if (!previewModal) return;
+    previewModal.classList.add('hidden');
+    previewModal.classList.remove('flex');
+    document.body.style.overflow = '';
+};
+window.openPreview = openPreview;
+window.closePreview = closePreview;
+if (previewModal) {
+    previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) closePreview();
     });
-
-    // --- EFFET DE CLIC CTA (SNIPER MODE) ---
+}
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePreview();
+});
+// --- EFFET DE CLIC CTA (SNIPER MODE) ---
     const setupSniperClick = () => {
         const ctas = document.querySelectorAll(".cta-accent, .calendly-popup-trigger");
         ctas.forEach(cta => {
@@ -63,8 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     };
-
-    // --- PROTECTION EMAIL ---
+// --- PROTECTION EMAIL ---
     const setupEmailProtection = () => {
         document.querySelectorAll('.protected-mail').forEach(link => {
             const user = link.dataset.user;
@@ -78,19 +70,16 @@ document.addEventListener("DOMContentLoaded", () => {
             link.href = `mailto:${fullEmail}`;
         });
     };
-
-    // --- TIMELINE PROGRESSION ---
+// --- TIMELINE PROGRESSION ---
     const handleTimelineProgress = () => {
         const container = document.getElementById('timeline-container');
         const progressLine = document.getElementById('progress-line');
         const steps = document.querySelectorAll('.step-container');
         if (!container || !progressLine) return;
-
         const rect = container.getBoundingClientRect();
         const triggerPoint = window.innerHeight / 1.5;
         const progress = Math.max(0, Math.min(100, ((triggerPoint - rect.top) / rect.height) * 100));
         progressLine.style.height = `${progress}%`;
-
         steps.forEach(step => {
             const dot = step.querySelector('.timeline-dot');
             const ghost = step.querySelector('.ghost-text');
@@ -104,8 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     };
-
-    // --- ANIMATIONS D'APPARITION ---
+// --- ANIMATIONS D'APPARITION ---
     const setupAnimations = () => {
         const animatedElements = document.querySelectorAll(".animate-on-scroll");
         const animationObserver = new IntersectionObserver((entries) => {
@@ -119,8 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, { threshold: 0.1 });
         animatedElements.forEach((el) => animationObserver.observe(el));
     };
-
-    // --- FAQ ACCORDION ---
+// --- FAQ ACCORDION ---
     const setupFaqAccordion = () => {
         const faqItems = document.querySelectorAll(".faq-item");
         faqItems.forEach((item) => {
@@ -142,35 +129,50 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     };
-
-    // --- CALENDLY ---
-    const CALENDLY_URL = 'https://calendly.com/aurore-am20/20min?hide_event_type_details=1&text_color=14244f&primary_color=4d0fa5';
-    let isCalendlyLoaded = false;
-    const loadCalendly = () => {
-        if (isCalendlyLoaded) return Promise.resolve();
-        return new Promise((resolve) => {
-            const link = document.createElement('link');
-            link.href = 'https://assets.calendly.com/assets/external/widget.css';
-            link.rel = 'stylesheet';
-            document.head.appendChild(link);
-            const script = document.createElement('script');
-            script.src = 'https://assets.calendly.com/assets/external/widget.js';
-            script.async = true;
-            script.onload = () => { isCalendlyLoaded = true; resolve(); };
-            document.body.appendChild(script);
-        });
+// --- GESTION DE CALENDLY ---
+const CALENDLY_URL = 'https://calendly.com/aurore-am20/20min?hide_event_type_details=1&text_color=14244f&primary_color=4d0fa5';
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.calendly-popup-trigger');
+    if (btn) {
+        e.preventDefault();
+        e.stopPropagation(); 
+        executeCalendlyLogic();
+    }
+});
+function executeCalendlyLogic() {
+    const loader = document.getElementById('calendly-loader');
+    if (loader) loader.classList.remove('hidden'); 
+    const launch = () => {
+        if (window.Calendly) {
+            const existing = document.querySelector('.calendly-overlay');
+            if (existing) existing.remove();
+            Calendly.initPopupWidget({ url: CALENDLY_URL });
+            const checkExist = setInterval(() => {
+                const calendlyPopup = document.querySelector('.calendly-overlay');
+                if (calendlyPopup) {
+                    clearInterval(checkExist);
+                    setTimeout(() => {
+                        if (loader) loader.classList.add('hidden'); 
+                        calendlyPopup.classList.add('active'); 
+                    }, 1500);
+                }
+            }, 100);
+        }
     };
-
-    document.querySelectorAll(".calendly-popup-trigger").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            loadCalendly().then(() => {
-                if (window.Calendly) Calendly.initPopupWidget({ url: CALENDLY_URL });
-            });
-        });
-    });
-
-    // --- INITIALISATION FINALE ---
+    if (!window.Calendly) {
+        const link = document.createElement('link');
+        link.href = 'https://assets.calendly.com/assets/external/widget.css';
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+        const script = document.createElement('script');
+        script.src = 'https://assets.calendly.com/assets/external/widget.js';
+        script.onload = launch;
+        document.body.appendChild(script);
+    } else {
+        launch();
+    }
+}
+// --- INITIALISATION FINALE ---
     setupEmailProtection();
     setupFaqAccordion();
     setupSniperClick(); 

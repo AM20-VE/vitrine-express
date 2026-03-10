@@ -1,18 +1,27 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // TRÈS IMPORTANT : On dit à Tailwind de regarder tous tes fichiers HTML et JS
-  content: [
-    "./index.html",
-    "./config.html",
-    "./success-ve-complet.html",
-    "./success-ve-linkedin.html",
-    "./success-ve-web.html",
-    "./script.js",
-    "./config.js"
-  ],
+ content: [
+  "./*.html",        
+  "./*.js",          
+  "./config/*.js",   
+  "./pages/**/*.html" 
+],
+ safelist: [
+  "scale-95",
+  "scale-[1.02]",
+  "active:scale-[0.98]",
+  "blur-[80px]",
+  "blur-[120px]",
+  "z-[100]",
+  "bg-indigo-200/30",
+  "max-w-lg",
+  "items-center",
+  "justify-center",
+  "-right-2",
+  "-bottom-6"
+],
   theme: {
     extend: {
-      // Tu pourras ajouter tes couleurs personnalisées ici plus tard
     },
   },
   plugins: [],

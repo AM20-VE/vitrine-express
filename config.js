@@ -1,7 +1,9 @@
 let localConfig = {
+    selectedMode: "",
+    template:"moderne",
     colors: { accent: "#8449d9", dark: "#0E1B2A", bgLight: "#F8FAFC" },
     meta: { title: "", description: "" },
-    header: { logo: "", companyName: "Ton Logo ou nom de l'entreprise", useTextOnly: false },
+    header: { logo: "", companyName: "Logo ou Nom", useTextOnly: false },
     hero: {
         title: "Ton titre principal",
         desc: "Explique en une phrase ce que tu fais, pour qui, et le bénéfice principal. Simple, concret, sans jargon technique. Si on ne comprend pas en 5 secondes, simplifie.",
@@ -9,9 +11,9 @@ let localConfig = {
         img: "",
         showFigures: true,
         figures: [
-            { num: "150+", label: "PROJETS RÉALISÉS" },
-            { num: "10", label: "ANNÉES d'EXPERTISE" },
-            { num: "99%", label: "CLIENTS SATISFAITS" }
+            { num: "999+", label: "Ta réalisation" },
+            { num: "999", label: "Ton expérience" },
+            { num: "999%", label: "Tes clients" }
         ]
     },
     services: {
@@ -34,6 +36,7 @@ let localConfig = {
     ]
 },
     gallery: {
+        show: true,
         title: "Des résultats concrets",
         images: [
             { src: "", cap: "Témoignage client : [Prénom], [métier/statut] : ‘[Phrase courte sur ce qu’ils ont aimé ou le résultat]" },
@@ -124,26 +127,47 @@ let localConfig = {
         vignette2Cta: "Sélectionner"
     },
 };
-// On récupère la frame (déjà fait plus haut dans ton code normalement)
 const frame = document.getElementById('preview-frame');
-
-// PROTECTION LIGNE 130 :
 if (frame) {
     frame.onload = () => {
         sync();
     };
 } else {
-    // Si la frame n'est pas là, on ne plante pas le script
     console.warn("Ligne 130 : 'preview-frame' introuvable. On continue sans sync.");
 }
+// VERIFICATION ADMIN
+let IS_ADMIN = false; 
+async function verifyAccess() {
+    const params = new URLSearchParams(window.location.search);
+    const pass = params.get('adm');
+    const SECRET_HASH = "1a10705c240715d8c19d0dad3c5a59c9d18afc9a9d60c0755c46dd3fbb8c8360";
+    let hashHex = "";
+    if (pass) {
+        const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass));
+        hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    if (hashHex === SECRET_HASH || localStorage.getItem('_vxe_node') === SECRET_HASH) {
+        localStorage.setItem('_vxe_node', SECRET_HASH);
+        IS_ADMIN = true; 
+        document.getElementById('payment-loader')?.remove();
+        const card = document.getElementById('success-card');
+        if (card) {
+            card.style.display = "block";
+            card.classList.remove('hidden', 'opacity-0');
+        }
+        return true;
+    }
+    return false;
+}
 // --- LIENS VERS PAIEMENT ---
-// On l'attache à window pour garantir son accessibilité globale
 window.handleFinalAction = function() {
-    // Vérification de sécurité pour localConfig
+// Vérification de sécurité pour localConfig
     if (typeof localConfig === 'undefined') {
         console.error("Erreur : localConfig n'est pas défini.");
         return;
     }
+// ON SAUVEGARDE UNE DERNIÈRE FOIS SOUS TA CLÉ HABITUELLE
+    localStorage.setItem('vitrine_express_progression', JSON.stringify(localConfig));
     const mode = localConfig.selectedMode;
     let stripeUrl = "";
     console.log("Mode sélectionné avant redirection :", mode);
@@ -158,7 +182,7 @@ window.handleFinalAction = function() {
             stripeUrl = "https://buy.stripe.com/test_bJe8wOfTob7Z8O67OxfrW04";
             break;
         default:
-            alert("Merci de sélectionner un forfait (Web, LinkedIn ou Full) avant de continuer.");
+            alert("Merci de sélectionner un format (Web, LinkedIn ou Combo) avant de continuer.");
             return;
     }
     const finalText = document.getElementById('final-cta-text');
@@ -170,6 +194,842 @@ window.handleFinalAction = function() {
         window.location.href = stripeUrl;
     }, 600);
 };
+// --- FONCTIONS DEDIEES A LA MODIF ---
+function toggleModifierModule() {
+    const section = document.getElementById('section-rechargement');
+    if (section) {
+        const isHidden = section.classList.contains('hidden');
+        section.classList.toggle('hidden');
+        if (isHidden) { 
+            section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            localStorage.setItem('showRechargement', 'true');
+        } else {
+            localStorage.removeItem('showRechargement');
+        }
+    }
+}
+// --- LOGIQUE DE RECHARGEMENT ---
+function handleHtmlDrop(e) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) processImportedFile(file);
+}
+function handleHtmlImport(input) {
+    const file = input.files[0];
+    if (file) processImportedFile(file);
+}
+function lockImportedInputs() {
+    const companyNameInput = document.querySelector('input[oninput*="header"][oninput*="companyName"]');
+    if (companyNameInput) {
+        companyNameInput.readOnly = true;
+        companyNameInput.classList.add('bg-slate-50', 'text-slate-500', 'cursor-not-allowed');
+        companyNameInput.title = "Non modifiable sur un fichier importé";
+    }
+    const legalToLock = [
+        'input[oninput*="legal"][oninput*="editor"]',
+        'input[oninput*="legal"][oninput*="legalName"]',
+    ];
+    legalToLock.forEach(selector => {
+        const input = document.querySelector(selector);
+        if (input) {
+            input.readOnly = true;
+            input.classList.add('bg-slate-50', 'text-slate-500', 'cursor-not-allowed');
+        }
+    });
+}
+async function processImportedFile(file) {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const content = e.target.result;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, 'text/html');
+            const jsonConfig = doc.getElementById('export-data')?.textContent;
+            if (!jsonConfig) throw new Error("Ce fichier n'est pas valide.");
+            localConfig = JSON.parse(jsonConfig);
+        // ---  FILTRE DE SÉCURITÉ  ---
+            if (localConfig.meta?.origin !== 'vitrine-express-branding') {
+                throw new Error("Ce fichier n'est pas compatible avec Vitrine Express.");
+            }
+            const hasSiteId = !!localConfig.meta?.netlifySiteId;
+            const mode = localConfig.selectedMode;
+        // --- LOGIQUE ADMIN BYPASS  ---
+            const isAdmin = localStorage.getItem('_vxe_node') === "1a10705c240715d8c19d0dad3c5a59c9d18afc9a9d60c0755c46dd3fbb8c8360";
+            if ((mode === 'web' || mode === 'full') && !hasSiteId && !isAdmin) {
+                throw new Error("Ce fichier n'est pas compatible. Utilise le configurateur vitrine-express pour créer ta vitrine.");
+            }
+        // Sécurité supplémentaire pour les utilisateurs normaux sur le kit LinkedIn
+            if (mode === 'linkedin' && !localConfig.linkedinKit && !isAdmin) {
+                throw new Error("Ce fichier ne contient pas de configuration LinkedIn valide.");
+            }
+        // --- PERSISTANCE & ÉTAT DE MODIFICATION ---
+            localStorage.setItem('modeModificationActive', 'true');
+            localStorage.setItem('showRechargement', 'true');
+        // --- MASQUAGE DES SECTIONS EN MODE MODIF ---
+            const sectionsToHide = ['section-finale', 'section-ia'];
+            sectionsToHide.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.setProperty('display', 'none', 'important');
+            });
+        // --- ON VERROUILLE LES INPUTS ---
+            lockImportedInputs();
+        // 1. On récupère le mode enregistré (web, full, ou linkedin)
+            const savedMode = localConfig.selectedMode || 'web'; 
+        // 2. On coche visuellement le radio bouton correspondant
+            const radio = document.querySelector(`input[name="config-type"][value="${savedMode}"]`);
+            if (radio) {
+                radio.checked = true;
+        // 3. On appelle ta fonction qui affiche les sections et la preview
+                switchConfigMode(savedMode); 
+            }
+        // 4. On considère la section "Choisis ta vitrine" comme validée et on la verrouille
+            const sectionVitrine = document.getElementById('section-vitrine');
+            if (sectionVitrine) {
+                sectionVitrine.classList.add('opacity-50', 'pointer-events-none');
+                sectionVitrine.querySelector('.btn-save-step').classList.add('hidden');
+            }
+        // 5. On remplit le reste et on synchronise
+            applyConfigToInputs(); 
+            showImportStatus('success');
+        } catch (err) {
+            console.error(err);
+            showImportStatus('error');
+        }
+    };
+    reader.readAsText(file);
+}
+function showImportStatus(status) {
+    const success = document.getElementById('import-success-msg');
+    const error = document.getElementById('import-error-msg');
+    const action = document.getElementById('update-action-container');
+    success.classList.add('hidden');
+    error.classList.add('hidden');
+    action.classList.add('hidden');
+    if (status === 'success') {
+        success.classList.remove('hidden');
+        action.classList.remove('hidden');
+    } else {
+        error.classList.remove('hidden');
+    }
+}
+function applyConfigToInputs() {
+    if (!localConfig) return;
+// --- 1. MODÈLE & COULEURS ---
+if (localConfig.template) {
+    const selectedTemplateId = localConfig.template;
+// 1. Récupérer les infos du template dans la base
+    const templateData = TEMPLATES_DB.find(t => t.id === selectedTemplateId);
+    if (templateData) {
+// 2️. Sélectionner la catégorie correspondante et filtrer les modèles
+        const catButtons = document.querySelectorAll('.cat-btn');
+        const targetCatBtn = Array.from(catButtons).find(btn =>
+            btn.innerText.toUpperCase().includes(templateData.cat.toUpperCase())
+        );
+        if (targetCatBtn) {
+            filterTemplates(templateData.cat, targetCatBtn); 
+        }
+// 3️. Appliquer le template dans l'UI
+        adaptUIForTemplate(selectedTemplateId);
+// 4️. Mettre à jour les frames (preview web et LinkedIn)
+        if (frame) frame.src = `template-${selectedTemplateId}.html`;
+        const liFrame = document.getElementById('linkedin-frame');
+        if (liFrame) {
+            liFrame.src = `template-linkedin-${selectedTemplateId}.html`;
+            liFrame.onload = () => sync();
+        }
+    }
+}
+    if (localConfig.colors) {
+        Object.keys(localConfig.colors).forEach(key => {
+            const input = document.getElementById(`cp-${key}`);
+            if (input) {
+                input.value = localConfig.colors[key];
+                updateColorSync(key, localConfig.colors[key]);
+            }
+        });
+    }
+// --- 2. IDENTITÉ (LOGO & NOM) ---
+    if (localConfig.header) {
+        const nameInput = document.querySelector('input[oninput*="header"][oninput*="companyName"]');
+        if (nameInput) nameInput.value = localConfig.header.companyName || "";
+        if (localConfig.header.useTextOnly !== undefined) {
+            const toggleLogo = document.getElementById('toggle-logo-mode'); 
+            if (toggleLogo) toggleLogo.checked = localConfig.header.useTextOnly;
+            toggleLogoMode(localConfig.header.useTextOnly);
+        }
+        updateDynamicFavicon();
+    }
+// --- 3. ACCUEIL (HERO) ---
+if (localConfig.hero) {
+    const h = localConfig.hero;
+    const hTitle = document.querySelector('input[oninput*="hero"][oninput*="title"]');
+    if (hTitle) hTitle.value = h.title || "";
+    const hDesc = document.querySelector('textarea[oninput*="hero"][oninput*="desc"]');
+    if (hDesc) hDesc.value = h.desc || "";
+    const hCta = document.querySelector('input[oninput*="hero"][oninput*="ctaLabel"]');
+    if (hCta) hCta.value = h.ctaLabel || "";
+    const showFigsToggle = document.getElementById('toggle-figures'); 
+    if (showFigsToggle) {
+        const shouldShow = h.showFigures !== false;
+        showFigsToggle.checked = shouldShow;
+        if (typeof updateHeroToggle === 'function') updateHeroToggle('showFigures', shouldShow);
+    }
+    if (h.figures && Array.isArray(h.figures)) {
+        h.figures.forEach((fig, i) => {
+            const valInput = document.querySelector(`input[oninput*="updateFigure(${i}, 'num'"]`);
+            if (valInput) valInput.value = fig.num || "";
+            const labelSel = document.getElementById(`fig-label-sel-${i}`);
+            if (labelSel) {
+                const knownLabels = ["Projets", "Clients", "Années"];
+                const isCustom = fig.label && !knownLabels.includes(fig.label);
+                labelSel.value = isCustom ? "CUSTOM" : (fig.label || "Projets");
+                if (typeof handleLabelSelectChange === 'function') handleLabelSelectChange(i, labelSel.value);
+                if (isCustom) {
+                    const customIn = document.getElementById(`fig-custom-${i}`);
+                    if (customIn) customIn.value = fig.label || "";
+                }
+            }
+        });
+    }
+    const heroInputs = document.querySelectorAll('#section-hero input, #section-hero textarea');
+    heroInputs.forEach(inp => inp.dispatchEvent(new Event('input', { bubbles: true })));
+}
+// --- 4. SERVICES ---
+if (localConfig.services) {
+    const s = localConfig.services;
+    const servicesTitleIn = document.querySelector('input[oninput*="services"][oninput*="title"]');
+    if (servicesTitleIn) servicesTitleIn.value = s.title || "";
+    if (s.items && Array.isArray(s.items)) {
+        s.items.forEach((svc, i) => {
+            const titleInput = document.querySelector(`input[oninput*="updateServiceCard(${i}, 'h3'"]`);
+            const descInput = document.querySelector(`textarea[oninput*="updateServiceCard(${i}, 'p'"]`);
+            const priceInput = document.querySelector(`input[oninput*="updateServiceCard(${i}, 'price'"]`);
+            const prefixSel = document.querySelector(`select[onchange*="handleIndicationChange(${i}"]`);
+            if (titleInput) titleInput.value = svc.h3 || svc.title || "";
+            if (descInput) descInput.value = svc.p || svc.desc || "";
+            if (priceInput) priceInput.value = svc.price || "";
+            if (prefixSel) {
+                const knownPrefixes = ["Dès", "À partir de", "Sur devis"];
+                const currentPrefix = svc.prefix || "";
+                const isCustom = currentPrefix && !knownPrefixes.includes(currentPrefix) && currentPrefix !== "";
+                prefixSel.value = isCustom ? "Saisie libre" : currentPrefix;
+                if (typeof handleIndicationChange === 'function') {
+                    handleIndicationChange(i, prefixSel.value);
+                }
+                if (isCustom) {
+                    const customIn = document.getElementById(`custom-prefix-${i}`);
+                    if (customIn) customIn.value = currentPrefix;
+                }
+            }
+        });
+    }
+    const servicesInputs = document.querySelectorAll('#section-services input, #section-services textarea');
+    servicesInputs.forEach(inp => inp.dispatchEvent(new Event('input', { bubbles: true })));
+}
+// --- 5. AVIS ---
+if (localConfig.testimonials) {
+    const tSection = localConfig.testimonials;
+    const testToggle = document.getElementById('toggle-testimonials');
+    if (testToggle) {
+        testToggle.checked = tSection.show !== false;
+        if (typeof toggleSectionVisibility === 'function') {
+            toggleSectionVisibility('testimonials', tSection.show !== false);
+        }
+    }
+    const testTitleIn = document.querySelector('input[oninput*="testimonials"][oninput*="title"]');
+    if (testTitleIn) testTitleIn.value = tSection.title || "";
+    if (tSection.items && Array.isArray(tSection.items)) {
+        tSection.items.forEach((t, i) => {
+            const txt = document.querySelector(`textarea[oninput*="updateTestimonial(${i}, 'text'"]`);
+            const name = document.querySelector(`input[oninput*="updateTestimonial(${i}, 'name'"]`);
+            const role = document.querySelector(`input[oninput*="updateTestimonial(${i}, 'role'"]`); 
+            const stars = document.querySelector(`select[onchange*="updateTestimonial(${i}, 'stars'"]`);
+            if (txt) txt.value = t.text || "";
+            if (name) name.value = t.name || "";
+            if (role) role.value = t.role || "";
+            if (stars) stars.value = t.stars || 5;
+        });
+    }
+    const testCtaTextIn = document.querySelector('input[oninput*="testimonials"][oninput*="ctaText"]');
+    if (testCtaTextIn) testCtaTextIn.value = tSection.ctaText || "";
+    const avisInputs = document.querySelectorAll('#section-avis input, #section-avis textarea');
+    avisInputs.forEach(inp => inp.dispatchEvent(new Event('input', { bubbles: true })));
+}
+// --- 6. GALERIE ---
+if (localConfig.gallery) {
+    const g = localConfig.gallery;
+    const galToggle = document.getElementById('toggle-gallery');
+    if (galToggle) {
+        galToggle.checked = g.show !== false;
+
+        if (typeof toggleSectionVisibility === "function") {
+            toggleSectionVisibility('gallery', g.show !== false);
+        }
+    }
+    const galTitleIn = document.querySelector('input[oninput*="gallery"][oninput*="title"]');
+    if (galTitleIn) galTitleIn.value = g.title || "";
+    const count = (g.images && Array.isArray(g.images)) ? g.images.length : 0;
+    const galSelect = document.querySelector('select[onchange*="updateGalleryGrid"]');
+    if (galSelect) {
+        const selectValue = count <= 3 ? "3" : "6";
+        galSelect.value = selectValue;
+        if (typeof updateGalleryGrid === 'function') {
+            updateGalleryGrid(selectValue);
+        }
+    }
+    if (count > 0) {
+        g.images.forEach((img, i) => {
+            if (typeof updateGalleryImageUI === 'function') {
+                updateGalleryImageUI(i, img.src || "");
+            }
+            const capInput = document.querySelector(`textarea[oninput*="updateGalleryCaption(${i}"]`);
+            if (capInput) {
+                capInput.value = img.cap || img.caption || "";
+            }
+        });
+    }
+    const galleryInputs = document.querySelectorAll('#section-gallery input, #section-gallery textarea');
+    galleryInputs.forEach(inp =>
+        inp.dispatchEvent(new Event('input', { bubbles: true }))
+    );
+}
+// --- 7. A PROPOS  ---
+if (localConfig.about) {
+    const a = localConfig.about;
+    updateAboutImageUI(a.img || "");
+    const aboutTitle = document.querySelector('input[oninput*="about"][oninput*="title"]');
+    const aboutDesc = document.querySelector('textarea[oninput*="about"][oninput*="desc"]');
+    if (aboutTitle) aboutTitle.value = a.title || "";
+    if (aboutDesc) aboutDesc.value = a.desc || "";
+}
+// --- 8. INFOS PRATIQUES  ---
+if (localConfig.practical) {
+    const p = localConfig.practical;
+    const mainToggle = document.getElementById('toggle-practical');
+    if (mainToggle) mainToggle.checked = !!p.show;
+    togglePracticalSectionVisibility(!!p.show);
+    const mode = p.displayMode || 'text';
+    setPracticalMode(mode);
+    if (p.hoursImg) {
+        const preview = document.getElementById('preview-img-practical');
+        const placeholder = document.getElementById('upload-placeholder-practical');
+        const trashBtn = document.getElementById('trash-btn-practical');
+        if (preview) { preview.src = p.hoursImg; preview.classList.remove('hidden'); }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (trashBtn) trashBtn.classList.remove('hidden');
+    }
+    if (p.address) {
+        const parts = p.address.split(',');
+        const street = parts[0] || "";
+        const remaining = parts[1] ? parts[1].trim().split(' ') : [];
+        const zip = remaining[0] || "";
+        const city = remaining.slice(1).join(' ') || "";
+        const inStreet = document.querySelector('input[oninput*="updateAddressPart(\'street\'"]');
+        const inZip = document.querySelector('input[oninput*="updateAddressPart(\'zip\'"]');
+        const inCity = document.querySelector('input[oninput*="updateAddressPart(\'city\'"]');
+        if (inStreet) inStreet.value = street;
+        if (inZip) inZip.value = zip;
+        if (inCity) inCity.value = city;
+        window.currentAddr = { street, zip, city };
+    }
+    const mapToggle = document.querySelector('input[onchange*="updatePracticalCta"]');
+    if (mapToggle) mapToggle.checked = p.showMapBtn !== false;
+    if (p.hoursItems && p.hoursItems.length > 0) {
+        p.hoursItems.forEach((item, i) => {
+            const timeStr = item.time || "";
+            if (timeStr === "Fermé" || timeStr === "—") {
+                toggleDayOpen(i, false);
+                const radioFerme = document.querySelector(`.day-block[data-index="${i}"] input[onchange*="toggleDayOpen(${i}, false)"]`);
+                if (radioFerme) radioFerme.checked = true;
+            } else {
+                toggleDayOpen(i, true);
+                const radioOuvert = document.querySelector(`.day-block[data-index="${i}"] input[onchange*="toggleDayOpen(${i}, true)"]`);
+                if (radioOuvert) radioOuvert.checked = true;
+                const isContinuous = !timeStr.includes('/');
+                toggleContinuous(i, isContinuous);
+                const checkCont = document.querySelector(`.day-block[data-index="${i}"] input[onchange*="toggleContinuous(${i}"]`);
+                if (checkCont) checkCont.checked = isContinuous;
+                const times = timeStr.match(/\d{2}:\d{2}/g) || [];
+                if (isContinuous) {
+                    hoursState[i].start = times[0] || "";
+                    hoursState[i].end = times[1] || "";
+                    const inS = document.querySelector(`.day-block[data-index="${i}"] input[oninput*="updateContinuous(${i}, 'start'"]`);
+                    const inE = document.querySelector(`.day-block[data-index="${i}"] input[oninput*="updateContinuous(${i}, 'end'"]`);
+                    if (inS) inS.value = hoursState[i].start;
+                    if (inE) inE.value = hoursState[i].end;
+                } else {
+                    hoursState[i].mStart = times[0] || "";
+                    hoursState[i].mEnd = times[1] || "";
+                    hoursState[i].aStart = times[2] || "";
+                    hoursState[i].aEnd = times[3] || "";
+                    const fields = ['mStart', 'mEnd', 'aStart', 'aEnd'];
+                    fields.forEach(f => {
+                        const inp = document.querySelector(`.day-block[data-index="${i}"] input[oninput*="updateSplit(${i}, '${f}'"]`);
+                        if (inp) inp.value = hoursState[i][f];
+                    });
+                }
+            }
+        });
+    }
+}
+// --- 9. FAQ ---
+if (localConfig.faq && localConfig.faq.items) {
+    const faqTitleIn = document.querySelector('input[oninput*="faq"][oninput*="title"]');
+    if (faqTitleIn) faqTitleIn.value = localConfig.faq.title || "";
+    localConfig.faq.items.forEach((item, i) => {
+        const qIn = document.querySelector(`input[oninput*="updateFAQ(${i}, 'q'"]`);
+        const aIn = document.querySelector(`textarea[oninput*="updateFAQ(${i}, 'a'"]`);
+        
+        if (qIn) qIn.value = item.q || "";
+        if (aIn) aIn.value = item.a || "";
+    });
+}
+// --- 10. CONTACT ---
+if (localConfig.contact) {
+    const c = localConfig.contact;
+    const contactTitleIn = document.querySelector('input[oninput*="updateContactData(\'title\'"]');
+    if (contactTitleIn) contactTitleIn.value = c.title || "";
+    const contactDescIn = document.querySelector('textarea[oninput*="updateContactData(\'desc\'"]');
+    if (contactDescIn) contactDescIn.value = c.desc || "";
+    const ctaLabelSelect = document.querySelector('select[onchange*="handleCtaLabelChange"]');
+    if (ctaLabelSelect) {
+        const knownLabels = ["Prendre RDV", "Nous contacter"];
+        const isCustom = c.ctaLabel && !knownLabels.includes(c.ctaLabel);
+        ctaLabelSelect.value = isCustom ? "custom" : (c.ctaLabel || "Prendre RDV");
+        if (typeof handleCtaLabelChange === 'function') handleCtaLabelChange(ctaLabelSelect.value);
+        if (isCustom) {
+            const customIn = document.getElementById('custom-cta-label');
+            if (customIn) customIn.value = c.ctaLabel;
+        }
+    }
+    const typeSelect = document.querySelector('select[onchange*="handleCtaTypeChange"]');
+    if (typeSelect) {
+        typeSelect.value = c.type || "link";
+        if (typeof handleCtaTypeChange === 'function') handleCtaTypeChange(typeSelect.value); 
+    }
+    if (c.type === 'tel' && c.countryIso && typeof handleCountryChange === 'function') {
+        handleCountryChange(c.countryIso); 
+    }
+    const valInput = document.getElementById('cta-value-input');
+    if (valInput) valInput.value = c.value || "";
+    const contactInputs = document.querySelectorAll('#section-contact input, #section-contact textarea');
+    contactInputs.forEach(inp => {
+        inp.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+}
+// --- 11. SEO  ---
+if (localConfig.meta) {
+    const m = localConfig.meta;
+    const seoTitleIn = document.querySelector('#section-seo input[oninput*="updateMeta(\'title\'"]');
+    const seoDescIn = document.querySelector('#section-seo textarea[oninput*="updateMeta(\'description\'"]');
+    if (m.title && m.title !== "") {
+        if (seoTitleIn) {
+            seoTitleIn.value = m.title;
+            if (typeof updateMeta === 'function') {
+                updateMeta('title', m.title);
+            }
+        }
+    }
+    if (m.description && m.description !== "") {
+        if (seoDescIn) {
+            seoDescIn.value = m.description;
+            if (typeof updateMeta === 'function') {
+                updateMeta('description', m.description);
+            }
+        }
+    }
+    if (typeof checkMetaValidity === 'function') {
+        checkMetaValidity();
+    }
+}
+// --- 12. RÉSEAUX SOCIAUX (CORRIGÉ) ---
+if (localConfig.socials) {
+    const s = localConfig.socials;
+    const socialTitleIn = document.getElementById('social-title-input');
+    if (socialTitleIn) {
+        socialTitleIn.value = s.title || "";
+    }
+    const platforms = ['linkedin', 'facebook', 'instagram'];
+    platforms.forEach(key => {
+        const val = s[key]; 
+        const input = document.getElementById(`input-social-${key}`);
+        const toggle = document.getElementById(`toggle-social-${key}`);
+        if (input) {
+            input.value = val || "";
+        }
+        if (toggle) {
+            const shouldShow = (val && val.trim() !== "");
+            toggle.checked = shouldShow;
+            if (typeof handleSocialToggle === 'function') {
+                handleSocialToggle(key, shouldShow);
+            }
+        }
+    });
+    if (socialTitleIn) {
+        socialTitleIn.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+}
+// --- 13. INFOS LÉGALES ---
+if (localConfig.legal) {
+    const L = localConfig.legal;
+// 1. Pays (MODIFIABLE)
+    const countrySel = document.querySelector('#section-legale select');
+    if (countrySel) {
+        countrySel.value = L.country || "FR";
+        handleLegalCountryChange(L.country || "FR");
+    }
+// 2. Type d'entité (VERROUILLÉ)
+    const entityRadios = document.querySelectorAll('input[name="entity-type"]');
+    entityRadios.forEach(r => {
+        if (r.value === (L.entityType || 'pro')) r.checked = true;
+        r.disabled = true; 
+        r.parentElement.classList.add('opacity-60', 'cursor-not-allowed');
+    });
+// 3. Prénom et Nom (REMPLIS ET VERROUILLÉS)
+    const firstNameIn = document.querySelector('input[oninput*="firstName"]');
+    const lastNameIn = document.querySelector('input[oninput*="lastName"]');
+    if (firstNameIn) {
+        firstNameIn.value = L.firstName || "";
+        firstNameIn.readOnly = true;
+        firstNameIn.classList.add('bg-slate-50', 'text-slate-400', 'cursor-not-allowed');
+    }
+    if (lastNameIn) {
+        lastNameIn.value = L.lastName || "";
+        lastNameIn.readOnly = true;
+        lastNameIn.classList.add('bg-slate-50', 'text-slate-400', 'cursor-not-allowed');
+    }
+// 4. Raison Sociale (REMPLIE ET VERROUILLÉE)
+    const legalNameIn = document.getElementById('id-company-name');
+    if (legalNameIn) {
+        legalNameIn.value = L.legalName || "";
+        legalNameIn.readOnly = true;
+        legalNameIn.classList.add('bg-slate-50', 'text-slate-400', 'cursor-not-allowed');
+    }
+// 5. Adresse (MODIFIABLE)
+    if (L.address) {
+        const parts = L.address.split(',');
+        const street = parts[0] || "";
+        const rest = parts[1] ? parts[1].trim().split(' ') : [];
+        const zip = rest[0] || "";
+        const city = rest.slice(1).join(' ') || "";
+        const inStreet = document.getElementById('legal-street');
+        const inZip = document.getElementById('legal-zip');
+        const inCity = document.getElementById('legal-city');
+        if (inStreet) inStreet.value = street.trim();
+        if (inZip) inZip.value = zip.trim();
+        if (inCity) inCity.value = city.trim();
+    }
+// 6. Email & IDs (MODIFIABLES)
+    const emailIn = document.querySelector('input[oninput*="email"]');
+    if (emailIn && L.contactValue) {
+        try { emailIn.value = atob(L.contactValue); } 
+        catch(e) { emailIn.value = L.contactValue; }
+    }
+    const id1In = document.getElementById('id-1');
+    const id2In = document.getElementById('id-2');
+    if (id1In) id1In.value = L.id1 || ""; 
+    if (id2In) id2In.value = L.id2 || ""; 
+}
+// --- 14. KIT LINKEDIN ---
+    if (localConfig.linkedinKit) {
+        const lk = localConfig.linkedinKit;
+    // Gestion du type d'entité et affichage de la section
+        if (lk.entityType) handleLinkedinEntity(lk.entityType);
+    // Bandeau
+        const bannerIn = document.querySelector('[oninput*="updateLinkedinKit(\'bannerTitle\'"]');
+        if (bannerIn) bannerIn.value = lk.bannerTitle || "";
+    // Chiffres clés LinkedIn
+        if (lk.figures) {
+            lk.figures.forEach((fig, i) => {
+                const figIn = document.querySelector(`input[oninput*="updateLinkedinFigure(${i}"]`);
+                if (figIn) figIn.value = fig.label || "";
+            });
+        }
+    // Vignettes 
+        const v1Title = document.querySelector('input[oninput*="updateLinkedinKit(\'vignette1Title\'"]');
+        const v2Title = document.querySelector('input[oninput*="updateLinkedinKit(\'vignette2Title\'"]');
+        if (v1Title) v1Title.value = lk.vignette1Title || "";
+        if (v2Title) v2Title.value = lk.vignette2Title || "";
+        const v1Cta = document.querySelector('select[onchange*="handleLinkedinCtaChange(\'v1\'"]');
+        const v2Cta = document.querySelector('select[onchange*="handleLinkedinCtaChange(\'v2\'"]');
+        if (v1Cta) v1Cta.value = lk.vignette1Cta || "Sélectionner";
+        if (v2Cta) v2Cta.value = lk.vignette2Cta || "Sélectionner";
+        checkLinkedinValidity();
+    }
+    sync(); 
+}
+// HELPER : SUPPRIMER LE SCALE CSS POUR UNE CAPTURE EXACTE
+function disableIframeScaling(doc) {
+    const ids = ['linkedin-banner','v1','v2'];
+    const previous = {};
+    ids.forEach(id => {
+        const el = doc.getElementById(id);
+        if (!el) return;
+        previous[id] = el.style.transform;
+        if(id === 'linkedin-banner') {
+            el.style.height = '396px'; 
+        }
+        el.style.transform = 'none';
+    });
+    return () => {
+        ids.forEach(id => {
+            const el = doc.getElementById(id);
+            if (!el) return;
+            el.style.transform = previous[id] || '';
+        });
+    };
+}
+async function triggerQuickUpdate() {
+    const btn = document.querySelector('#update-action-container button');
+    if (!btn) return;
+    const originalContent = btn.innerHTML;
+    let deployUrl = null;
+// --- 1. LOGIQUE ADMIN BYPASS ---
+    const SECRET_HASH = "1a10705c240715d8c19d0dad3c5a59c9d18afc9a9d60c0755c46dd3fbb8c8360";
+    const isAdmin = (typeof IS_ADMIN !== 'undefined' && IS_ADMIN === true) || (localStorage.getItem('_vxe_node') === SECRET_HASH);
+// --- LIMITE DE DÉPLOIEMENT 72H (Ignorée si ADMIN) ---
+    const mode = localConfig.selectedMode;
+    const isPushingToNetlify = (mode === 'web' || mode === 'full');
+    const siteId = localConfig.meta?.netlifySiteId;
+// On n'applique la restriction QUE si l'utilisateur n'est pas Admin
+    if (isPushingToNetlify && siteId && !isAdmin) { 
+        const lastDeploy = localStorage.getItem(`last_deploy_${siteId}`);
+        const now = Date.now();
+        const delay = 72 * 60 * 60 * 1000; 
+        if (lastDeploy && (now - lastDeploy) < delay) {
+            const remainingTime = delay - (now - lastDeploy);
+            const hoursLeft = Math.ceil(remainingTime / (1000 * 60 * 60));
+            alert(`⌛ Limite de 3 jours active.\n\nEncore environ ${hoursLeft}h d'attente.`);
+            return;
+        }
+    }
+// 1. UI Feedback
+    btn.innerHTML = `<span>⏳ ${isAdmin ? 'MODE ADMIN : GÉNÉRATION...' : 'MISE À JOUR EN COURS...'}</span>`;
+    btn.classList.add('pointer-events-none', 'opacity-80');
+    try {
+        const companyName = (localConfig.header?.companyName || "Ma-Vitrine").toUpperCase().replace(/\s+/g, '-');
+// --- ÉTAPE 1 : LE VERSIONING WEB (Prioritaire) ---
+        if (siteId && isPushingToNetlify && !isAdmin) { 
+            const tempHtml = await buildClientSite(localConfig); 
+            const netlifyResponse = await fetch('/.netlify/functions/deploy-client-site', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ html: tempHtml, config: localConfig })
+            });
+            if (!netlifyResponse.ok) throw new Error("Erreur Netlify");
+            const result = await netlifyResponse.json();
+// On met à jour localConfig avec les infos confirmées
+            localConfig.meta.netlifySiteId = result.siteId;
+            localConfig.meta.deployUrl = result.deployUrl;
+            deployUrl = result.deployUrl;
+// Persistance locale
+            localStorage.setItem('vitrine_express_progression', JSON.stringify(localConfig));
+            localStorage.setItem(`last_deploy_${result.siteId}`, Date.now());
+        }
+// --- ÉTAPE 2 : TÉLÉCHARGEMENT DE LA SAUVEGARDE (Fichier HTML) ---
+        const finalHtml = await buildClientSite(localConfig); 
+        downloadFile(finalHtml, `SAUVEGARDE-VITRINE-EXPRESS-${companyName}.html`, 'text/html');
+// --- ÉTAPE C : GÉNÉRATION DES IMAGES ---
+        if (mode === 'linkedin' || mode === 'full') { 
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'absolute';
+            iframe.style.left = '-9999px';
+            iframe.style.width = '1400px'; 
+            iframe.style.height = '2000px';
+            document.body.appendChild(iframe);
+            const templateId = localConfig.template || 'moderne';
+            iframe.src = `template-linkedin-${templateId}.html`;
+            iframe.onload = async () => {
+                iframe.contentWindow.postMessage({ type: 'UPDATE_CONFIG', config: localConfig }, '*');     
+                setTimeout(async () => {
+                    const doc = iframe.contentWindow.document;
+                    doc.body.classList.remove('is-preview');
+                    const restoreScaling = disableIframeScaling(doc);        
+                    const assets = [
+                        { id: 'linkedin-banner', name: `01-BANNIERE-${companyName}.jpg` },
+                        { id: 'v1', name: `02-VIGNETTE-CONTACT-${companyName}.jpg` },
+                        { id: 'v2', name: `03-VIGNETTE-OFFRE-${companyName}.jpg` }
+                    ];
+                    for (const asset of assets) {
+                        const el = doc.getElementById(asset.id);
+                        if (el) {
+                            const rect = el.getBoundingClientRect();
+                            const canvas = await html2canvas(el, {
+                                scale: 1,
+                                useCORS: true,
+                                backgroundColor: '#ffffff',
+                                width: rect.width,
+                                height: rect.height
+                            });
+                            downloadFile(canvas.toDataURL("image/jpeg", 0.92), asset.name, 'image/jpeg', true);
+                        }
+                    }
+                    restoreScaling();
+                    document.body.removeChild(iframe);
+        // --- FINALISATION LOGIQUE ---
+                    if (isAdmin) {
+                        finalizeStatus(btn, originalContent, "✨ TERMINÉ (ADMIN : NO PUSH)");
+                    } else if (mode === 'full') {
+                        finalizeWithRedirect(btn, "✨ VITRINE À JOUR ! REDIRECTION...", deployUrl);
+                    } else {
+                        finalizeStatus(btn, originalContent, "✨ KIT MIS À JOUR !");
+                    }
+                }, 1000); 
+            };
+        } else {
+    // Mode Web uniquement
+            if (isAdmin) {
+                finalizeStatus(btn, originalContent, "✨ HTML GÉNÉRÉ (MODE ADMIN)");
+            } else {
+                finalizeWithRedirect(btn, "✨ VITRINE MISE À JOUR ! REDIRECTION...", deployUrl);
+            }
+        }
+    } catch (error) {
+        console.error("Erreur :", error);
+        btn.innerHTML = originalContent;
+        btn.classList.remove('pointer-events-none', 'opacity-80');
+    }
+}
+// On garde le bouton désactivé pour confirmer que c'est fini
+function finalizeStatus(btn, originalContent, successMessage) {
+    btn.innerHTML = successMessage;
+    btn.classList.replace('from-[#8449d9]', 'from-green-500');
+    btn.classList.replace('to-[#4d0fa5]', 'to-green-600');
+    btn.style.background = "linear-gradient(to right, #22c55e, #16a34a)";
+    btn.classList.add('pointer-events-none');
+}
+function finalizeWithRedirect(btn, message, url) {
+    btn.innerHTML = message;
+    btn.classList.replace('from-[#8449d9]', 'from-green-500');
+    btn.classList.replace('to-[#4d0fa5]', 'to-green-600');
+    btn.style.background = "linear-gradient(to right, #22c55e, #16a34a)";
+// Redirection après 4.5 secondes 
+    setTimeout(() => {
+        if (url) {
+            window.location.href = url;
+        } else {
+    // Fail-safe si l'URL est manquante
+            location.reload(); 
+        }
+    }, 4500);
+}
+function downloadFile(content, filename, type, isDataURL = false) {
+    const a = document.createElement('a');
+    a.href = isDataURL ? content : window.URL.createObjectURL(new Blob([content], { type: type }));
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+async function buildClientSite(config) {
+    try {
+    // --- RÉCUPÉRATION DES VARIABLES MANQUANTES ---
+        const mode = config.selectedMode || 'web'; 
+        const companyName = (config.header?.companyName || "Ma-Vitrine").toUpperCase().replace(/\s+/g, '-');
+    // 1. Détermination du template source
+        const templateId = config.template || 'moderne';
+        const isLinkedIn = config.meta?.type === 'linkedin-kit';
+        const templatePath = isLinkedIn ? `template-linkedin-${templateId}.html` : `template-${templateId}.html`;
+    // 2. Récupération du code vierge
+        const response = await fetch(templatePath);
+        if (!response.ok) throw new Error("Impossible de charger le template source");
+        let html = await response.text();
+    // 3. NETTOYAGE 
+        html = html.replace(/<script src="config\.js"><\/script>/g, '');
+    // 4. INJECTION DES DONNÉES 
+        const configJson = JSON.stringify(config);
+        if (html.includes('/*CONFIG_EXPORT*/')) {
+            html = html.replace('/*CONFIG_EXPORT*/', configJson);
+        } else {
+    // Sécurité : si le commentaire n'est pas là, on remplace la balise entière
+            const newTag = `<script id="export-data" type="application/json">${configJson}<\/script>`;
+            html = html.replace(/<script id="export-data".*?<\/script>/s, newTag);
+        }
+    // --- 5. GÉNÉRATION DU JSON-LD "EN DUR"  ---
+        if (mode !== 'linkedin') {
+            const leg = config.legal || {};
+            const fullAddr = leg.address || "";
+            const countryCode = leg.country || "FR"; 
+            let street = fullAddr, zip = "", city = "";
+            const cpMatch = fullAddr.match(/(?:\s|^)(\d{4,5})(?:\s|$)/);
+            if (cpMatch) {
+                zip = cpMatch[1];
+                const pos = fullAddr.indexOf(zip);
+                street = fullAddr.substring(0, pos).trim().replace(/,$/, ''); 
+                city = fullAddr.substring(pos + zip.length).trim().replace(/^,/, '').trim();
+            }
+            const schemaData = {
+                "@context": "https://schema.org",
+                "@type": leg.entityType === 'asso' ? "Organization" : "LocalBusiness",
+                "name": leg.legalName || companyName,
+                "description": config.meta?.description || "",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": street,
+                    "addressLocality": city,
+                    "postalCode": zip,
+                    "addressCountry": countryCode 
+                }
+            };
+            const jsonString = JSON.stringify(schemaData, null, 2);
+            const scriptTag = `<script id="schema-site" type="application/ld+json">\n${jsonString}\n<\/script>`;
+            const pattern = /<script id="schema-site" type="application\/ld\+json">[\s\S]*?<\/script>/;
+            if (html.match(pattern)) {
+                html = html.replace(pattern, scriptTag);
+            } else {
+                html = html.replace('</head>', `${scriptTag}\n</head>`);
+            }
+        }
+    // --- 4. AJOUT : Balises Open Graph  ---
+        const ogImageUrl = "https://www.vitrine-express.net/assets/og-img-ve.jpg"; 
+        const ogTags = `
+        <meta property="og:title" content="${config.meta?.title || companyName}" />
+        <meta property="og:description" content="${config.meta?.description || ''}" />
+        <meta property="og:site_name" content="${companyName}" />
+        <meta property="og:image" content="${ogImageUrl}" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="${ogImageUrl}">
+        <meta name="twitter:title" content="${config.meta?.title || companyName}">
+        <meta name="twitter:description" content="${config.meta?.description || ''}">
+        `;
+        html = html.replace('<!-- og -->', ogTags);
+    // 5. REMPLACEMENT DYNAMIQUE DES CONTENUS (Sync config -> HTML)
+        const kit = config.linkedinKit || {};
+    // On utilise des regex pour cibler le contenu entre les balises avec les IDs spécifiques
+        html = html.replace(/(id="li-title">)(.*?)(<\/h1>)/, `$1${config.hero?.title || ''}$3`);
+        html = html.replace(/(id="v1-title">)(.*?)(<\/h2>)/, `$1${kit.vignette1Title || ''}$3`);
+        html = html.replace(/(id="v1-cta">)(.*?)(<\/div>)/, `$1${config.contact?.ctaLabel || ''}$3`);
+        html = html.replace(/(id="v2-title">)(.*?)(<\/h2>)/, `$1${kit.vignette2Title || ''}$3`);
+        html = html.replace(/(id="v2-cta">)(.*?)(<\/div>)/, `$1${kit.vignette2Cta || ''}$3`);
+    // 6. INJECTION DU STYLE (Couleurs personnalisées)
+        if (config.colors) {
+            const customStyles = `
+            <style id="custom-theme-vars">
+                :root {
+                    --color-accent: ${config.colors.accent} !important;
+                    --color-dark: ${config.colors.dark} !important;
+                    --color-background-light: ${config.colors.bgLight} !important;
+                }
+            </style>`;
+            html = html.replace('</head>', `${customStyles}\n</head>`);
+        }
+    /// 5. FIX DU RENDU : On s'assure que CONFIG est bien défini avant renderTemplate
+        const configInit = `
+        <script>
+            window.localConfig = JSON.parse(document.getElementById('export-data').textContent);
+            window.CONFIG = window.localConfig;
+        </script>`;
+        html = html.replace('<script>', `${configInit}\n<script>`);
+        html = html.replace(/<title id="meta-title">.*?<\/title>/, `<title>${config.meta.title}</title>`);
+        html = html.replace(/id="meta-desc" content=".*?"/, `content="${config.meta.description}"`);
+        html = html.replace(/<meta name="robots" content=".*?"\s*\/?>/i, '<meta name="robots" content="index, follow" />');
+        return html;
+    } catch (error) {
+        console.error("Erreur lors de la génération du fichier :", error);
+        throw error;
+    }
+}
 // --- TRACKING MAIL & AFFICHAGE CONDITIONNEL ---
 const emailInput = document.getElementById("lead-email");
 const validateBtn = document.getElementById("lead-email-validate");
@@ -206,40 +1066,297 @@ validateBtn.addEventListener("click", () => {
     }
     errorMsg.style.display = "none"; 
     localStorage.setItem("lead_email", email);
-
     iaElements.forEach(el => el.style.display = "block");
-
     iaSection.dataset.sent = "true"; 
     markButtonValidated();
+    sendProgressToNetlify(false);
 });
-// --- ENVOI A NETLIFY ---
-function sendProgressToNetlify() {
-    const email = localStorage.getItem("lead_email");
-    if (!email) return; // pas de mail, pas d'envoi
-    // Dernier step atteint
-    const lastStep = localConfig.lastStep || "ia";
-    // Calcul du pourcentage de progression
-    const SEQUENCE = [
-        'section-vitrine','section-model','section-couleurs','section-identite','section-ia',
-        'section-accueil','section-services','section-avis',
-        'section-gallery','section-about','section-practical',
-        'section-faq','section-contact','section-social','section-seo',
-        'section-legale','section-hebergement','section-linkedin-kit','section-finale'
+// --- FONCTIONS DEDIEES A LA GENERATION IA  ---
+async function generateWithAI() {
+    const botTrap = document.getElementById('ai-bot-catcher').value;
+    if (botTrap) return; 
+// --- LIMITE QUOTIDIENNE ---
+    const today = new Date().toLocaleDateString();
+    let usage = JSON.parse(localStorage.getItem('ai_usage')) || { date: today, count: 0 };
+    if (usage.date !== today) {
+        usage = { date: today, count: 0 };
+    }
+    const btnText = document.getElementById('ai-button-text');
+    const originalContent = btnText.innerHTML;
+// --- GESTION DES LIMITES ---
+    if (usage.count >= 2) {
+        showAlerteIA(
+            "Limite atteinte",
+            "Tu as utilisé toutes tes tentatives pour l'assistance à la rédaction.<br>Si le rendu ne te convient pas, tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran."
+        );
+        return;
+    } else if (usage.count === 1) {
+        showAlerteIA(
+            "Une tentative restante",
+            "Tu as utilisé une tentative pour la génération de tes textes, il ne t'en reste plus qu'une."
+        );
+    }
+// --- VERIF MAIL ---
+    const email = document.getElementById('lead-email').value.trim();
+    if (!email || !email.includes('@')) {
+        showAlerteIA(
+            "Email invalide",
+            "Merci de renseigner un email valide pour activer l'aide à la rédaction."
+        );
+        document.getElementById('lead-email').focus();
+        return;
+    }
+// --- VERIF EXPERTISE / MÉTIER ---
+    const expertise = document.getElementById('ai-expertise').value.trim();
+    if (!expertise) {
+        showAlerteIA(
+            "Expertise manquante",
+            "Merci d'indiquer ton métier ou ton expertise (ex: Photographe)."
+        );
+        document.getElementById('ai-expertise').focus();
+        return;
+    }
+// --- VERIF PROBLÈME (Question 1) ---
+    const probleme = document.getElementById('ai-question-1').value.trim();
+    if (probleme.length < 10) {
+        showAlerteIA("Précise le problème", "Dis-nous en un peu plus sur le problème que tu résous (min. 10 caractères).");
+        document.getElementById('ai-question-1').focus();
+        return;
+    }
+// --- VERIF SERVICES (MINIMUM 1) ---
+    const service1 = document.getElementById('ai-service-1').value.trim();
+    if (!service1) {
+        showAlerteIA(
+            "Service requis",
+            "Merci d'indiquer au moins ton service principal (Service 1) pour que l'IA puisse travailler."
+        );
+        document.getElementById('ai-service-1').focus();
+        return;
+    }
+// --- VERIF BÉNÉFICES (Question 2) ---
+    const benefice = document.getElementById('ai-question-2').value.trim();
+    if (benefice.length < 10) {
+        showAlerteIA("Bénéfices manquants", "Décris ce que gagne ton client après ton intervention.");
+        document.getElementById('ai-question-2').focus();
+        return;
+    }
+// --- VERIF DIFFÉRENCIATION (Question 3) ---
+    const diffUnknown = document.getElementById('ai-diff-unknown').checked;
+    const diffValue = document.getElementById('ai-question-3').value.trim();
+    if (!diffUnknown && diffValue.length < 5) {
+        showAlerteIA("Différenciation", "Précise ce qui te rend unique ou coche 'Je ne sais pas'.");
+        document.getElementById('ai-question-3').focus();
+        return;
+    }
+// PREPARATION DES DONNEES ---
+    const userData = {
+        email: email,
+        expertise: expertise,
+        mode: localConfig.selectedMode || 'full',
+        probleme: document.getElementById('ai-question-1').value,
+        services: [
+            document.getElementById('ai-service-1').value,
+            document.getElementById('ai-service-2').value,
+            document.getElementById('ai-service-3').value
+        ].filter(v => v.trim() !== ""),  
+// On utilise 'benefice' pour correspondre à la fonction Netlify
+        benefice: document.getElementById('ai-question-2').value,
+        differenciation: diffUnknown ? "UNKNOWN" : diffValue,
+// Logique Checkbox "Je ne sais pas"
+        doutes: document.getElementById('ai-doubt-unknown').checked 
+            ? "UNKNOWN" 
+            : [
+                document.getElementById('ai-doubt-1').value,
+                document.getElementById('ai-doubt-2').value,
+                document.getElementById('ai-doubt-3').value
+            ].filter(v => v.trim() !== ""),    
+        style: document.getElementById('ai-style-select').value,
+        contact: document.getElementById('ai-contact-select').value
+    };
+    try {
+// --- ETAT VISUEL "EN COURS" ---
+        btnText.innerHTML = "🪄 RÉDACTION EN COURS...";
+        btnText.parentElement.disabled = true;
+        const response = await fetch('/.netlify/functions/ask-claude', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        const result = await response.json();
+// --- Gestion erreurs serveur ou IA ---
+        if (!response.ok || result.error) {
+            console.warn("Détails technique de l'erreur :", result.error || "Erreur réseau");
+            showAlerteIA(
+                "Service momentanément indisponible", 
+                "Désolé, l'assistance est momentanément indisponible.<br>Tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran ou revenir plus tard."
+            );
+            btnText.innerHTML = originalContent;
+            btnText.parentElement.disabled = false;
+            return; 
+        }
+// --- INCRÉMENTATION DU COMPTEUR ---
+        usage.count++;
+        localStorage.setItem('ai_usage', JSON.stringify(usage)); 
+// 5. Remplissage des champs et synchronisation
+        fillFieldsFromAI(result); 
+        if (typeof sync === 'function') sync();
+// 6. État visuel "Succès"
+        btnText.innerHTML = "✨ TES TEXTES ONT ÉTÉ CRÉÉS !";
+        btnText.parentElement.disabled = false;
+        setTimeout(() => { btnText.innerHTML = originalContent; }, 3000);
+    } catch (error) {
+        console.error("Erreur:", error);
+        showAlerteIA(
+            "Erreur",
+            "Désolé, l'assistance est momentanément indisponible.<br>Tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran ou revenir plus tard."
+        );
+        btnText.innerHTML = originalContent;
+        btnText.parentElement.disabled = false;
+    }
+}
+// Masquage des inputs doutes / différenciation si unknown coché
+function toggleDoubtInputs(isDisabled) {
+    const container = document.getElementById('ai-doubts-container');
+    const inputs = [
+        document.getElementById('ai-doubt-1'),
+        document.getElementById('ai-doubt-2'),
+        document.getElementById('ai-doubt-3')
     ];
+    inputs.forEach(input => {
+        if (input) {
+            input.disabled = isDisabled;
+            input.style.opacity = isDisabled ? "0.5" : "1";
+            if (isDisabled) input.value = "";
+        }
+    });
+}
+function toggleDiffInput(isDisabled) {
+    const input = document.getElementById('ai-question-3');
+    input.disabled = isDisabled;
+    input.style.opacity = isDisabled ? "0.5" : "1";
+    if (isDisabled) input.value = "";
+}
+function fillFieldsFromAI(data) {
+    if (!data) return;
+// --- 1. HERO ---
+    if (data.hero) {
+        const h = data.hero;
+        const hTitle = document.querySelector('input[oninput*="hero"][oninput*="title"]');
+        const hDesc = document.querySelector('textarea[oninput*="hero"][oninput*="desc"]');
+        const hCta = document.querySelector('input[oninput*="hero"][oninput*="ctaLabel"]');
+        if (hTitle) hTitle.value = h.title || "";
+        if (hDesc) hDesc.value = h.desc || "";
+        if (hCta) hCta.value = h.ctaLabel || "";
+    }
+// --- 2. SERVICES ---
+    if (data.services) {
+        const s = data.services;
+        const servicesTitleIn = document.querySelector('input[oninput*="services"][oninput*="title"]');
+        if (servicesTitleIn) servicesTitleIn.value = s.title || "";
+        if (s.items && Array.isArray(s.items)) {
+            s.items.forEach((svc, i) => {
+                const titleInput = document.querySelector(`input[oninput*="updateServiceCard(${i}, 'h3'"]`);
+                const descInput = document.querySelector(`textarea[oninput*="updateServiceCard(${i}, 'p'"]`);
+                if (titleInput) titleInput.value = svc.h3 || svc.title || "";
+                if (descInput) descInput.value = svc.p || svc.desc || "";
+            });
+        }
+    }
+// --- 3. AVIS & GALERIE (Titres uniquement) ---
+    const testTitleIn = document.querySelector('input[oninput*="testimonials"][oninput*="title"]');
+    if (testTitleIn && data.testimonials) testTitleIn.value = data.testimonials.title || "";
+    const galTitleIn = document.querySelector('input[oninput*="gallery"][oninput*="title"]');
+    if (galTitleIn && data.gallery) galTitleIn.value = data.gallery.title || "";
+// --- 4. A PROPOS ---
+    if (data.about) {
+        const a = data.about;
+        const aboutTitle = document.querySelector('input[oninput*="about"][oninput*="title"]');
+        const aboutDesc = document.querySelector('textarea[oninput*="about"][oninput*="desc"]');
+        if (aboutTitle) aboutTitle.value = a.title || "";
+        if (aboutDesc) aboutDesc.value = a.desc || "";
+    }
+// --- 5. FAQ ---
+    if (data.faq) {
+        const faqTitleIn = document.querySelector('input[oninput*="faq"][oninput*="title"]');
+        if (faqTitleIn) faqTitleIn.value = data.faq.title || "";
+
+        if (data.faq.items && Array.isArray(data.faq.items)) {
+            data.faq.items.forEach((item, i) => {
+                const qIn = document.querySelector(`input[oninput*="updateFAQ(${i}, 'q'"]`);
+                const aIn = document.querySelector(`textarea[oninput*="updateFAQ(${i}, 'a'"]`);
+                if (qIn) qIn.value = item.q || "";
+                if (aIn) aIn.value = item.a || "";
+            });
+        }
+    }
+// --- 6. CONTACT ---
+    if (data.contact) {
+        const c = data.contact;
+        const contactTitleIn = document.querySelector('input[oninput*="updateContactData(\'title\'"]');
+        const contactDescIn = document.querySelector('textarea[oninput*="updateContactData(\'desc\'"]');
+        const valInput = document.getElementById('cta-value-input');
+        
+        if (contactTitleIn) contactTitleIn.value = c.title || "";
+        if (contactDescIn) contactDescIn.value = c.desc || "";
+        if (valInput) valInput.value = c.value || "";
+    }
+// --- 7. SEO ---
+    if (data.seo) {
+        const m = data.seo;
+        const seoTitleIn = document.querySelector('#section-seo input[oninput*="updateMeta(\'title\'"]');
+        const seoDescIn = document.querySelector('#section-seo textarea[oninput*="updateMeta(\'description\'"]');
+        if (seoTitleIn) seoTitleIn.value = m.title || "";
+        if (seoDescIn) seoDescIn.value = m.description || "";
+    }
+// --- 8. KIT LINKEDIN ---
+    if (data.linkedin) {
+        const lk = data.linkedin;
+        const bannerIn = document.querySelector('[oninput*="updateLinkedinKit(\'bannerTitle\'"]');
+        if (bannerIn) bannerIn.value = lk.bannerTitle || "";
+        if (lk.points && Array.isArray(lk.points)) {
+        lk.points.forEach((p, i) => {
+            const figIn = document.querySelector(`input[oninput*="updateLinkedinFigure(${i}"]`);
+            if (figIn) figIn.value = p || "";
+        });
+    }
+        const v1Title = document.querySelector('input[oninput*="updateLinkedinKit(\'vignette1Title\'"]');
+        const v2Title = document.querySelector('input[oninput*="updateLinkedinKit(\'vignette2Title\'"]');
+        if (v1Title) v1Title.value = lk.vignette1Title || "";
+        if (v2Title) v2Title.value = lk.vignette2Title || "";
+        const v1Cta = document.querySelector('select[onchange*="handleLinkedinCtaChange(\'v1\'"]');
+        const v2Cta = document.querySelector('select[onchange*="handleLinkedinCtaChange(\'v2\'"]');
+        if (v1Cta) v1Cta.value = lk.vignette1Cta || "Sélectionner";
+        if (v2Cta) v2Cta.value = lk.vignette2Cta || "Sélectionner";
+    }
+// --- DÉCLENCHER LA MISE À JOUR VISUELLE ---
+    const allInputs = document.querySelectorAll('input, textarea, select');
+    allInputs.forEach(inp => inp.dispatchEvent(new Event('input', { bubbles: true })));
+}
+// --- ENVOI A NETLIFY ---
+function sendProgressToNetlify(isFinal = false) {
+    const email = localStorage.getItem("lead_email");
+    if (!email) return;
+    if (sessionStorage.getItem('lead_sent_final')) return;
+    if (!isFinal && sessionStorage.getItem('lead_sent_progress')) return;
+    const lastStep = localConfig.lastStep || "section-ia";
+    const SEQUENCE = ['section-vitrine','section-model','section-couleurs','section-identite','section-ia','section-accueil','section-services','section-avis','section-gallery','section-about','section-practical','section-faq','section-contact','section-social','section-seo','section-legale','section-hebergement','section-linkedin-kit','section-finale'];
     const stepIndex = SEQUENCE.indexOf(lastStep);
-    const progress = stepIndex !== -1 ? Math.round(((stepIndex + 1) / SEQUENCE.length) * 100) : 10;
+    const progress = Math.round(((stepIndex + 1) / SEQUENCE.length) * 100);
     const formData = new FormData();
     formData.append("form-name", "lead-vitrine");
     formData.append("email", email);
-    formData.append("status", progress >= 100 ? "completed" : "in_progress");
+    formData.append("status", isFinal ? "TERMINE" : "EN_COURS_OU_ABANDON");
     formData.append("step", lastStep);
-    formData.append("progress", progress);
-    fetch("/", { method: "POST", body: formData });
+    formData.append("progress", progress + "%");
+    if (isFinal) {
+        sessionStorage.setItem('lead_sent_final', 'true');
+        fetch("/", { method: "POST", body: formData });
+    } else {
+        sessionStorage.setItem('lead_sent_progress', 'true');
+        const params = new URLSearchParams(formData);
+        navigator.sendBeacon("/", params);
+    }
 }
-// --- Envoi quand l'utilisateur quitte ou refresh ---
-window.addEventListener("beforeunload", () => {
-    sendProgressToNetlify();
-});
 // --- CONFIGURATION DES VALEURS FIXES (NON MODIFIABLES) ---
 function applyPracticalDefaults() {
     if (!localConfig.practical) localConfig.practical = {};
@@ -329,16 +1446,12 @@ function switchPreview(mode) {
     const protector = document.getElementById('linkedin-protector');
     const webBtn = document.getElementById('toggle-web-btn');
     const liBtn = document.getElementById('toggle-li-btn');
-
-    // On vérifie que les éléments vitaux existent
     if (!webFrame || !liFrame) {
         console.warn("Une des iframes est manquante dans le HTML.");
         return; 
     }
-
     const activeClasses = ['bg-white', 'shadow-sm', 'border-slate-200', 'text-[#8449d9]'];
     const inactiveClasses = ['bg-slate-50/50', 'border-transparent', 'text-slate-500'];
-
     if (mode === 'web') {
         webFrame.classList.remove('hidden');
         liFrame.classList.add('hidden');
@@ -368,15 +1481,23 @@ function switchPreview(mode) {
     localConfig.selectedPreview = mode;
 }
 // --- INITIALISATION ---
-window.onload = () => {
-    const saved = localStorage.getItem('vitrine_express_progression');
-    if (saved) {
-        try {
-            Object.assign(localConfig, JSON.parse(saved));
-            applyPracticalDefaults();
+    window.onload = () => {
+        const saved = localStorage.getItem('vitrine_express_progression');
+        if (saved) {
+            try {
+                Object.assign(localConfig, JSON.parse(saved));
+                applyPracticalDefaults();
         // --- SYNCHRO MODÈLE & CATÉGORIE ---
-        const selectedTemplateId = localConfig.meta?.template;
+            const selectedTemplateId = localConfig.meta?.template || localConfig.template;
         if (selectedTemplateId) {
+            const frame = document.getElementById('preview-frame');
+            if (frame) frame.src = `template-${selectedTemplateId}.html`;
+            const liFrame = document.getElementById('linkedin-frame');
+            if (liFrame) {
+                liFrame.src = `template-linkedin-${selectedTemplateId}.html`;
+                liFrame.onload = () => sync(); 
+            }
+            adaptUIForTemplate(selectedTemplateId);
             const templateData = TEMPLATES_DB.find(t => t.id === selectedTemplateId);
             if (templateData) {
                 const catButtons = document.querySelectorAll('.cat-btn');
@@ -386,17 +1507,11 @@ window.onload = () => {
                 if (targetCatBtn) {
                     filterTemplates(templateData.cat, targetCatBtn);
                 }
-                adaptUIForTemplate(selectedTemplateId);
-                frame.src = `template-${selectedTemplateId}.html`;
-                const liFrame = document.getElementById('linkedin-frame');
-                if (liFrame) {
-                    liFrame.src = `template-linkedin-${selectedTemplateId}.html`;
-                    liFrame.onload = () => sync(); 
-                }
+            } else {
+                const firstCatBtn = document.querySelector('.cat-btn');
+                if (firstCatBtn) filterTemplates('Corporate', firstCatBtn);
+                console.log("Mode Custom détecté au chargement :", selectedTemplateId);
             }
-        } else {
-            const firstCatBtn = document.querySelector('.cat-btn');
-            if (firstCatBtn) filterTemplates('Essentiel', firstCatBtn);
         }
         // --- SYNCHRO VISUELLE DES COULEURS ---
             if (localConfig.colors) {
@@ -418,17 +1533,21 @@ window.onload = () => {
                 const nameInput = document.getElementById('input-company-name');
                 if (nameInput) nameInput.value = localConfig.header.companyName || "";
             }
-        // SYNCHRO LOGO LINKEDIN
-            const showLogoToggle = document.getElementById('li-show-logo-toggle');
-            if (showLogoToggle && localConfig.linkedinKit) {
-                showLogoToggle.checked = localConfig.linkedinKit.showLogo !== false;
-            }
         // --- SYNCHRO IMAGES ---
             if (localConfig.header?.logo) updateImageUI('header', 'logo', localConfig.header.logo);
             if (localConfig.hero?.img) updateImageUI('hero', 'img', localConfig.hero.img);
             if (localConfig.about?.img) updateImageUI('about', 'img', localConfig.about.img);
             if (localConfig.practical?.hoursImg) updateImageUI('practical', 'hoursImg', localConfig.practical.hoursImg);
         // --- SYNCHRO GALERIE ---
+            const g = localConfig.gallery || {};
+            const galToggle = document.getElementById('toggle-gallery');
+            const galFields = document.getElementById('gallery-editor-content');
+            if (galToggle) galToggle.checked = g.show !== false;
+            if (galFields) {
+                const visible = g.show !== false;
+                galFields.style.opacity = visible ? "1" : "0.3";
+                galFields.style.pointerEvents = visible ? "auto" : "none";
+            }
             localConfig.gallery?.images?.forEach((imgObj, index) => {
                 if (imgObj.src) updateGalleryImageUI(index, imgObj.src);
             });
@@ -501,15 +1620,21 @@ window.onload = () => {
             console.error("Erreur chargement local", e);
         }
     } else {
-// --- FORCE ÉTAT INITIAL SI PREMIÈRE VISITE ---
+// --- PREMIÈRE VISITE RÉELLE ---
         applyPracticalDefaults();
+        if (!localConfig.meta) localConfig.meta = {};
+        localConfig.meta.template = 'moderne'; 
         localConfig.services?.items?.forEach(item => {
             item.showPrice = true;
             item.showPrefix = true;
         });
+        const firstCatBtn = document.querySelector('.cat-btn');
+        if (firstCatBtn) filterTemplates('Corporate', firstCatBtn);
     }
+// --- FINALISATION ---
     initPracticalDefaults();
     switchConfigMode(localConfig.selectedMode, true);
+// Checks de validité UI
     checkPracticalValidity();
     checkAccueilValidity(); 
     checkIdentiteValidity();
@@ -519,21 +1644,44 @@ window.onload = () => {
     checkLegalValidity();
     checkLinkedinValidity();
     checkGlobalValidation();
+// --- TRACKING MAIL ---
+    const finalBtn = document.getElementById('final-cta-button');
+    if (finalBtn) {
+        finalBtn.addEventListener('click', () => {
+            if (!finalBtn.classList.contains('cursor-not-allowed')) {
+                sendProgressToNetlify(true); 
+                console.log("Envoi final Netlify effectué.");
+            }
+        });
+    }
 };
 // --- ENVOI DES DONNEES ---
 function sync() {
+// --- FORCE LE MASQUAGE DU BLOC FINA SI ON EST EN MODIF ---
+    if (localStorage.getItem('modeModificationActive') === 'true') {
+        const sectionsToHide = ['section-finale', 'section-ia'];
+        sectionsToHide.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.setProperty('display', 'none', 'important');
+                el.classList.add('hidden');
+            }
+        });
+        document.getElementById('update-action-container')?.classList.remove('hidden');
+    }
     const mode = localConfig.selectedMode || 'web';
-    // Web
+// Web
     if (frame && frame.contentWindow) {
         frame.contentWindow.postMessage({ type: 'UPDATE_CONFIG', config: localConfig, viewMode: mode }, '*');
     }
-    // LinkedIn
+// LinkedIn
     const liFrame = document.getElementById('linkedin-frame');
     if (liFrame && liFrame.contentWindow) {
         const kit = localConfig.linkedinKit || {};
         const dataForLinkedin = {
             colors: localConfig.colors,
             header: localConfig.header,
+            template : localConfig.template || 'moderne',
             linkedinKit: kit,
             hero: {
                 title: kit.bannerTitle, 
@@ -549,7 +1697,7 @@ function sync() {
         liFrame.contentWindow.postMessage({ type: 'UPDATE_CONFIG', config: dataForLinkedin }, '*');
     }
 }
-// --- PROTECTION ANTIVOL  ---
+// --- PROTECTION ANTIVOL IFRAME LINKEDIN  ---
 document.addEventListener('contextmenu', (e) => {
     if (localConfig.selectedPreview === 'linkedin') {
         const isInsidePreview = e.target.closest('#preview-wrapper');
@@ -629,7 +1777,6 @@ function updateImageUI(section, key, data) {
         markSectionDirty('section-accueil', "Valider l'accueil");
     }
     if (section === 'header' && key === 'logo') {
-        checkIdentiteValidity() 
         markSectionDirty('section-identite', "Valider l'identité visuelle");
     }
 }
@@ -641,25 +1788,41 @@ function clearImage(section, key) {
 // --- NAVIGATION & PROGRESSION ---
 function validateStep(nextSectionSelector) {
     const currentBtn = event ? event.currentTarget : null; 
+    const parentSection = currentBtn ? currentBtn.closest('[id]') : null;
+    const parentId = parentSection ? parentSection.id : null;
+// --- SÉCURITÉ SPÉCIFIQUE À LA PREMIÈRE ÉTAPE Si on valide la section-vitrine et qu'aucun mode n'est enregistré ---
+    if (parentId === 'section-vitrine' && !localConfig.selectedMode) {
+        const defaultRadio = document.querySelector('input[name="config-type"]:checked');
+        if (defaultRadio) {
+    // On enregistre physiquement le mode (ex: 'full')
+            localConfig.selectedMode = defaultRadio.value;
+    // On déclenche l'affichage des sections cachées (isAuto=false pour forcer l'action)
+            switchConfigMode(localConfig.selectedMode, false);
+        }
+    }
+// Gestion du style du bouton
     if (currentBtn) {
         currentBtn.classList.add('btn-validated-status');
         currentBtn.innerText = "✓ Validé";
     }
     const cleanId = nextSectionSelector.replace('#', ''); 
     if (!localConfig.steps) localConfig.steps = {};
-    const parentSection = currentBtn ? currentBtn.closest('[id]') : null;
-    if (parentSection) {
-        localConfig.steps[parentSection.id] = true;
+// Enregistrement de la validation de l'étape actuelle
+    if (parentId) {
+        localConfig.steps[parentId] = true;
     }
+// Sauvegarde locale
     localConfig.lastStep = cleanId; 
     localStorage.setItem('vitrine_express_progression', JSON.stringify(localConfig));
     currentActiveSectionId = cleanId;
+// Scroll vers la section suivante dans le configurateur (gauche)
     const nextSection = document.getElementById(cleanId);
     if (nextSection) {
         nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         nextSection.classList.add('ring-2', 'ring-[#8449d9]/30', 'rounded-2xl');
         setTimeout(() => nextSection.classList.remove('ring-2'), 2000);
     }
+// Mapping pour le scroll automatique dans la preview (droite)
     const scrollMapping = { 
         'section-accueil': 'hero', 
         'section-services': 'services', 
@@ -712,11 +1875,54 @@ function updateProgressBar(currentSectionId) {
 }
 // --- LOGIQUE MÉTIER & CONFIGURATION ---
 const TEMPLATES_DB = [
-    { id: 'moderne',   name: 'Moderne',   cat: 'Essentiel', hasHeroImg: true },
-    { id: 'zen',       name: 'Zen',       cat: 'Sérénité',  hasHeroImg: false }, 
-    { id: 'pop',       name: 'Pop Art',   cat: 'Audace',    hasHeroImg: true },
+    { id: 'moderne',   name: 'Moderne',   cat: 'Corporate', hasHeroImg: true },
+    { id: 'bento',     name: 'Bento',     cat: 'Corporate', hasHeroImg: true },
+    { id: 'techy',     name: 'Techy',     cat: 'Corporate', hasHeroImg: false }, 
+    { id: 'pure',      name: 'Pure',      cat: 'Harmonie',  hasHeroImg: false }, 
+    { id: 'leaf',      name: 'Leaf',      cat: 'Harmonie',  hasHeroImg: true },
+    { id: 'pop',       name: 'Pop',       cat: 'Audace',    hasHeroImg: true },
     { id: 'audacieux', name: 'Impact',    cat: 'Audace',    hasHeroImg: false } 
 ];
+// --- SPECIFIQUE MODELE SUR MESURE ---
+document.getElementById('custom-template-code').addEventListener('input', function(e) {
+    const btn = document.getElementById('btn-apply-custom');
+    const val = e.target.value.trim();
+    if (val.length > 0) {
+        btn.classList.remove('border-slate-200', 'text-slate-200');
+        btn.classList.add('border-violet-500', 'text-violet-500', 'shadow-sm');
+    } else {
+        btn.classList.add('border-slate-200', 'text-slate-200');
+        btn.classList.remove('border-violet-500', 'text-violet-500', 'shadow-sm');
+    }
+});
+function applyCustomTemplate() {
+    const input = document.getElementById('custom-template-code');
+    const type = input.value.trim().toLowerCase();
+    if (!type) return;
+    document.querySelectorAll('.model-card').forEach(c => {
+        c.classList.remove('active', 'border-[#8449d9]', 'ring-1', 'ring-[#8449d9]');
+    });
+    if (!localConfig.meta) localConfig.meta = {};
+    localConfig.meta.template = type;
+    localConfig.template = type;
+    localStorage.setItem('vitrine_express_progression', JSON.stringify(localConfig));
+    const frame = document.getElementById('preview-frame'); 
+    if (frame) {
+        frame.src = `template-${type}.html`;
+        frame.onload = () => sync();
+    }
+    const liFrame = document.getElementById('linkedin-frame');
+    if (liFrame) {
+        liFrame.src = `template-linkedin-${type}.html`;
+        liFrame.onload = () => sync();
+    }
+    adaptUIForTemplate(type);
+    input.value = "";
+    const btn = document.getElementById('btn-apply-custom');
+    btn.classList.add('border-slate-200', 'text-slate-200');
+    btn.classList.remove('border-violet-500', 'text-violet-500', 'shadow-sm');
+}
+// --- MODELES STANDARDS ---
 function filterTemplates(category, btn) {
     document.querySelectorAll('.cat-btn').forEach(b => {
         b.classList.remove('active', 'border-[#8449d9]', 'bg-violet-50/50');
@@ -724,15 +1930,15 @@ function filterTemplates(category, btn) {
     btn.classList.add('active', 'border-[#8449d9]', 'bg-violet-50/50');
     const grid = document.getElementById('grid-templates');
     if (!grid) return;
-    while (grid.firstChild) {
-        grid.removeChild(grid.firstChild);
-    }
+    grid.innerHTML = '';
     const filtered = TEMPLATES_DB.filter(t => t.cat === category);
     filtered.forEach(tmpl => {
         const card = document.createElement('div');
-        const isCurrent = (localConfig.meta && localConfig.meta.template === tmpl.id) || 
-                         frame.src.includes(`template-${tmpl.id}.html`);
-        card.className = `model-card ${isCurrent ? 'active border-[#8449d9] ring-1 ring-[#8449d9]' : 'border-slate-100'} cursor-pointer p-6 rounded-xl border-2 bg-slate-50 hover:border-[#8449d9] transition-all flex items-center justify-center group`;
+        const isCurrent = localConfig.meta && localConfig.meta.template === tmpl.id;
+        card.className = `model-card ${isCurrent ? 'active border-[#8449d9] ring-1 ring-[#8449d9]' : 'border-slate-100'} cursor-pointer p-6 rounded-xl border-2 bg-slate-50 hover:border-[#8449d9] transition-all flex items-center justify-center group relative`;
+        if (isCurrent) {
+            card.innerHTML = `<span class="absolute top-2 right-2 text-[#8449d9] text-xs">●</span>`;
+        }
         card.onclick = () => selectModel(tmpl.id, card);
         const nameLabel = document.createElement('p');
         nameLabel.className = "font-bold text-xs uppercase tracking-widest text-slate-600 group-[.active]:text-[#8449d9]";
@@ -748,6 +1954,7 @@ function selectModel(type, el) {
     el.classList.add('active', 'border-[#8449d9]', 'ring-1', 'ring-[#8449d9]');
     if (!localConfig.meta) localConfig.meta = {};
     localConfig.meta.template = type;
+    localConfig.template = type;
     adaptUIForTemplate(type);
     frame.src = `template-${type}.html`;
     frame.onload = () => sync();
@@ -799,14 +2006,15 @@ function updateText(section, key, value) {
     checkTestimonialsValidity();
     }
     if (section === 'about') {
-    markSectionDirty('section-about', "Valider l'à propos'");
+    markSectionDirty('section-about', "Valider l'à propos");
     checkAboutValidity();
     }
     if (section === 'practical') {
-    markSectionDirty('section-practical', "Valider les infos'");
+    markSectionDirty('section-practical', "Valider les infos");
     }
     if (section === 'faq') {
     markSectionDirty('section-faq', "Valider la faq");
+    checkFaqValidity();
     }
     if (section === 'contact') {
     markSectionDirty('section-contact', "Valider le contact'");
@@ -833,7 +2041,7 @@ function toggleLogoMode(noLogo) {
         uploadZone.style.opacity = "1";
         uploadZone.style.pointerEvents = "auto";
     }
-    resetIdentiteValidation()
+    checkIdentiteValidity();
     sync(); 
 }
 // ---  GÉNÉRATION DU FAVICON DYNAMIQUE ---
@@ -909,7 +2117,6 @@ function handleCTASelect(value) {
 // --- LOGIQUE DÉDIÉE À LA SECTION SERVICES ---
 function handleIndicationChange(index, value) {
     const customInput = document.getElementById(`custom-prefix-${index}`);
-    
     if (value === 'Saisie libre') {
         customInput.classList.remove('hidden');
     } else {
@@ -929,7 +2136,6 @@ function toggleServiceFeature(index, key, isChecked) {
 function updateServiceCard(index, key, value) {
     if (localConfig.services && localConfig.services.items[index]) {
         localConfig.services.items[index][key] = value;
-
         if (key === 'price' && value.trim() !== "") localConfig.services.items[index].showPrice = true;
         if (key === 'prefix' && value.trim() !== "") localConfig.services.items[index].showPrefix = true;
         markSectionDirty('section-services', "Valider les services");
@@ -1037,7 +2243,7 @@ function processAboutFile(file) {
         if (!localConfig.about) localConfig.about = {};
         localConfig.about.img = webpData; 
         updateAboutImageUI(webpData);
-        markSectionDirty('section-about', "Valider l'à propos'");
+        markSectionDirty('section-about', "Valider l'à propos");
         checkAboutValidity();
         sync(); 
     });
@@ -1061,11 +2267,10 @@ function clearAboutImage() {
     document.getElementById('about-img-upload').value = "";
     updateAboutImageUI("");
     markSectionDirty('section-about', "Valider l'à propos'");
-    checkSAboutValidity();
+    checkAboutValidity();
     sync();
 }
 // --- LOGIQUE DÉDIÉE À LA SECTION INFOS PRATIQUES ---
-// --- IMAGE ---
 function handlePracticalImage(input) {
     if (input.files && input.files[0]) {
         processFile(input.files[0], (webpData) => {
@@ -1174,11 +2379,9 @@ function toggleDayOpen(i, isOpen) {
     hoursState[i].open = isOpen;
     const block = document.querySelector(`.day-block[data-index="${i}"]`);
     if(!block) return;
-
     const splitView = block.querySelector(".day-split");
     const contView = block.querySelector(".day-continuous");
     const closedView = block.querySelector(".day-closed");
-
     if (!isOpen) {
         splitView?.classList.add("hidden");
         contView?.classList.add("hidden");
@@ -1199,10 +2402,8 @@ function toggleContinuous(i, isContinuous) {
     hoursState[i].continuous = isContinuous;
     const block = document.querySelector(`.day-block[data-index="${i}"]`);
     if(!block) return;
-
     const splitView = block.querySelector(".day-split");
     const contView = block.querySelector(".day-continuous");
-
     if (isContinuous) {
         splitView?.classList.add("hidden");
         contView?.classList.remove("hidden");
@@ -1280,7 +2481,7 @@ function setPracticalMode(mode) {
     checkPracticalValidity(); 
     sync();
 }
-// --- LOGIQUE DÉDIÉE À LA SECTION FAQ ---
+// --- LOGIQUE DÉDIÉE AUX TOGGLE MONTRER / MASQUER ---
 function toggleSectionVisibility(section, isVisible) {
     let configKey, fieldsId, sectionId, label;
     if (section === 'avis' || section === 'testimonials') {
@@ -1295,6 +2496,12 @@ function toggleSectionVisibility(section, isVisible) {
         sectionId = 'section-faq';
         label     = "Valider la FAQ";
     }
+    else if (section === 'gallery') {
+    configKey = 'gallery';
+    fieldsId  = 'gallery-editor-content';
+    sectionId = 'section-gallery';
+    label     = "Valider la galerie";
+    }
     if (!localConfig[configKey]) localConfig[configKey] = {};
     localConfig[configKey].show = isVisible;
     const fieldsEl = document.getElementById(fieldsId);
@@ -1307,12 +2514,15 @@ function toggleSectionVisibility(section, isVisible) {
     }
     markSectionDirty(sectionId, label);
     if (section === 'faq') {
-        checkFaqValidity();
-    } else {
+    checkFaqValidity();
+    } else if (section === 'avis' || section === 'testimonials') {
         checkTestimonialsValidity();
-    } 
+    } else if (section === 'gallery') {
+        checkGalleryValidity();
+    }
     sync();
 }
+// --- LOGIQUE DÉDIÉE A LA FAQ ---
 function updateFaqDisplayCount(count) {
     const selectedCount = parseInt(count);
     if (!localConfig.faq) localConfig.faq = { show: true, title: "Questions fréquentes", items: [], displayCount: 3 };
@@ -1333,9 +2543,7 @@ function updateFAQ(index, key, value) {
     if (!localConfig.faq) localConfig.faq = { show: true, title: "Questions fréquentes", items: [] };
     if (!localConfig.faq.items) localConfig.faq.items = [];
     if (!localConfig.faq.items[index]) localConfig.faq.items[index] = { q: "", a: "" };
-
     localConfig.faq.items[index][key] = value;
-
     checkFaqValidity(); 
     markSectionDirty('section-faq', "Valider la faq");
     sync();
@@ -1472,11 +2680,12 @@ function handleEntityType(type) {
     localConfig.legal.entityType = type;
     const warning = document.getElementById('warning-particulier');
     const fieldsContainer = document.getElementById('legal-fields-container');
-    const btnValidate = document.getElementById('btn-validate-legal');
     const companyInput = document.getElementById('id-company-name');
+    const btnValidate = document.querySelector('#section-legale .btn-save-step');
     if (type === 'particulier') {
         if (warning) {
-            warning.querySelector('p').textContent = "La configuration est réservée aux entreprises et associations.";
+            warning.querySelector('p').textContent =
+            "La création d'une Vitrine Express est réservée aux professionnels et aux associations.";
             warning.classList.remove('hidden');
         }
         if (fieldsContainer) fieldsContainer.classList.add('hidden');
@@ -1486,30 +2695,37 @@ function handleEntityType(type) {
         if (fieldsContainer) fieldsContainer.classList.remove('hidden');
         if (btnValidate) btnValidate.classList.remove('hidden');
         if (companyInput) {
-            companyInput.placeholder = (type === 'asso') ? "Nom de l'association" : "Raison Sociale";
+            companyInput.placeholder =
+                (type === 'asso') ? "Nom de l'association" : "Raison Sociale";
         }
         handleLegalCountryChange(localConfig.legal.country || 'FR');
     }
+    if (localConfig.steps) localConfig.steps['section-legale'] = false;
+    markSectionDirty('section-legale', "Valider les informations");
     checkLegalValidity();
+    sync();
 }
 function handleLegalCountryChange(countryCode) {
     if (!localConfig.legal) localConfig.legal = {};
     localConfig.legal.country = countryCode;
     const flagImg = document.getElementById('legal-flag-img');
-    if (flagImg) flagImg.src = `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
+    if (flagImg) {
+        flagImg.src = `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
+    }
     const id1 = document.getElementById('id-1');
     const id2 = document.getElementById('id-2');
     const type = localConfig.legal.entityType || 'pro';
     if (countryCode === 'FR') {
-        id1.placeholder = (type === 'asso') ? "N° RNA" : "SIRET";
-        id2.placeholder = (type === 'pro') ? "SIREN" : "SIRET (si applicable)";
+        if (id1) id1.placeholder = (type === 'asso') ? "N° RNA" : "SIRET";
+        if (id2) id2.placeholder = (type === 'pro') ? "SIREN" : "SIRET (si applicable)";
     } else if (countryCode === 'BE') {
-        id1.placeholder = "BCE - N° d'entreprise";
-        id2.placeholder = "N° de TVA";
+        if (id1) id1.placeholder = "BCE - N° d'entreprise";
+        if (id2) id2.placeholder = "N° de TVA";
     } else if (countryCode === 'LU') {
-        id1.placeholder = "N° RCS";
-        id2.placeholder = "N° Matricule";
+        if (id1) id1.placeholder = "N° RCS";
+        if (id2) id2.placeholder = "N° Matricule";
     }
+    if (localConfig.steps) localConfig.steps['section-legale'] = false;
     markSectionDirty('section-legale', "Valider les informations");
     checkLegalValidity();
     sync();
@@ -1526,6 +2742,8 @@ function updateLegal(key, val) {
             contactValue: ""
         };
     }
+    if (!localConfig.steps) localConfig.steps = {};
+    localConfig.steps['section-legale'] = false;
     localConfig.legal[key] = val;
     if (key === 'email') {
         try {
@@ -1536,7 +2754,14 @@ function updateLegal(key, val) {
     }
     markSectionDirty('section-legale', "Valider les informations");
     checkLegalValidity();
-    sync(); 
+    sync();
+}
+function recomposeAddress() {
+    const street = document.getElementById('legal-street').value.trim();
+    const zip = document.getElementById('legal-zip').value.trim();
+    const city = document.getElementById('legal-city').value.trim();
+    const full = `${street}${street ? ',' : ''} ${zip} ${city}`.trim();
+    updateLegal('address', full);
 }
 // --- UPDATE LINKEDIN KIT ---
 function updateLinkedinKit(key, value) {
@@ -1557,7 +2782,13 @@ function updateLinkedinFigure(index, value) {
 }
 function handleLinkedinCtaChange(vignette, val) {
     const field = (vignette === 'v1') ? 'vignette1Cta' : 'vignette2Cta';
-    updateLinkedinKit(field, val);
+    const customInput = document.getElementById(`li-${vignette}-cta-custom`);
+    if (val === 'custom') {
+        if (customInput) customInput.classList.remove('hidden');
+    } else {
+        if (customInput) customInput.classList.add('hidden');
+        updateLinkedinKit(field, val);
+    }
     markSectionDirty('section-linkedin-kit', "Valider mon kit linkedin");
     checkLinkedinValidity();
     sync();
@@ -1574,6 +2805,7 @@ function handleLinkedinEntity(type) {
         if (warning) warning.classList.add('hidden');
         if (fullSection) fullSection.classList.remove('hidden');
     }
+    markSectionDirty('section-linkedin-kit', "Valider mon kit linkedin");
     sync();
 }
 // ----------- LOGIQUE DE VALIDATION ET ADAPTATION -------------
@@ -1600,17 +2832,15 @@ function markSectionDirty(sectionId, defaultLabel) {
     }
 }
 // --- IDENTITE VISUELLE ---
-function getIdentiteBtn() {
-    return document.querySelector('#section-identite .btn-save-step');
-}
 function checkIdentiteValidity() {
-    const btn = document.getElementById('btn-validate-identite');
+    const btn = document.querySelector(`#section-identite .btn-save-step`);
     if (!btn) return;
+    const companyName = (localConfig.header?.companyName || "").trim();
     const noLogo = localConfig.header?.useTextOnly;
     const hasLogoImg = !!localConfig.header?.logo;
-    const companyName = (localConfig.header?.companyName || "").trim();
+    const isAlreadyValidated = btn.classList.contains('btn-validated-status');
     let isValid = false;
-    if (companyName.length > 0) {
+    if (companyName.length >= 2) {
         if (noLogo || hasLogoImg) {
             isValid = true;
         }
@@ -1619,8 +2849,10 @@ function checkIdentiteValidity() {
         btn.disabled = false;
         btn.classList.remove('opacity-40', 'pointer-events-none');
     } else {
-        btn.disabled = true;
-        btn.classList.add('opacity-40', 'pointer-events-none');
+        if (!isAlreadyValidated) {
+            btn.disabled = true;
+            btn.classList.add('opacity-40', 'pointer-events-none');
+        }
     }
 }
 function resetIdentiteValidation() {
@@ -1629,11 +2861,11 @@ function resetIdentiteValidation() {
     const validated = localConfig.steps?.['header'];
     const dirty = localConfig.header?.dirty;
     if (validated && !dirty) {
-        // Vert
+// Vert
         btn.classList.add('btn-validated-status');
         btn.innerText = "✓ Validé";
     } else {
-        // Violet
+// Violet
         btn.classList.remove('btn-validated-status');
         btn.innerText = "Valider l'identité visuelle";
     }
@@ -1678,24 +2910,24 @@ function checkAccueilValidity() {
     const defaults = {
         title: "Ton titre principal",
         desc: "Explique en une phrase ce que tu fais, pour qui, et le bénéfice principal. Simple, concret, sans jargon technique. Si on ne comprend pas en 5 secondes, simplifie.",
-        nums: ["150+", "10", "99%"],
-        labels: ["PROJETS RÉALISÉS", "ANNÉES d'EXPERTISE", "CLIENTS SATISFAITS"]
+        nums: ["999+", "999", "999%"],
+        labels: ["Ta réalisation", "Ton expérience", "Tes clients"]
     };
 // --- CHAMPS TEXTE ---
-    const titleOk = h.title && h.title.trim() !== "" && h.title !== defaults.title;
-    const descOk  = h.desc && h.desc.trim() !== "" && h.desc !== defaults.desc;
+    const titleOk = h.title && h.title.trim().length > 2; 
+    const descOk  = h.desc && h.desc.trim().length > 3;  
     const ctaOk   = h.ctaLabel && h.ctaLabel.trim() !== "";
-// --- FIGURES ---
+// --- FIGURES  ---
     let figuresOk = true;
     const toggleEl = document.getElementById('toggle-figures');
     if (toggleEl && toggleEl.checked) {
         if (!h.figures || h.figures.length < 3) {
             figuresOk = false;
         } else {
-            figuresOk = h.figures.every((f, i) => {
+            figuresOk = h.figures.every((f) => {
                 const n = f.num ? f.num.toString().trim() : "";
                 const l = f.label ? f.label.toString().trim() : "";
-                return n !== "" && l !== "" && n !== defaults.nums[i] && l !== defaults.labels[i];
+                return n.length > 0 && l.length > 0;
             });
         }
     }
@@ -1789,8 +3021,8 @@ function checkServicesValidity() {
 }
 // --- AVIS ---
 const TESTIMONIALS_DEFAULTS = {
-    title: "Ce que nos clients disent",
-    ctaText: "Et si vous étiez le prochain ?",
+    title: "Ce que nos xxxxxxxxxxxxx",
+    ctaText: "Et si xxxxxxxxxx ?",
     items: [
         { stars: "5", text: "", name: "", role: "" },
         { stars: "5", text: "", name: "", role: "" },
@@ -1824,7 +3056,7 @@ function checkTestimonialsValidity() {
 }
 // --- GALLERY ---
 const GALLERY_DEFAULTS = {
-    title: "Des résultats concrets",
+    title: "Des résulxxxxxxxxxxxx",
     images: [
         { src: "", cap: "Témoignage client : [Prénom], [métier/statut] : ‘[Phrase courte sur ce qu’ils ont aimé ou le résultat]" },
         { src: "", cap: "Projet / réalisation : [Nom du projet] pour [client/secteur] – [bénéfice principal ou usage]" },
@@ -1833,23 +3065,25 @@ const GALLERY_DEFAULTS = {
 };
 function checkGalleryValidity() {
     const g = localConfig.gallery || {};
-    const images = g.images || [];
+    const items = g.images || [];
+    if (g.show === false) {
+        checkSectionValidity('section-gallery', true);
+        return;
+    }
     let isValid = true;
     if (!g.title || g.title.trim() === "" || g.title === GALLERY_DEFAULTS.title) {
         isValid = false;
     }
-    for (let i = 0; i < images.length; i++) {
-        const img = images[i];
+    items.forEach((item, i) => {
         if (
-            !img ||
-            !img.src || img.src.trim() === "" ||
-            !img.cap || img.cap.trim() === "" ||
-            (GALLERY_DEFAULTS.images[i] && img.cap.trim() === GALLERY_DEFAULTS.images[i].cap)
+            !item.src || item.src.trim() === "" ||
+            !item.cap || item.cap.trim() === "" ||
+            (GALLERY_DEFAULTS.images[i] && item.cap.trim() === GALLERY_DEFAULTS.images[i].cap)
         ) {
             isValid = false;
-            break;
         }
-    }
+
+    });
     checkSectionValidity('section-gallery', isValid);
 }
 // --- ABOUT ---
@@ -2036,26 +3270,24 @@ function checkLegalValidity() {
     const l = localConfig.legal || {};
     const btn = document.querySelector('#section-legale .btn-save-step');
     if (!btn) return;
-    const isValid =
-        l.firstName && l.firstName.trim().length > 1 &&
-        l.lastName && l.lastName.trim().length > 1 &&
-        l.legalName && l.legalName.trim().length > 1 &&
-        l.address && l.address.trim().length > 5 &&
-        l.id1 && l.id1.trim().length > 3 &&
-        l.contactValue && l.contactValue.trim().length > 5;
-    if (isValid && (!localConfig.steps || localConfig.steps['section-legale'] !== true)) {
+    if (localConfig.steps && localConfig.steps['section-legale'] === true) {
+        return;
+    }
+    const country = l.country || "FR";
+    const zipRegex = (country === "FR") ? /\d{5}/ : /\d{4}/;
+    const hasZip = zipRegex.test(l.address || "");
+    let isValid = true;
+    if (!l.firstName || l.firstName.trim().length <= 1) isValid = false;
+    if (!l.lastName || l.lastName.trim().length <= 1) isValid = false;
+    if (!l.legalName || l.legalName.trim().length <= 1) isValid = false;
+    if (!l.address || l.address.trim().length <= 8 || !hasZip) isValid = false;
+    if (!l.id1 || l.id1.trim().length <= 3) isValid = false;
+    if (!l.contactValue || l.contactValue.trim().length <= 5) isValid = false;
+    if (isValid) {
         if (!localConfig.steps) localConfig.steps = {};
         localConfig.steps['section-legale'] = true;
-
-        btn.classList.add('btn-validated-status');
-        btn.innerText = "✓ Validé";
-        btn.disabled = false;
-        btn.style.opacity = "1";
-        btn.style.pointerEvents = "auto";
-        sync(); 
-    } else {
-        checkSectionValidity('section-legale', isValid);
     }
+    checkSectionValidity('section-legale', isValid);
 }
 // --- CHECK LINKEDIN KIT VALIDITY ---
 function checkLinkedinValidity() {
@@ -2096,6 +3328,7 @@ function checkLinkedinValidity() {
         checkSectionValidity('section-linkedin-kit', isValid);
     }
 }
+// --- FONCTION DEDIEE A LA FINALISATION ---
 function checkGlobalValidation() {
     const mode = localConfig.selectedMode;
     const finalSection = document.getElementById('section-finale');
@@ -2103,7 +3336,12 @@ function checkGlobalValidation() {
     const finalText = document.getElementById('final-cta-text');
     const finalTitle = document.getElementById('final-title');
     const finalDesc = document.getElementById('final-desc');
-    let requiredSections = ['section-vitrine', 'section-model', 'section-couleurs', 'section-identite']; // Le "Core"
+    const legalCheckbox = document.getElementById('legal-checkbox');
+// Les icônes du cercle du haut
+    const iconCross = document.getElementById('icon-cross');
+    const iconCheck = document.getElementById('icon-check');
+// 1. Définition des sections requises selon le mode
+    let requiredSections = ['section-vitrine', 'section-model', 'section-couleurs', 'section-identite']; 
     if (mode === 'web') {
         requiredSections = requiredSections.concat([
             'section-accueil', 'section-services', 'section-avis', 'section-gallery', 
@@ -2120,148 +3358,50 @@ function checkGlobalValidation() {
             'section-about', 'section-practical', 'section-faq', 'section-contact', 
             'section-social', 'section-seo', 'section-legale', 'section-linkedin-kit'
         ]);
-        finalText.innerText = "Lancer ma présence en ligne";
+        finalText.innerText = "Mettre ma vitrine en ligne";
     }
+// 2. Vérifications (On garde "allValid")
     const allValid = requiredSections.every(id => localConfig.steps && localConfig.steps[id] === true);
-    if (allValid) {
+    const isLegalAccepted = legalCheckbox && legalCheckbox.checked;
+// 3. Gestion des états visuels
+    if (allValid && isLegalAccepted) {
+// --- ÉTAT : VALIDATION TOTALE ---
         finalSection.classList.remove('opacity-50', 'pointer-events-none', 'border-slate-200');
-        finalSection.classList.add('border-violet-400', 'shadow-2xl', 'shadow-violet-100');
-        
+        finalSection.classList.add('border-[#22c55e]', 'shadow-2xl', 'shadow-violet-100');
+        finalSection.classList.remove('border-violet-400');
+        if (iconCross) iconCross.classList.add('hidden');
+        if (iconCheck) iconCheck.classList.remove('hidden');
         finalBtn.classList.remove('grayscale', 'cursor-not-allowed');
         finalBtn.classList.add('hover:scale-[1.02]');
-        
         finalTitle.innerText = "Tout est prêt !";
-        finalTitle.classList.replace('text-slate-400', 'text-slate-800');
+        finalTitle.className = "text-lg font-bold text-validate transition-colors";
         finalDesc.innerText = "Vérifie une dernière fois ta vitrine, puis valide ci-dessous pour la rendre visible à tous.";
-        finalDesc.classList.replace('text-slate-400', 'text-slate-500');
-    } else {
-        finalSection.classList.add('opacity-50', 'pointer-events-none');
+        finalDesc.className = "text-sm text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed mb-10";
+    } else if (allValid && !isLegalAccepted) {
+// --- ÉTAT : ÉTAPES OK MAIS CHECKBOX MANQUANTE ---
+        finalSection.classList.remove('opacity-50', 'pointer-events-none'); 
+        finalSection.classList.add('border-violet-400'); 
+        finalSection.classList.remove('border-[#22c55e]', 'shadow-2xl');
+        if (iconCross) iconCross.classList.remove('hidden');
+        if (iconCheck) iconCheck.classList.add('hidden');
         finalBtn.classList.add('grayscale', 'cursor-not-allowed');
+        finalBtn.classList.remove('hover:scale-[1.02]');
+        finalTitle.innerText = "Certification requise";
+        finalTitle.className = "text-lg font-bold text-gradient transition-colors";
+        finalDesc.innerText = "Toutes les étapes sont validées ! Veuillez certifier votre statut professionnel pour débloquer la mise en ligne.";
+        finalDesc.className = "text-sm text-accent mt-2 max-w-sm mx-auto leading-relaxed mb-10 font-medium";
+    } else {
+// --- ÉTAT : CONFIGURATION INCOMPLETE ---
+        finalSection.classList.add('opacity-50', 'pointer-events-none', 'border-slate-200');
+        finalSection.classList.remove('border-[#22c55e]', 'border-violet-400', 'shadow-2xl');
+        if (iconCross) iconCross.classList.remove('hidden');
+        if (iconCheck) iconCheck.classList.add('hidden');
+        finalBtn.classList.add('grayscale', 'cursor-not-allowed');
+        finalBtn.classList.remove('hover:scale-[1.02]');
         finalTitle.innerText = "Configuration incomplète";
-    }
-}
-
-
-// --- LOGIQUE DEDIEE A L'ASSISTANCE IA ---
-const PROMPTS = {
-    hero: `Tu es un expert en copywriting web orienté conversion et clarté.
-        Tu écris pour un site vitrine professionnel simple, crédible et efficace.
-        CONTEXTE DU SITE
-        - Domaine d’activité : [ex : coach sportif, artisan couvreur, thérapeute, consultant, etc.]
-        - Cible principale : [ex : particuliers, TPE, indépendants, entreprises locales…]
-        - Offres principales : [liste courte de ce que je propose]
-        - Bénéfices clients clés : [ex : gain de temps, tranquillité d’esprit, plus de clients, résultats concrets…]
-        - Action attendue sur le site : contacter / prendre rendez-vous
-        - Ton souhaité : clair, humain, professionnel, sans jargon marketing
-        OBJECTIF
-        Générer le contenu de la section HERO d’un site vitrine optimisé pour inciter à la prise de contact.
-        À PRODUIRE :
-        1️⃣ Un titre H1
-        - Court (1 phrase max)
-        - Orienté bénéfice client
-        - Clair en moins de 5 secondes
-        - Doit expliquer la valeur apportée, pas juste le métier
-        2️⃣ Un paragraphe d’accroche (2–3 lignes max)
-        - Complète le H1 sans le répéter
-        - Précise pour qui c’est, le problème résolu et le résultat attendu
-        - Ton rassurant et concret
-        3️⃣ Des suggestions de chiffres clés pertinents à afficher
-        - Proposer 3 à 5 types de chiffres adaptés à mon activité
-        - Exemples possibles : années d’expérience, projets réalisés, clients accompagnés, délais moyens, taux de satisfaction, zone géographique couverte, spécialisation, etc.
-        - Ne pas inventer de chiffres, seulement indiquer les types à afficher
-        4️⃣ L’intitulé du CTA principal pour passer à la section suivante (bénéfices / services)
-        - Choisir le plus pertinent parmi cette liste :
-        - "Voir nos services"
-        - "Découvrir l’offre"
-        - "Voir les bénéfices"
-        - "Découvrir notre solution"
-        - OU proposer un meilleur intitulé si aucun n’est optimal
-        - Le CTA doit inciter à continuer la lecture, pas vendre directement
-        5️⃣ Une **recommandation de type d’image pour la hero**
-        - Indiquer le type d’image le plus crédible pour mon activité :
-        - photo de réalisations / chantiers
-        - ambiance de travail
-        - photo d’équipe ou du professionnel
-        - illustration sobre
-        - Expliquer brièvement pourquoi ce choix inspire confiance
-        CONTRAINTES
-        - Texte orienté bénéfices clients et confiance
-        - Pas de promesses exagérées
-        - Pas de jargon marketing
-        - Clarté > créativité
-        - Le site doit donner envie de contacter ou prendre rendez-vous
-        Réponds de façon structurée et directement exploitable pour un site web.
-        `,
-
-    services: `Tu es un expert en rédaction web orientée conversion et clarté.
-        Objectif :
-        M’aider à remplir la section “Services / Bénéfices” de mon site vitrine.
-        Cette section contient 3 cartes visibles en un coup d’œil.
-        Le but est que mes visiteurs comprennent immédiatement :
-        - ce que je propose
-        - en quoi ça les aide concrètement
-        - pourquoi me choisir moi
-        et qu’ils aient envie de cliquer sur “Contacter” ou “Prendre rendez-vous”.
-        Contexte :
-        Mon site est simple, rapide et orienté prise de contact.
-        Les textes doivent être :
-        - clairs
-        - concrets
-        - orientés bénéfices clients
-        - rassurants (confiance, expertise)
-        - sans jargon inutile
-        Tu peux choisir la structure la plus pertinente selon mon activité :
-        - soit 3 services distincts
-        - soit 1 service décliné en 3 bénéfices forts
-        - soit un mix logique (service + bénéfice)
-        L’important : 3 cartes impactantes et cohérentes.
-        Pour chaque carte, fournis :
-        1. Un titre court et explicite (max 5–7 mots)
-        2. Un paragraphe de 2–3 phrases qui parle du problème du client, du bénéfice obtenu et de ce qui me différencie
-        3. (Optionnel) Une suggestion de tarif à afficher ou une recommandation de ne pas afficher de prix si ce n’est pas pertinent
-        Voici les informations à prendre en compte :
-        - Mon activité / métier : [décris ton activité en une phrase simple]
-        - Mes offres ou prestations principales : [liste ou description courte]
-        - Les problèmes ou frustrations de mes clients idéaux : [ce qu’ils veulent éviter]
-        - Les résultats ou bénéfices qu’ils recherchent : [ce qu’ils veulent obtenir]
-        - Ce qui me différencie des autres : [approche, méthode, expérience, valeurs]
-        - Type de client idéal : [freelance, particulier, TPE, PME, etc.]
-        - Souhait d’afficher des tarifs : [oui / non / à recommander]
-        Contraintes importantes :
-        - Le visiteur doit se reconnaître en moins de 5 secondes
-        - Chaque carte doit donner envie d’aller plus loin
-        - Les textes doivent naturellement mener à une prise de contact ou un rendez-vous
-        - Ton style doit être simple, humain et orienté action
-        À la fin, indique :
-        - si la structure choisie est “3 services”, “3 bénéfices” ou “mix”
-        - pourquoi cette structure est la plus pertinente pour mon activité
-        `
-};
-function openIAModal(type = 'hero') {
-    const modal = document.getElementById('modal-ia');
-    const content = document.getElementById('prompt-content');
-    
-    if (modal && content && PROMPTS[type]) {
-        modal.classList.remove('hidden');
-        content.innerText = PROMPTS[type];
-    }
-}
-function closeIAModal() {
-    const modal = document.getElementById('modal-ia');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-}
-function copyAIPrompt() {
-    const content = document.getElementById('prompt-content');
-    if (content) {
-        const text = content.innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            alert("Prompt copié !");
-            closeIAModal();
-        }).catch(err => {
-            console.error('Erreur lors de la copie : ', err);
-        });
+        finalTitle.className = "text-lg font-bold text-slate-400 transition-colors";
+        finalDesc.innerText = "Valide toutes les étapes pour débloquer la mise en ligne.";
+        finalDesc.className = "text-sm text-slate-400 mt-2 max-w-sm mx-auto leading-relaxed mb-10";
     }
 }
 // --- GESTION PREVIEW (DESKTOP & MOBILE FULLSCREEN) ---
@@ -2273,21 +3413,31 @@ function toggleMobile() {
     const liFrame = document.getElementById('linkedin-frame');
     isMobileView = !isMobileView;
     if (isMobileView) {
-        wrapper.style.setProperty('width', '375px', 'important');
-        wrapper.style.setProperty('height', '700px', 'important');
+        wrapper.style.display = "flex";
+        wrapper.style.alignItems = "center";
+        wrapper.style.justifyContent = "center";
         wrapper.style.setProperty('padding-top', '0', 'important'); 
-        wrapper.classList.add('shadow-2xl', 'border-[12px]', 'border-slate-800', 'rounded-[3rem]', 'my-auto', 'overflow-hidden');
+        wrapper.style.marginTop = "70px"; 
+        wrapper.style.width = "375px";
+        wrapper.style.height = "min(750px, calc(90vh - 80px))"; 
+        wrapper.classList.add('shadow-2xl', 'border-[12px]', 'border-slate-800', 'rounded-[3rem]', 'overflow-hidden', 'bg-black', 'transition-all');
         [webFrame, liFrame].forEach(f => {
-            if(f) f.classList.add('rounded-[2rem]'); 
+            if(f) {
+                f.style.height = "100%";
+                f.classList.add('rounded-[2rem]');
+            }
         });
         toggleText.textContent = "Vue Desktop";
     } else {
+        wrapper.style.marginTop = "24px"; 
         wrapper.style.width = "100%";
         wrapper.style.height = "100%";
         wrapper.style.setProperty('padding-top', '3.5rem', 'important'); 
-        wrapper.classList.remove('border-[12px]', 'border-slate-800', 'rounded-[3rem]', 'h-[700px]', 'my-auto', 'overflow-hidden');
+        wrapper.classList.remove('border-[12px]', 'border-slate-800', 'rounded-[3rem]', 'overflow-hidden', 'bg-black');
         [webFrame, liFrame].forEach(f => {
-            if(f) f.classList.remove('rounded-[2rem]');
+            if(f) {
+                f.classList.remove('rounded-[2rem]');
+            }
         });
         toggleText.textContent = "Vue Mobile";
     }
@@ -2297,16 +3447,13 @@ function handleMobilePreview() {
     const previewMain = document.querySelector('main');
     const previewWrapper = document.getElementById('preview-wrapper');
     const iconContainer = document.getElementById('mobile-toggle-icon');
-
     isFullPreviewOpen = !isFullPreviewOpen;
-
     if (isFullPreviewOpen) {
         previewMain.style.setProperty('display', 'flex', 'important');
         previewMain.className = "fixed inset-0 z-[9999] bg-white flex flex-col";
         previewWrapper.className = "relative w-full h-full pt-20 transition-all";
         previewWrapper.style.width = "100vw";
         previewWrapper.style.height = "100vh";
-
         iconContainer.innerHTML = `
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round"/>
@@ -2379,9 +3526,113 @@ function initScrollObserver() {
     });
 }
 initScrollObserver();
-
-
-function generateExport() {
-    localStorage.setItem('vitrine_express_progression', JSON.stringify(localConfig));
-    alert("Progrès sauvegardés !");
+// --- FONCTION DÉDIÉE À LA MODALE ALERTES IA ---
+function showAlerteIA(title, message) {
+    const modal = document.getElementById('alertes-ia-modal');
+    const modalTitle = document.getElementById('alertes-ia-title');
+    const modalMessage = document.getElementById('alertes-ia-message');
+    if (!modal) {
+        alert(title + "\n\n" + message.replace('<br>', '\n'));
+        return;
+    }
+    modalTitle.innerText = title;
+    modalMessage.innerHTML = message;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
+function closeAlerteIA() {
+    const modal = document.getElementById('alertes-ia-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+// --- FONCTION DÉDIÉE À LA MODALE DE GESTION DE L'AIDE ---
+function openHelp() {
+    const modal = document.getElementById('help-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    const form = document.getElementById('help-form');
+    if (form) {
+        form.reset();
+        form.classList.remove('hidden');
+    }
+    const successMsg = document.getElementById('help-success');
+    if (successMsg) successMsg.classList.add('hidden');
+}
+function closeHelp() {
+    const modal = document.getElementById('help-modal');
+    if (modal) modal.classList.add('hidden');
+}
+// Interception de l'envoi du formulaire pour Netlify
+document.getElementById('help-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector('button[type="submit"]');
+    const originalBtnText = btn.innerText;
+    btn.disabled = true;
+    btn.innerText = "Envoi en cours...";
+    btn.style.opacity = "0.7";
+    const formData = new FormData(form);
+// Envoi AJAX vers Netlify
+    fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData).toString(),
+    })
+    .then((response) => {
+        if (response.ok) {
+// Succès : On masque le formulaire et on montre le message de réussite
+            form.classList.add('hidden');
+            document.getElementById('help-success').classList.remove('hidden');
+        } else {
+            throw new Error("Réponse serveur incorrecte");
+        }
+    })
+    .catch((error) => {
+        alert("Oups ! Une erreur est survenue lors de l'envoi. Merci de réessayer.");
+        console.error("Erreur Netlify:", error);
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerText = originalBtnText;
+        btn.style.opacity = "1";
+    });
+});
+// --- NEUTRALISATION EN MODE MODIF ---
+document.addEventListener('DOMContentLoaded', () => {
+    const isModifActive = localStorage.getItem('modeModificationActive') === 'true';
+    if (isModifActive) {
+        const sectionsToHide = ['section-finale', 'section-ia'];
+        sectionsToHide.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+        // 1. On cache immédiatement
+                el.style.setProperty('display', 'none', 'important');
+        // 2. Le garde du corps (MutationObserver)
+                const observer = new MutationObserver(() => {
+                    if (el.style.display !== 'none') {
+                        el.style.setProperty('display', 'none', 'important');
+                    }
+                });
+                observer.observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+            }
+        });
+        const sectionVitrine = document.getElementById('section-vitrine');
+        if (sectionVitrine) {
+            sectionVitrine.classList.add('opacity-50', 'pointer-events-none');
+            sectionVitrine.querySelector('.btn-save-step')?.classList.add('hidden');
+        }
+        lockImportedInputs();
+        document.getElementById('update-action-container')?.classList.remove('hidden');
+    }
+// Gestion de la zone drag&drop 
+    if (localStorage.getItem('showRechargement') === 'true') {
+        document.getElementById('section-rechargement')?.classList.remove('hidden');
+    }
+});
+// --- GESTION DU TRACKING MAIL ---
+window.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === 'hidden') {
+        sendProgressToNetlify(false);
+    }
+});

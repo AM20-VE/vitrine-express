@@ -8,6 +8,8 @@
     <meta name="description" id="meta-desc" content="">
     <link id="favicon" rel="icon" type="image/webp" href="">
     <link id="favicon-apple" rel="apple-touch-icon" href="">
+<!-- og -->
+<script id="schema-site" type="application/ld+json"></script>
 <style>
     :root {
         --color-dark: #222222;
@@ -28,8 +30,8 @@
     .bg-dark { background-color: var(--color-dark); color: var(--color-light-text); }
 /* Typographies */
     h1, h2, h3 { text-transform: uppercase; font-weight: 900; line-height: 0.9; letter-spacing: -0.03em; }
-    h1 { font-size: clamp(2.5rem, 10vw, 7rem); margin-bottom: 2rem; }
-    h2 { font-size: clamp(2rem, 7vw, 4rem); margin-bottom: 2.5rem; }
+    h1 { font-size: clamp(2.5rem, 10vw, 5rem); margin-bottom: 2rem; color: var(--color-dark); }
+    h2 { font-size: clamp(2rem, 7vw, 4rem); margin-bottom: 2.5rem; color: var(--color-dark); }
     h3 { font-size: 1.8rem; margin-bottom: 1.5rem; }
 /* Boutons */
     .cta-button { display: inline-block; padding: 18px 30px; background: var(--color-accent); border: var(--border-dark); color: var(--color-dark); font-weight: 900; text-decoration: none; text-transform: uppercase; box-shadow: 6px 6px 0px var(--color-dark); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; top: 0; left: 0; }
@@ -40,11 +42,10 @@
     .logo-container { height: 50px; width: 150px; display: flex; align-items: center; justify-content: flex-start; }
     .logo-img { height: 60px; max-width: 60px; object-fit: contain; }
     .logo-text { background: white; color: var(--color-dark); padding: 5px; border: 3px solid var(--color-accent); font-weight: 900; text-transform: uppercase; font-size: 0.85rem; line-height: 1; display: flex; align-items: center; justify-content: center; text-align: center; width: 100%; height: 100%; overflow: hidden; word-break: break-word; }
-    #header-cta { padding: 10px 15px; font-size: 0.8rem; background: var(--color-background-light); box-shadow: 3px 3px 0 var(--color-accent); }
+    #header-cta { text-align: center; padding: 10px 15px; font-size: 0.8rem; background: var(--color-background-light); box-shadow: 3px 3px 0 var(--color-accent); }
 /* Hero Section */
     #hero { padding: 40px 5% 80px; background-color: var(--color-background-light); background-image: linear-gradient(45deg, var(--color-accent) 25%, transparent 25%, transparent 50%, var(--color-accent) 50%, var(--color-accent) 75%, transparent 75%, transparent); background-size: 60px 60px; position: relative; text-align: center; }
     #hero::after { content: ""; position: absolute; bottom: 0; right: 0; width: 100%; height: 30%; background: var(--color-dark); clip-path: polygon(0 100%, 100% 100%, 100% 0); z-index: 1; }
-    
     .hero-text-side { background: white; padding: 40px 25px; border: var(--border-dark); box-shadow: 10px 10px 0px var(--color-dark); position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
     #hero-desc { font-size: 1.4rem; font-weight: 700; margin-bottom: 30px; }
 /* Key Figures */
@@ -53,8 +54,8 @@
     .figure-num { display: block; font-size: 2rem; color: var(--color-accent); font-weight: 900; }
 /* Services */
     .services-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
-    .service-card { padding: 40px 30px; border: var(--border-dark); background: var(--color-dark); color: white; box-shadow: 8px 8px 0px var(--color-accent); }
-    .price-tag { display: inline-block; margin-top: 25px; padding: 8px 15px; background: var(--color-accent); color: var(--color-dark); font-weight: 800; }
+    .service-card { display: flex; flex-direction: column; gap: 20px; padding: 40px 30px; border: var(--border-dark); background: var(--color-dark); color: white; box-shadow: 8px 8px 0px var(--color-accent); }
+    .price-tag { margin-top: auto; align-self: flex-start; padding: 8px 15px; background: var(--color-accent); color: var(--color-dark); font-weight: 800; }
 /* --- Testimonials --- */
     #testimonials-grid { display: grid; grid-template-columns: 1fr; gap: 40px; max-width: 1200px; margin: 0 auto; align-items: stretch; }
     .testimonial-card { background: white; padding: 40px 30px; border: var(--border-dark); box-shadow: 10px 10px 0px var(--color-accent); display: flex; flex-direction: column; text-align: left; transition: all 0.2s ease; }
@@ -85,6 +86,7 @@
     .planning-img { width: 100%; border: var(--border-dark); }
 /* --- Faq --- */
     #faq-container { max-width: 900px; margin: 0 auto; }
+    #faq-title { text-align: center;}
     .faq-item { margin-bottom: 25px; border: var(--border-dark); background: white; box-shadow: 6px 6px 0px var(--color-dark); }
     .faq-question { width: 100%; padding: 25px; background: none; border: none; text-align: left; font-family: var(--font-main); font-size: 1.3rem;   font-weight: 900; text-transform: uppercase; color: var(--color-dark); cursor: pointer; display: flex; justify-content: space-between;    align-items: center; }
     .faq-question::after { content: '▼'; font-size: 1rem; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -96,7 +98,7 @@
 /* Contact Section */
     #contact { text-align: center; }
     #contact-desc { font-weight: 700; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
-    #contact-cta-btn { background: var(--color-dark); color: white; }
+    #contact-cta-btn { background: var(--color-background-light); color: var(--color-dark); }
 /* Footer & Socials */
     footer { padding: 50px 5%; background: var(--color-dark); color: white; text-align: center; }
     .social-title { font-weight: 900; text-transform: uppercase; margin-bottom: 20px; font-size: 1.2rem; color: var(--color-accent); }
@@ -107,7 +109,7 @@
     .legal-btn { background: none; border: none; color: #e9e3e3; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; margin: 5px; }
     .legal-content { background: var(--color-dark); text-align: left; transition: max-height 0.4s ease-out; max-height: 0; overflow: hidden; font-size: 0.85rem; }
     .legal-content.open { max-height: 1200px; padding: 30px; border: 1px solid #333; margin-top: 10px; }
-    .legal-content h4 { color: var(--color-accent); margin: 20px 0 10px; text-transform: uppercase; font-size: 0.9rem; }
+    .legal-content h3 { color: var(--color-accent); margin: 20px 0 10px; text-transform: uppercase; font-size: 0.9rem; }
     .legal-content p { margin-bottom: 10px; color: #ccc; line-height: 1.6; }
     .footer-copy { font-size: 0.75rem; color: #e9e3e3; margin-top: 30px; }
     .footer-credit { font-size: 0.75rem; color: #e9e3e3; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
@@ -203,7 +205,7 @@
     <div id="legal-m" class="legal-content"></div>
     <div id="legal-c" class="legal-content"></div>
     <p class="footer-copy">&copy; <span id="current-year"></span> - TOUS DROITS RÉSERVÉS.</p> 
-    <p class="footer-credit">Vitrine Express réalisée avec <a href="https://www.am20.fr" target="_blank">AM 2.0</a></p>
+    <p class="footer-credit">Réalisé avec <a href="https://www.vitrine-express.net" target="_blank">Vitrine Express</a></p>
 </footer>
 <script src="config.js"></script>
 <script id="export-data" type="application/json">
@@ -222,18 +224,23 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
 }, { threshold: 0.1 });
 function addPrivacyParagraph(parent, title, text) {
-    const h4 = document.createElement('h4');
-    h4.textContent = title;
+    const h3 = document.createElement('h3');
+    h3.textContent = title;
     const p = document.createElement('p');
     p.textContent = text;
-    parent.append(h4, p);
+    parent.append(h3, p);
 }
 function renderTemplate() {
 // --- 0. Meta tags & Favicon Setup ---
-const companyName = CONFIG.header.companyName || CONFIG.legal.companyName || "Entreprise";
-document.title = CONFIG.meta.title || companyName;
+const companyName = CONFIG.header.companyName || "Entreprise";
+const titleTag = document.getElementById('meta-title'); 
+const finalTitle = CONFIG.meta.title || companyName;
+if (titleTag) titleTag.textContent = finalTitle; 
+document.title = finalTitle; 
 const metaDesc = document.getElementById('meta-desc');
-if (metaDesc) metaDesc.setAttribute('content', CONFIG.meta.description || `Bienvenue sur le site de ${companyName}`);
+if (metaDesc) {
+    metaDesc.setAttribute('content', CONFIG.meta.description || `Découvrez les services de ${companyName}.`);
+}
 const r = document.documentElement.style;
 const accentColor = CONFIG.colors.accent || '#1ECAD3';
 r.setProperty('--color-accent', accentColor);
@@ -245,7 +252,7 @@ const fav = document.getElementById('favicon');
 const favApple = document.getElementById('favicon-apple');
 logoSlot.replaceChildren();
 if (CONFIG.header.logo && CONFIG.header.logo.trim() !== "" && !CONFIG.header.useTextOnly) {
-    // CAS A : LOGO ACTIF
+    // LOGO ACTIF
     const img = document.createElement('img');
     img.src = CONFIG.header.logo; 
     img.className = "logo-img";
@@ -255,7 +262,7 @@ if (CONFIG.header.logo && CONFIG.header.logo.trim() !== "" && !CONFIG.header.use
     if (fav) fav.href = CONFIG.header.logo;
     if (favApple) favApple.href = CONFIG.header.logo;
 } else {
-    // CAS B : TEXTE UNIQUEMENT (ou pas de logo fourni)
+    // TEXTE UNIQUEMENT 
     const div = document.createElement('div');
     div.className = "logo-text"; 
     div.textContent = companyName;
@@ -283,6 +290,7 @@ if (CONFIG.header.logo && CONFIG.header.logo.trim() !== "" && !CONFIG.header.use
     document.getElementById('about-title').textContent = CONFIG.about.title;
     document.getElementById('about-desc').textContent = CONFIG.about.desc;
     document.getElementById('about-img').src = CONFIG.about.img || P_IMG;
+    document.getElementById('about-img').alt = `Présentation en image de ${companyName}`;
     document.getElementById('contact-title').textContent = CONFIG.contact.title;
     document.getElementById('contact-desc').textContent = CONFIG.contact.desc;
 // 3. CTA dynamique (Header & Contact)
@@ -297,10 +305,8 @@ contactBtns.forEach(btn => {
         }
         const type = CONFIG.contact.type ? CONFIG.contact.type.toUpperCase() : "LINK";
         let val = CONFIG.contact.value.trim();
-
         if (type === "EMAIL") {
             e.preventDefault();
-            // Décodage si c'est de l'alternatif (base64) sinon direct
             try { if (val.includes('==')) val = atob(val); } catch(err) {}
             window.location.href = `mailto:${val}`;
         } 
@@ -336,7 +342,6 @@ contactBtns.forEach(btn => {
 const servGrid = document.getElementById('services-grid');
 if (servGrid && CONFIG.services && CONFIG.services.items) {
     servGrid.replaceChildren();
-
     CONFIG.services.items.forEach(s => {
         const card = document.createElement('div');
         card.className = 'service-card reveal';
@@ -350,10 +355,8 @@ if (servGrid && CONFIG.services && CONFIG.services.items) {
         if (hasVisiblePrefix || hasVisiblePrice) {
             const priceTag = document.createElement('div');
             priceTag.className = "price-tag";   
-            let textParts = [];   
-            
-            if (hasVisiblePrefix) textParts.push(s.prefix.trim());  
-            
+            let textParts = [];     
+            if (hasVisiblePrefix) textParts.push(s.prefix.trim());    
             if (hasVisiblePrice) {
                 const valPrix = s.price.trim();
                 const isNumeric = !isNaN(parseFloat(valPrix)) && isFinite(valPrix);
@@ -369,12 +372,10 @@ if (servGrid && CONFIG.services && CONFIG.services.items) {
 // 6. Testimonials
 const testSection = document.getElementById('testimonials');
 const testGrid = document.getElementById('testimonials-grid');
-
 if (CONFIG.testimonials && CONFIG.testimonials.show) {
     testSection.style.display = "block"; 
     document.getElementById('testimonials-title').textContent = CONFIG.testimonials.title;
     testGrid.replaceChildren();
-    
     CONFIG.testimonials.items.forEach(t => {
         const card = document.createElement('div');
         card.className = 'testimonial-card reveal';
@@ -416,10 +417,8 @@ if (CONFIG.testimonials && CONFIG.testimonials.show) {
     ctaBtn.onclick = (e) => {
         e.preventDefault();
         if (!CONFIG.contact.value || CONFIG.contact.value.trim() === "") return;
-
         let val = CONFIG.contact.value.trim();
         const type = CONFIG.contact.type ? CONFIG.contact.type.toUpperCase() : "LINK";
-
         if (type === "EMAIL" || type === "MAIL") { 
             try { if (val.includes('==')) val = atob(val); } catch(err) {}
             window.location.href = `mailto:${val}`; 
@@ -439,20 +438,27 @@ if (CONFIG.testimonials && CONFIG.testimonials.show) {
     if (testSection) testSection.style.display = "none"; 
 }
 // 7. Galerie
-    const galGrid = document.getElementById('gallery-grid');
+const gallerySection = document.getElementById('social-proof');
+const galGrid = document.getElementById('gallery-grid');
+if (CONFIG.gallery && CONFIG.gallery.show !== false) {
+    gallerySection.style.display = "block";
     galGrid.replaceChildren();
-    CONFIG.gallery.images.forEach(imgData => {
+    CONFIG.gallery.images.forEach((imgData, i) => { 
         const item = document.createElement('div');
         item.className = 'gallery-item';
         const img = document.createElement('img');
         img.src = imgData.src || P_IMG;
         img.loading = "lazy";
+        img.alt = imgData.cap || `Réalisation ${i + 1} de ${companyName}`;
         const cap = document.createElement('div');
         cap.className = "gallery-caption";
         cap.textContent = imgData.cap;
         item.append(img, cap);
         galGrid.appendChild(item);
     });
+} else {
+    if (gallerySection) gallerySection.style.display = "none";
+}
 // 8. Infos Pratiques 
 const practicalSection = document.getElementById('practical');
 if (CONFIG.practical && CONFIG.practical.show) {
@@ -479,7 +485,7 @@ if (CONFIG.practical && CONFIG.practical.show) {
             const img = document.createElement('img');
             img.src = CONFIG.practical.hoursImg || P_IMG;
             img.className = "planning-img";
-            img.alt = "Planning";
+            img.alt = `Planning détaillé de ${companyName}`;
             img.loading = "lazy";
             hoursContent.appendChild(img);
         } else {
@@ -548,13 +554,20 @@ if (CONFIG.faq && CONFIG.faq.show && CONFIG.faq.items.length > 0) {
     const socLinks = document.getElementById('social-links');
     socLinks.replaceChildren();
     socHead.textContent = CONFIG.socials.title || "Suivez-nous";
-
+    const socialLabels = {
+    linkedin: "Visitez mon profil LinkedIn",
+    facebook: "Visitez notre page Facebook",
+    instagram: "Visitez notre compte Instagram"
+};
     let hasSocial = false;
     for (const [key, url] of Object.entries(CONFIG.socials)) {
         if (key !== "title" && url && url.trim() !== "" && url !== "#") {
             hasSocial = true;
             const a = document.createElement('a');
             a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
+        if (socialLabels[key]) {
+            a.setAttribute('aria-label', socialLabels[key]);
+        }
             a.innerHTML = SVGS[key]; 
             socLinks.appendChild(a);
         }
@@ -564,15 +577,12 @@ if (CONFIG.faq && CONFIG.faq.show && CONFIG.faq.items.length > 0) {
 const m = document.getElementById('legal-m');
 if (m) {
     m.replaceChildren();
-
     const addLegalSection = (parent, title, lines) => {
-        const h4 = document.createElement('h4');
-        h4.textContent = title;
-        parent.appendChild(h4);
+        const h3 = document.createElement('h3');
+        h3.textContent = title;
+        parent.appendChild(h3);
         lines.forEach(line => {
-            // On affiche la ligne si la valeur existe OU si on veut forcer l'affichage
             const displayVal = (line.val && line.val.trim() !== "") ? line.val : "Non renseigné";
-            
             const p = document.createElement('p');
             const strong = document.createElement('strong');
             strong.textContent = line.label + " : ";
@@ -581,12 +591,10 @@ if (m) {
             parent.appendChild(p);
         });
     };
-
     const leg = CONFIG.legal || {};
     const country = leg.country || 'FR';
     const type = leg.entityType || 'pro';
     
-    // Définition des libellés selon le pays
     let labelID1 = "SIRET";
     let labelID2 = "SIREN";
 
@@ -600,29 +608,21 @@ if (m) {
         labelID1 = "N° RCS"; 
         labelID2 = "N° Matricule";
     }
-
     const entityLabel = (type === 'asso') ? "Nom de l'association" : "Raison Sociale";
-
-    // Préparation des données avec fallback
     let contactDisplay = "";
     if (leg.contactValue) {
         try { contactDisplay = atob(leg.contactValue); } catch(e) { contactDisplay = leg.contactValue; }
     }
-
     const editorFullName = `${leg.firstName || ''} ${leg.lastName || ''}`.trim();
-
-    // Construction du tableau (Toutes les lignes sont présentes par défaut)
     const editionLines = [
         { label: "Éditeur", val: editorFullName },
-        { label: entityLabel, val: leg.companyName },
+        { label: entityLabel, val: leg.legalName },
         { label: "Adresse", val: leg.address },
         { label: "Contact", val: contactDisplay },
         { label: labelID1, val: leg.id1 },
         { label: labelID2, val: leg.id2 }
     ];
-
     addLegalSection(m, "Édition du site", editionLines);
-
     addLegalSection(m, "Hébergement", [
         { label: "Hébergeur", val: "Netlify Inc." },
         { label: "Adresse", val: "610 22nd Street, San Francisco, CA 94107, USA" }
@@ -634,7 +634,6 @@ if (m) {
     addPrivacyParagraph(c, "Protection des données (RGPD)", "Ce site est purement informatif. Il ne contient aucun formulaire de contact ou d'inscription. Par conséquent, aucune donnée personnelle n'est collectée, stockée ou traitée par ce site.");
     addPrivacyParagraph(c, "Cookies et traceurs", "Ce site est une page statique. Nous n'utilisons aucun cookie de suivi, de profilage ou de publicité. Aucun traceur tiers n'est installé sur votre navigateur lors de votre visite.");
     addPrivacyParagraph(c, "Liens tiers", "Si vous cliquez sur les boutons de contact (ex: 'Prendre RDV'), vous serez redirigé vers une plateforme externe. Dès lors que vous quittez ce site, seule la politique de confidentialité de la plateforme de destination s'applique.");
-
     document.getElementById('current-year').textContent = new Date().getFullYear();
 }
 window.addEventListener('message', (event) => {
