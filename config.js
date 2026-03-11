@@ -1034,42 +1034,156 @@ async function buildClientSite(config) {
 const emailInput = document.getElementById("lead-email");
 const validateBtn = document.getElementById("lead-email-validate");
 const iaSection = document.getElementById("section-ia");
-const iaElements = Array.from(iaSection.querySelector(".space-y-6").children)
-    .filter(el => !el.classList.contains("input-group"));
-iaElements.forEach(el => el.style.display = "none");
+const iaContainer = iaSection?.querySelector(".space-y-6");
+const btnGenerateAI = document.getElementById("btn-generate-ai");
+const aiButtonText = document.getElementById("ai-button-text");
+let iaElements = [];
+// Masquer tous les éléments IA (sauf input email)
+if (iaContainer) {
+    iaElements = Array.from(iaContainer.children).filter(el => !el.classList.contains("input-group"));
+    iaElements.forEach(el => (el.style.display = "none"));
+}
+// --- MESSAGE D'ERREUR EMAIL ---
 let errorMsg = document.createElement("p");
 errorMsg.className = "text-xs text-red-400 mt-1";
 errorMsg.style.display = "none";
 errorMsg.innerText = "Merci de renseigner un email valide.";
-const inputGroupDiv = emailInput.closest("div.flex");
-inputGroupDiv.insertAdjacentElement("afterend", errorMsg);
+emailInput?.closest("div.flex")?.insertAdjacentElement("afterend", errorMsg);
+// --- VALIDATION EMAIL ---
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 function markButtonValidated() {
-    validateBtn.style.background = "#10B981"; 
-    validateBtn.innerHTML = '<span style="color:white; font-weight:bold; font-size:1.2rem;">✓</span>'; 
+    if (!validateBtn) return;
+    validateBtn.style.background = "#10B981";
+    validateBtn.innerHTML = '<span style="color:white; font-weight:bold; font-size:1.2rem;">✓</span>';
     validateBtn.disabled = true;
 }
+function showIASection() {
+    iaElements.forEach(el => (el.style.display = "block"));
+    iaSection.dataset.sent = "true";
+}
+// --- STOCKAGE EMAIL ---
+function saveEmailLocally(email) {
+    localStorage.setItem("lead_email", email);
+}
+// --- ENVOI A NETLIFY ---
+function sendProgressToNetlify(isFinal = false) {
+    const email = localStorage.getItem("lead_email");
+    if (!email) return;
+// Si déjà envoyé
+    if (isFinal && sessionStorage.getItem('lead_sent_final')) return;
+    if (!isFinal && sessionStorage.getItem('lead_sent_progress')) return;
+    const lastStep = localConfig?.lastStep || "section-ia";
+    const SEQUENCE = [
+        'section-vitrine','section-model','section-couleurs','section-identite',
+        'section-ia','section-accueil','section-services','section-avis',
+        'section-gallery','section-about','section-practical','section-faq',
+        'section-contact','section-social','section-seo','section-legale',
+        'section-hebergement','section-linkedin-kit','section-finale'
+    ];
+    const stepIndex = SEQUENCE.indexOf(lastStep);
+    const progress = Math.round(((stepIndex + 1) / SEQUENCE.length) * 100);
+    const formData = new FormData();
+    formData.append("form-name", "lead-vitrine");
+    formData.append("email", email);
+    formData.append("status", isFinal ? "TERMINE" : "EN_COURS_OU_ABANDON");
+    formData.append("step", lastStep);
+    formData.append("progress", progress + "%");
+    if (isFinal) {
+        sessionStorage.setItem('lead_sent_final', 'true');
+        fetch("/", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams(formData).toString()
+        });
+    } else {
+        sessionStorage.setItem('lead_sent_progress', 'true');
+        const params = new URLSearchParams(formData).toString();
+        navigator.sendBeacon("/", params);
+    }
+}
+// --- SI EMAIL DÉJÀ STOCKÉ ---
 const storedEmail = localStorage.getItem("lead_email");
 if (storedEmail && isValidEmail(storedEmail)) {
-    emailInput.value = storedEmail;
-    iaElements.forEach(el => el.style.display = "block");
-    iaSection.dataset.sent = "true";
+    if (emailInput) emailInput.value = storedEmail;
     markButtonValidated();
+    showIASection();
+    saveEmailLocally(storedEmail);
+    sendProgressToNetlify(false); 
 }
-validateBtn.addEventListener("click", () => {
-    const email = emailInput.value.trim();
+// --- BOUTON VALIDATION EMAIL ---
+validateBtn?.addEventListener("click", () => {
+    const email = emailInput?.value.trim() || "";
     if (!isValidEmail(email)) {
         errorMsg.style.display = "block";
         return;
     }
-    errorMsg.style.display = "none"; 
-    localStorage.setItem("lead_email", email);
-    iaElements.forEach(el => el.style.display = "block");
-    iaSection.dataset.sent = "true"; 
+    errorMsg.style.display = "none";
     markButtonValidated();
-    sendProgressToNetlify(false);
+    showIASection();
+    saveEmailLocally(email);
+    sendProgressToNetlify(false); 
+});
+// --- BOUTON GENERER MES TEXTES (IA) ---
+btnGenerateAI?.addEventListener("click", async () => {
+    if (!emailInput?.value || !isValidEmail(emailInput.value.trim())) {
+        alert("Merci de renseigner un email valide avant de générer tes textes.");
+        emailInput.focus();
+        return;
+    }
+    const mode = (typeof localConfig !== "undefined" && localConfig.selectedMode) || "full";
+    const userData = {
+        email: emailInput.value.trim(),
+        expertise: document.getElementById("ai-expertise").value.trim(),
+        mode: mode,
+        probleme: document.getElementById("ai-question-1").value.trim(),
+        services: [
+            document.getElementById("ai-service-1").value,
+            document.getElementById("ai-service-2").value,
+            document.getElementById("ai-service-3").value
+        ].filter(v => v.trim() !== ""),
+        benefice: document.getElementById("ai-question-2").value.trim(),
+        differenciation: document.getElementById("ai-diff-unknown").checked
+            ? "UNKNOWN"
+            : document.getElementById("ai-question-3").value.trim(),
+        doutes: document.getElementById("ai-doubt-unknown").checked
+            ? "UNKNOWN"
+            : [
+                document.getElementById("ai-doubt-1").value,
+                document.getElementById("ai-doubt-2").value,
+                document.getElementById("ai-doubt-3").value
+            ].filter(v => v.trim() !== ""),
+        style: document.getElementById("ai-style-select").value,
+        contact: document.getElementById("ai-contact-select").value
+    };
+    const originalContent = aiButtonText.innerHTML;
+    aiButtonText.innerHTML = "🪄 RÉDACTION EN COURS...";
+    aiButtonText.parentElement.disabled = true;
+    try {
+        const response = await fetch("/.netlify/functions/ask-claude", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData)
+        });
+        const result = await response.json();
+        if (!response.ok || result.error) {
+            alert("Erreur IA ou service indisponible. Réessaye plus tard.");
+            aiButtonText.innerHTML = originalContent;
+            aiButtonText.parentElement.disabled = false;
+            return;
+        }
+        fillFieldsFromAI(result);
+        aiButtonText.innerHTML = "✨ TES TEXTES ONT ÉTÉ CRÉÉS !";
+        aiButtonText.parentElement.disabled = false;
+        setTimeout(() => (aiButtonText.innerHTML = originalContent), 3000);
+        sendProgressToNetlify(true); // ENVOI FINAL
+    } catch (err) {
+        console.error(err);
+        alert("Erreur réseau ou serveur. Réessaye plus tard.");
+        aiButtonText.innerHTML = originalContent;
+        aiButtonText.parentElement.disabled = false;
+    }
 });
 // --- FONCTIONS DEDIEES A LA GENERATION IA  ---
 async function generateWithAI() {
@@ -1338,41 +1452,6 @@ function fillFieldsFromAI(data) {
 // --- DÉCLENCHER LA MISE À JOUR VISUELLE ---
     const allInputs = document.querySelectorAll('input, textarea, select');
     allInputs.forEach(inp => inp.dispatchEvent(new Event('input', { bubbles: true })));
-}
-// --- ENVOI A NETLIFY ---
-function sendProgressToNetlify(isFinal = false) {
-    const email = localStorage.getItem("lead_email");
-    if (!email) return;
-    if (sessionStorage.getItem('lead_sent_final')) return;
-    if (!isFinal && sessionStorage.getItem('lead_sent_progress')) return;
-    const lastStep = localConfig.lastStep || "section-ia";
-    const SEQUENCE = [
-        'section-vitrine','section-model','section-couleurs','section-identite',
-        'section-ia','section-accueil','section-services','section-avis',
-        'section-gallery','section-about','section-practical','section-faq',
-        'section-contact','section-social','section-seo','section-legale',
-        'section-hebergement','section-linkedin-kit','section-finale'
-    ];
-    const stepIndex = SEQUENCE.indexOf(lastStep);
-    const progress = Math.round(((stepIndex + 1) / SEQUENCE.length) * 100);
-    const formData = new FormData();
-    formData.append("form-name", "lead-vitrine");
-    formData.append("email", email);
-    formData.append("status", isFinal ? "TERMINE" : "EN_COURS_OU_ABANDON");
-    formData.append("step", lastStep);
-    formData.append("progress", progress + "%");
-    if (isFinal) {
-        sessionStorage.setItem('lead_sent_final', 'true');
-        fetch("/", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams(formData).toString()
-        });
-    } else {
-        sessionStorage.setItem('lead_sent_progress', 'true');
-        const params = new URLSearchParams(formData).toString();
-        navigator.sendBeacon("/", params);
-    }
 }
 // --- CONFIGURATION DES VALEURS FIXES (NON MODIFIABLES) ---
 function applyPracticalDefaults() {
@@ -2998,15 +3077,15 @@ const SERVICES_DEFAULTS = {
     title: "Nos solutions",
     items: [
         {
-        h3: "Serv 1",
+        h3: "Service 1",
         p: "Présente ici un service clé ou un bénéfice majeur. Explique ce que tu fais, pour qui, et ce que ça change pour ton client."
         },
         {
-        h3: "Serv 2",
+        h3: "Service 2",
         p: "Présente ici un service clé ou un bénéfice majeur. Explique ce que tu fais, pour qui, et ce que ça change pour ton client."
         },
         {
-        h3: "Serv 3",
+        h3: "Service 3",
         p: "Présente ici un service clé ou un bénéfice majeur. Explique ce que tu fais, pour qui, et ce que ça change pour ton client."
         }
     ]
@@ -3657,4 +3736,8 @@ window.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'hidden') {
         sendProgressToNetlify(false);
     }
+});
+// Exécution au chargement
+window.addEventListener('DOMContentLoaded', () => {
+    verifyAccess();
 });

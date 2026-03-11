@@ -1,10 +1,13 @@
 const Anthropic = require('@anthropic-ai/sdk');
 exports.handler = async (event, context) => {
+    console.log("Function ask-claude appelée");
     if (event.httpMethod !== "POST") {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
     try {
+         console.log("Body brut reçu :", event.body);
         const userData = JSON.parse(event.body);
+        console.log("Body parsé :", userData);
 // --- 1. Extraction et Valeurs par défaut ---
         const email = userData.email || "";
         const mode = userData.mode || "full";
@@ -69,6 +72,7 @@ Structure JSON attendue :
 Si mode='web', 'linkedin' est null. Si mode='linkedin', 'hero' et 'seo' sont null.`;
 
 // --- 4. Appel API ---
+console.log("API KEY présente ?", !!process.env.ANTHROPIC_API_KEY);
         const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
         const msg = await anthropic.messages.create({
             model: "claude-3-5-sonnet-latest",
@@ -81,9 +85,12 @@ Si mode='web', 'linkedin' est null. Si mode='linkedin', 'hero' et 'seo' sont nul
             }],
             timeout: 20000
         });
+        console.log("Réponse brute Claude :", JSON.stringify(msg));
 // --- 5. Récupération et nettoyage de la réponse ---
     let aiResponse = msg?.content?.[0]?.text || "";
+    console.log("Texte Claude avant nettoyage :", aiResponse);
         aiResponse = aiResponse.replace(/```json|```/g, '').trim();
+    console.log("Texte Claude nettoyé :", aiResponse);
         const jsonStart = aiResponse.indexOf("{");
         const jsonEnd = aiResponse.lastIndexOf("}");
         if (jsonStart === -1 || jsonEnd === -1) {
@@ -96,6 +103,7 @@ Si mode='web', 'linkedin' est null. Si mode='linkedin', 'hero' et 'seo' sont nul
             body: JSON.stringify(parsed)
         };
         } catch (error) {
+            console.error("ERREUR COMPLETE :", error);
             console.error("Erreur Anthropic:", error);
             const message = error?.message || "";
             const isQuotaError =

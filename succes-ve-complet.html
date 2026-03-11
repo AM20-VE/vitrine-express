@@ -102,28 +102,27 @@
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
+const SECRET_HASH = "1a10705c240715d8c19d0dad3c5a59c9d18afc9a9d60c0755c46dd3fbb8c8360";
 // --- FONCTION DE VÉRIFICATION D'ACCÈS ---
 async function verifyAccess() {
     const params = new URLSearchParams(window.location.search);
     const pass = params.get('adm');
-// 1. VERIFICATION ADMIN
+// --- 1. VERIFICATION ADMIN ---
     let hashHex = "";
     if (pass) {
         const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass));
         hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
-    const SECRET_HASH = "1a10705c240715d8c19d0dad3c5a59c9d18afc9a9d60c0755c46dd3fbb8c8360";
     if (hashHex === SECRET_HASH || localStorage.getItem('_vxe_node') === SECRET_HASH) {
         localStorage.setItem('_vxe_node', SECRET_HASH);
-        document.getElementById('payment-loader')?.remove();
-        const card = document.getElementById('success-card');
-        card.style.display = "block"; 
-        card.classList.remove('hidden', 'opacity-0'); 
-        return true;
+        console.log("Accès Admin validé");
+        showSuccessUI();
+        return true; 
     }
-// 2. VERIFICATION STRIPE
+// --- 2. VERIFICATION STRIPE ---
     const sessionId = params.get('session_id');
     if (!sessionId) {
+        console.log("Pas de session Stripe, redirection vers config...");
         window.location.href = "/config"; 
         return false;
     }
@@ -131,27 +130,33 @@ async function verifyAccess() {
         const response = await fetch(`/.netlify/functions/verify-checkout?session_id=${sessionId}`);
         const data = await response.json();
         if (data.paid) {
-            document.getElementById('payment-loader')?.remove();
-            const card = document.getElementById('success-card');
-            card.style.display = "block";
-            card.classList.remove('hidden', 'opacity-0');
+            showSuccessUI();
             return true;
+        } else {
+             throw new Error("Paiement non validé");
         }
     } catch (err) {
-        document.getElementById('loader-text').innerHTML = "<span class='text-red-500'>❌ Échec de vérification</span>";
+        console.error("Erreur Stripe:", err);
+        const loaderText = document.getElementById('loader-text');
+        if (loaderText) loaderText.innerHTML = "<span class='text-red-500'>❌ Échec de vérification</span>";
         return false;
     }
 }
-   window.onload = () => {
-    verifyAccess().then((isAllowed) => {
-        if (isAllowed) {
-            const card = document.getElementById('success-card');
-            setTimeout(() => {
-                card.classList.remove('scale-95', 'opacity-0');
-            }, 300);
-        }
-    });
-};
+function showSuccessUI() {
+    document.getElementById('payment-loader')?.remove();
+    const card = document.getElementById('success-card');
+    if (card) {
+        card.style.display = "block";
+        card.classList.remove('hidden', 'opacity-0');
+        // Petit délai pour l'animation scale
+        setTimeout(() => {
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100', 'opacity-100');
+        }, 100);
+    }
+}
+// Lancement au chargement du DOM
+window.addEventListener('DOMContentLoaded', verifyAccess);
 // HELPER : SUPPRIMER LE SCALE CSS POUR UNE CAPTURE EXACTE
 function disableIframeScaling(doc) {
     const ids = ['linkedin-banner','v1','v2'];
@@ -196,7 +201,6 @@ async function startGlobalProcess() {
     if (!savedData) return alert("Erreur : Configuration introuvable.");
     const config = JSON.parse(savedData);
     const companyName = config.header?.companyName || "Ma-Vitrine";
-    const SECRET_HASH = "1a10705c240715d8c19d0dad3c5a59c9d18afc9a9d60c0755c46dd3fbb8c8360"; 
     const isAdmin = localStorage.getItem('_vxe_node') === SECRET_HASH;
     btn.classList.add('pointer-events-none', 'opacity-80');
     btn.innerHTML = isAdmin ? "Mode Admin : Génération locale..." : "Création de ta vitrine en cours...";
