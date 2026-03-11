@@ -23,7 +23,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.78.0",
+    "@anthropic-ai/sdk": "^0.36.0",
     "adm-zip": "^0.5.10",
     "axios": "^1.6.0",
     "stripe": "^20.4.1"
