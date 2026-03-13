@@ -465,7 +465,7 @@
                     <textarea id="ai-question-1" class="input-textarea-standard h-20" placeholder="Décris le problème principal..."></textarea>
                 </div>
                 <div class="flex flex-col gap-2 mt-8">
-                    <label class="font-bold text-white/90 text-sm uppercase">Quels services ou solutions proposes-tu ? (3 max)</label>
+                    <label class="font-bold text-white/90 text-sm uppercase">Quels services ou solutions proposes-tu ? (min 1)</label>
                     <div class="space-y-2">
                         <input id="ai-service-1" type="text" placeholder="Service 1" class="input-text-standard">
                         <input id="ai-service-2" type="text" placeholder="Service 2" class="input-text-standard">
@@ -481,7 +481,7 @@
                     <textarea id="ai-question-3" class="input-textarea-standard h-20" placeholder="Ce qui me différencie..."></textarea>
                     <div class="flex items-center gap-2 bg-white/30 px-2 py-4 rounded-lg">
                         <input type="checkbox" id="ai-diff-unknown" onchange="toggleDiffInput(this.checked)" class="checkbox-accent">
-                        <label for="ai-diff-unknown" class="text-xs text-white font-bold uppercase cursor-pointer">Je ne sais pas (laisser l'IA suggérer)</label>
+                        <label for="ai-diff-unknown" class="text-xs text-white font-bold uppercase cursor-pointer">Je ne sais pas - l'IA s'appuiera sur les bénéfices</label>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2 mt-8">
@@ -493,7 +493,7 @@
                     </div>
                     <div class="flex items-center gap-2 bg-white/30 px-2 py-4 rounded-lg">
                         <input type="checkbox" id="ai-doubt-unknown" onchange="toggleDoubtInputs(this.checked)" class="checkbox-accent">
-                        <label for="ai-doubt-unknown" class="text-xs text-white font-bold uppercase cursor-pointer">Je ne sais pas</label>
+                        <label for="ai-doubt-unknown" class="text-xs text-white font-bold uppercase cursor-pointer">Je ne sais pas - laisser l'IA rédiger une FAQ adaptée</label>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2 mt-8">
@@ -515,8 +515,8 @@
                     </select>
                 </div>
             </div>
-            <div class="pt-4">
-               <button id="btn-generate-ai" onclick="generateWithAI()" class="btn-save-step group" aria-label="Valider mon questionnaire et générer mes textes IA"
+            <div class="pt-2">
+               <button id="btn-generate-ai" class="btn-save-step group" aria-label="Valider mon questionnaire et générer mes textes IA"
                 style="
                     background: linear-gradient(white, white) padding-box, 
                                 linear-gradient(to right, #4d0fa5, #22c55e) border-box !important;
@@ -558,7 +558,11 @@
                     GÉNÉRER MES TEXTES
                     </span>
             </button>
+            <p id="ai-limit-microcopy" class="text-xs italic text-white text-center mt-2 uppercase font-bold tracking-widest"></p>
             </div>
+            <p class="text-xs text-white text-center mt-4 px-4 leading-relaxed">
+                💡 L'IA rédige une base personnalisée. Relis et ajuste les textes pour qu'ils reflètent parfaitement ton identité unique.
+            </p>
         </div>
     </div>
 </section>

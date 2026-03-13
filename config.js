@@ -1125,73 +1125,45 @@ async function buildClientSite(config) {
         saveEmailLocally(email);
         sendProgressToNetlify(false); 
     });
-// --- OVERLAY PENDANT LA GENERATION IA ---
-function createAIOverlay() {
-    if (document.getElementById('ai-loading-overlay')) return;
-    const overlay = document.createElement('div');
-    overlay.id = 'ai-loading-overlay';
-    overlay.className = "fixed inset-0 z-[9999] flex items-center justify-center bg-white/90 backdrop-blur-sm";
-    overlay.style.display = "none"; 
-    overlay.innerHTML = `
-        <div class="flex flex-col items-center p-8 text-center bg-white rounded-3xl shadow-2xl border border-slate-100">
-            <div class="w-24 h-24 mb-6 bg-white rounded-full shadow-xl shadow-violet-200/50 flex items-center justify-center animate-bounce">
-                <svg class="w-14 h-14" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="gradient-sparkle-wand" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#8449d9" />
-                            <stop offset="100%" stop-color="#22c55e" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M295.4 37L310.2 73.8L347 88.6C350 89.8 352 92.8 352 96C352 99.2 350 102.2 347 103.4L310.2 118.2L295.4 155C294.2 158 291.2 160 288 160C284.8 160 281.8 158 280.6 155L265.8 118.2L229 103.4C226 102.2 224 99.2 224 96C224 92.8 226 89.8 229 88.6L265.8 73.8L280.6 37C281.8 34 284.8 32 288 32C291.2 32 294.2 34 295.4 37zM142.7 105.7L164.2 155.8L214.3 177.3C220.2 179.8 224 185.6 224 192C224 198.4 220.2 204.2 214.3 206.7L164.2 228.2L142.7 278.3C140.2 284.2 134.4 288 128 288C121.6 288 115.8 284.2 113.3 278.3L91.8 228.2L41.7 206.7C35.8 204.2 32 198.4 32 192C32 185.6 35.8 179.8 41.7 177.3L91.8 155.8L113.3 105.7C115.8 99.8 121.6 96 128 96C134.4 96 140.2 99.8 142.7 105.7zM496 368C502.4 368 508.2 371.8 510.7 377.7L532.2 427.8L582.3 449.3C588.2 451.8 592 457.6 592 464C592 470.4 588.2 476.2 582.3 478.7L532.2 500.2L510.7 550.3C508.2 556.2 502.4 560 496 560C489.6 560 483.8 556.2 481.3 550.3L459.8 500.2L409.7 478.7C403.8 476.2 400 470.4 400 464C400 457.6 403.8 451.8 409.7 449.3L459.8 427.8L481.3 377.7C483.8 371.8 489.6 368 496 368zM492 64C503 64 513.6 68.4 521.5 76.2L563.8 118.5C571.6 126.4 576 137 576 148C576 159 571.6 169.6 563.8 177.5L475.6 265.7L374.3 164.4L462.5 76.2C470.4 68.4 481 64 492 64zM76.2 462.5L340.4 198.3L441.7 299.6L177.5 563.8C169.6 571.6 159 576 148 576C137 576 126.4 571.6 118.5 563.8L76.2 521.5C68.4 513.6 64 503 64 492C64 481 68.4 470.4 76.2 462.5z" 
-                    fill="url(#gradient-sparkle-wand)" />
-                </svg>
-            </div>
-            <h3 class="text-xl font-black uppercase tracking-tight text-[#8449d9] mb-2">Rédaction en cours...</h3>
-            <p class="text-slate-500 max-w-xs text-sm leading-relaxed">
-                L'intelligence artificielle prépare tes textes personnalisés. <br>
-                <span class="font-semibold text-[#8449d9]">Ne ferme pas cette fenêtre.</span>
-            </p>
-        </div>
-    `;
-    document.body.appendChild(overlay);
-}
-function showAIOverlay() {
-    createAIOverlay(); 
-    const ov = document.getElementById('ai-loading-overlay');
-    if (ov) ov.style.display = 'flex';
-}
-function hideAIOverlay() {
-    const ov = document.getElementById('ai-loading-overlay');
-    if (ov) {
-        ov.style.display = 'none';
-        ov.remove(); 
+// --- FONCTIONS DEDIEES A LA GENERATION IA  ---
+// 1. MAJ MICRO COPY TENTATIVES
+function updateAILimitUI() {
+    const today = new Date().toLocaleDateString();
+    let usage = JSON.parse(localStorage.getItem('ai_usage')) || { date: today, count: 0 };
+    if (usage.date !== today) usage = { date: today, count: 0 };
+    const btn = document.getElementById("btn-generate-ai");
+    const microCopy = document.getElementById("ai-limit-microcopy");
+    if (!btn || !microCopy) return;
+    const remaining = 2 - usage.count;
+    if (remaining <= 0) {
+        btn.disabled = true;
+        btn.innerHTML = "❌ PLUS DE GÉNÉRATION DISPONIBLE";
+        btn.style.opacity = "0.5";
+        btn.style.cursor = "not-allowed";
+        microCopy.innerText = "";
+    } else {
+        btn.disabled = false;
+        microCopy.innerText = `${remaining} génération${remaining > 1 ? 's' : ''} offerte${remaining > 1 ? 's' : ''}`;
     }
 }
-// --- FONCTIONS DEDIEES A LA GENERATION IA  ---
+document.addEventListener('DOMContentLoaded', updateAILimitUI);
+// 2. FONCTION DEDIEE A LA GENERATION DES TEXTES
 async function generateWithAI() {
     const botTrap = document.getElementById('ai-bot-catcher')?.value || "";
     if (botTrap) return; 
-// --- LIMITE QUOTIDIENNE ---
+    const btn = document.getElementById("btn-generate-ai");
+    const btnText = document.getElementById('ai-button-text');
+    const microCopy = document.getElementById("ai-limit-microcopy");
+    if (!btn || !btnText) return;
+    const originalHTML = btnText.innerHTML;
+// --- CHECK LIMITES ---
     const today = new Date().toLocaleDateString();
     let usage = JSON.parse(localStorage.getItem('ai_usage')) || { date: today, count: 0 };
-    if (usage.date !== today) {
-        usage = { date: today, count: 0 };
-    }
-    const btnText = document.getElementById('ai-button-text');
-    const originalContent = btnText.innerHTML;
-    const overlay = document.getElementById('ai-loading-overlay');
+    if (usage.date !== today) usage = { date: today, count: 0 };
 // --- GESTION DES LIMITES ---
     if (usage.count >= 2) {
-        showAlerteIA(
-            "Limite atteinte",
-            "Tu as utilisé toutes tes tentatives pour l'assistance à la rédaction.<br>Si le rendu ne te convient pas, tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran."
-        );
+        showAlerteIA("Limite atteinte", "Tu as utilisé toutes tes tentatives offertes. Tu peux t'aider des instructions affichées à l'écran pour rédiger tes textes.");
         return;
-    } else if (usage.count === 1) {
-        showAlerteIA(
-            "Une tentative restante",
-            "Tu as utilisé une tentative pour la génération de tes textes, il ne t'en reste plus qu'une."
-        );
     }
 // --- VERIF MAIL ---
     const email = document.getElementById('lead-email').value.trim();
@@ -1245,7 +1217,7 @@ async function generateWithAI() {
         document.getElementById('ai-question-3').focus();
         return;
     }
-// PREPARATION DES DONNEES ---
+// --- PREPARATION DES DONNEES ---
     const userData = {
         email: email,
         expertise: expertise,
@@ -1256,7 +1228,6 @@ async function generateWithAI() {
             document.getElementById('ai-service-2').value,
             document.getElementById('ai-service-3').value
         ].filter(v => v.trim() !== ""),  
-// On utilise 'benefice' pour correspondre à la fonction Netlify
         benefice: document.getElementById('ai-question-2').value,
         differenciation: diffUnknown ? "UNKNOWN" : diffValue,
 // Logique Checkbox "Je ne sais pas"
@@ -1270,60 +1241,56 @@ async function generateWithAI() {
         style: document.getElementById('ai-style-select').value,
         contact: document.getElementById('ai-contact-select').value
     };
-    try {
+    let progressInterval;
+    try {   
 // --- ETAT VISUEL "EN COURS" ---
-        btnText.innerHTML = "🪄 RÉDACTION EN COURS...";
-        btnText.parentElement.disabled = true;
-        if (overlay) overlay.style.display = 'flex';
+        btn.disabled = true;
+        btn.style.cursor = "not-allowed";
+        let progress = 0;
+        progressInterval = setInterval(() => { 
+            if (progress < 95) {
+                progress += Math.random() * 5;
+                btnText.innerText = `🪄 RÉDACTION... ${Math.floor(progress)}%`;
+            }
+        }, 1500);
         const response = await fetch('/.netlify/functions/ask-claude', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData)
         });
+        if (progressInterval) clearInterval(progressInterval);
+        if (!response.ok) throw new Error("Erreur serveur");
         const result = await response.json();
-// --- Gestion erreurs serveur ou IA ---
-        if (!response.ok || result.error) {
-            if (result.error === "SOLDE_EPUISE") {
-                showAlerteIA(
-                    "Service temporairement indisponible",
-                    "L'assistance IA est momentanément saturée. Tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran ou réessayer plus tard."
-                );
-            } else {
-                console.warn("Détails technique de l'erreur :", result.error || "Erreur réseau");
-                showAlerteIA(
-                    "Service momentanément indisponible", 
-                    "Désolé, l'assistance est momentanément indisponible.<br>Tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran ou revenir plus tard."
-                );
-            }
-            btnText.innerHTML = originalContent;
-            btnText.parentElement.disabled = false;
-            return;
-        }
+        if (result.error) throw new Error(result.error);
 // --- INCRÉMENTATION DU COMPTEUR ---
         usage.count++;
         localStorage.setItem('ai_usage', JSON.stringify(usage)); 
-// 5. Remplissage des champs et synchronisation
+// --- REMPLISSAGE DES CHAMPS ET SYNCHRO ---
         fillFieldsFromAI(result); 
         if (typeof sync === 'function') sync();
+// --- ETAT VISUEL "SUCCESS" ---
+        btnText.innerText = "RÉDACTION TERMINÉE !";
+        setTimeout(() => {
+            btnText.innerHTML = originalHTML; 
+            btn.disabled = false;
+            btn.style.cursor = "pointer";
+            updateAILimitUI(); 
+        }, 3000);
+// Envoi Netlify en arrière plan
         sendProgressToNetlify(true);
-// 6. État visuel "Succès"
-        btnText.innerHTML = "✨ TES TEXTES ONT ÉTÉ CRÉÉS !";
-        btnText.parentElement.disabled = false;
-        if (overlay) overlay.style.display = 'none';
-        setTimeout(() => { btnText.innerHTML = originalContent; }, 3000);
     } catch (error) {
         console.error("Erreur IA:", error);
-        if (overlay) overlay.style.display = 'none';
-        showAlerteIA(
-            "Erreur",
-            "Désolé, l'assistance est momentanément indisponible.<br>Tu peux compléter ta vitrine en t'aidant des instructions affichées à l'écran ou revenir plus tard."
-        );
-        btnText.innerHTML = originalContent;
-        btnText.parentElement.disabled = false;
+        if (progressInterval) clearInterval(progressInterval);
+        btn.disabled = false;
+        btn.style.cursor = "pointer";
+        btnText.innerHTML = originalHTML;
+        let msg = "Désolé, l'assistance est momentanément indisponible. Tu peux t'aider des instructions affichées à l'écran pour rédiger tes textes ou réessayer plus tard.";
+        if (error.message === "SOLDE_EPUISE") msg = "Désolé, l'assistance est momentanément indisponible. Tu peux t'aider des instructions affichées à l'écran pour rédiger tes textes ou réessayer plus tard.";
+        showAlerteIA("Erreur", msg);
     }
 }
 document.getElementById("btn-generate-ai")?.addEventListener("click", generateWithAI);
-// Masquage des inputs doutes / différenciation si unknown coché
+// 3. MASQUAGE DES INPUTS UNKNOWN
 function toggleDoubtInputs(isDisabled) {
     const container = document.getElementById('ai-doubts-container');
     const inputs = [
@@ -1345,6 +1312,7 @@ function toggleDiffInput(isDisabled) {
     input.style.opacity = isDisabled ? "0.5" : "1";
     if (isDisabled) input.value = "";
 }
+// 4. COMPLETION DES INPUTS
 function fillFieldsFromAI(data) {
     if (!data) return;
 // --- 1. HERO ---
@@ -3507,9 +3475,9 @@ function checkGlobalValidation() {
         if (iconCheck) iconCheck.classList.add('hidden');
         finalBtn.classList.add('grayscale', 'cursor-not-allowed');
         finalBtn.classList.remove('hover:scale-[1.02]');
-        finalTitle.innerText = "Certification requise";
+        finalTitle.innerText = "Dernière étape !";
         finalTitle.className = "text-lg font-bold text-gradient transition-colors";
-        finalDesc.innerText = "Toutes les étapes sont validées ! Veuillez certifier votre statut professionnel pour débloquer la mise en ligne.";
+        finalDesc.innerText = "Bravo ! Ta vitrine est prête. Valide les conditions d'utilisation et ton statut professionnel pour mettre ta vitrine en ligne";
         finalDesc.className = "text-sm text-accent mt-2 max-w-sm mx-auto leading-relaxed mb-10 font-medium";
     } else {
 // --- ÉTAT : CONFIGURATION INCOMPLETE ---
