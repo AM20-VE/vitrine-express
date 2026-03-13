@@ -108,8 +108,8 @@ exports.handler = async (event, context) => {
 // --- 4. Appel API ---
         const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
         const msg = await anthropic.messages.create({
-            model: "claude-sonnet-4-6",
-            max_tokens: 2500,
+            model: "claude-haiku-4-5-20251001",
+            max_tokens: 1800,
             temperature: 0.7,
             system: systemPrompt,
             messages: [{
