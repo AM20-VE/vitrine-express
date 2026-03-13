@@ -1068,12 +1068,14 @@ async function buildClientSite(config) {
         localStorage.setItem("lead_email", email);
     }
 // --- ENVOI A NETLIFY ---
-    function sendProgressToNetlify(isFinal = false) {
-        const email = localStorage.getItem("lead_email");
-        if (!email) return;
-// Si déjà envoyé
+function sendProgressToNetlify(isFinal = false) {
+    const email = localStorage.getItem("lead_email");
+    if (!email) return;
+
+    // Protection contre les envois en double
     if (isFinal && sessionStorage.getItem('lead_sent_final')) return;
     if (!isFinal && sessionStorage.getItem('lead_sent_progress')) return;
+
     const lastStep = localConfig?.lastStep || "section-ia";
     const SEQUENCE = [
         'section-vitrine','section-model','section-couleurs','section-identite',
@@ -1082,25 +1084,35 @@ async function buildClientSite(config) {
         'section-contact','section-social','section-seo','section-legale',
         'section-hebergement','section-linkedin-kit','section-finale'
     ];
+    
     const stepIndex = SEQUENCE.indexOf(lastStep);
     const progress = Math.round(((stepIndex + 1) / SEQUENCE.length) * 100);
-    const formData = new FormData();
-    formData.append("form-name", "lead-vitrine");
-    formData.append("email", email);
-    formData.append("status", isFinal ? "TERMINE" : "EN_COURS_OU_ABANDON");
-    formData.append("step", lastStep);
-    formData.append("progress", progress + "%");
+
+    // Objet simple pour l'encodage
+    const data = {
+        "form-name": "lead-vitrine",
+        "email": email,
+        "status": isFinal ? "TERMINE" : "EN_COURS_OU_ABANDON",
+        "step": lastStep,
+        "progress": progress + "%"
+    };
+
+    // Encodage manuel (comme dans ton ancien code qui fonctionnait)
+    const encodedData = Object.keys(data)
+        .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+        .join("&");
+
     if (isFinal) {
         sessionStorage.setItem('lead_sent_final', 'true');
         fetch("/", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams(formData).toString()
+            body: encodedData
         });
     } else {
         sessionStorage.setItem('lead_sent_progress', 'true');
-        const params = new URLSearchParams(formData).toString();
-        navigator.sendBeacon("/", params);
+        // Pour navigator.sendBeacon, on envoie directement la string encodée
+        navigator.sendBeacon("/", encodedData);
     }
 }
 // --- SI EMAIL DÉJÀ STOCKÉ ---
