@@ -239,6 +239,7 @@ function lockImportedInputs() {
 }
 async function processImportedFile(file) {
     const reader = new FileReader();
+    const fileName = file.name;
     reader.onload = async (e) => {
         try {
             const content = e.target.result;
@@ -247,6 +248,7 @@ async function processImportedFile(file) {
             const jsonConfig = doc.getElementById('export-data')?.textContent;
             if (!jsonConfig) throw new Error("Ce fichier n'est pas valide.");
             localConfig = JSON.parse(jsonConfig);
+            window.localConfig = localConfig;
         // ---  FILTRE DE SÉCURITÉ  ---
             if (localConfig.meta?.origin !== 'vitrine-express-branding') {
                 throw new Error("Ce fichier n'est pas compatible avec Vitrine Express.");
@@ -290,7 +292,7 @@ async function processImportedFile(file) {
             }
         // 5. On remplit le reste et on synchronise
             applyConfigToInputs(); 
-            showImportStatus('success');
+            showImportStatus('success', fileName);
         } catch (err) {
             console.error(err);
             showImportStatus('error');
@@ -298,20 +300,64 @@ async function processImportedFile(file) {
     };
     reader.readAsText(file);
 }
-function showImportStatus(status) {
-    const success = document.getElementById('import-success-msg');
-    const error = document.getElementById('import-error-msg');
+function showImportStatus(status, fileName = "") {
+    const zone = document.getElementById('drop-zone-reload');
+    const placeholder = document.getElementById('reload-placeholder');
+    const activeState = document.getElementById('reload-active-state');
+    const iconContainer = document.getElementById('status-icon-container');
+    const statusText = document.getElementById('status-text');
+    const nameDisplay = document.getElementById('file-name-display');
     const action = document.getElementById('update-action-container');
-    success.classList.add('hidden');
-    error.classList.add('hidden');
-    action.classList.add('hidden');
+    const warningInfo = document.getElementById('warning-info-reload');
+// Bascule des vues
+    placeholder.classList.add('hidden');
+    activeState.classList.remove('hidden');
+    nameDisplay.innerText = fileName;
     if (status === 'success') {
-        success.classList.remove('hidden');
+// UI SUCCÈS
+        zone.classList.remove('border-slate-200', 'border-red-200');
+        zone.classList.add('border-green-500', 'bg-green-50/30');
+        iconContainer.className = "w-12 h-12 rounded-full flex items-center justify-center shadow-sm bg-green-500 text-white";
+        iconContainer.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>`;
+        statusText.innerText = "Configuration récupérée !";
+        statusText.className = "text-xs font-bold uppercase tracking-tight text-green-600";
         action.classList.remove('hidden');
         updateModifierBtnUI();
+        const mode = localConfig.selectedMode;
+        if (warningInfo) {
+            if (mode === 'linkedin') {
+                warningInfo.classList.add('hidden'); 
+            } else {
+                warningInfo.classList.remove('hidden'); 
+            }
+        }
     } else {
-        error.classList.remove('hidden');
+// UI ERREUR
+        zone.classList.remove('border-slate-200', 'border-green-500');
+        zone.classList.add('border-red-500', 'bg-red-50/30');
+        iconContainer.className = "w-12 h-12 rounded-full flex items-center justify-center shadow-sm bg-red-500 text-white";
+        iconContainer.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>`;
+        statusText.innerText = "Fichier non valide";
+        statusText.className = "text-xs font-bold uppercase tracking-tight text-red-600";
+        action.classList.add('hidden');
+        if (warningInfo) warningInfo.classList.add('hidden');
     }
+}
+function resetImportZone(event) {
+    if(event) event.stopPropagation(); 
+    const zone = document.getElementById('drop-zone-reload');
+    const placeholder = document.getElementById('reload-placeholder');
+    const activeState = document.getElementById('reload-active-state');
+    const action = document.getElementById('update-action-container');
+    const fileInput = document.getElementById('file-import-html');
+// Reset UI
+    zone.classList.remove('border-green-500', 'bg-green-50/30', 'border-red-500', 'bg-red-50/30');
+    zone.classList.add('border-slate-200');
+    placeholder.classList.remove('hidden');
+    activeState.classList.add('hidden');
+    action.classList.add('hidden');
+// Reset data
+    fileInput.value = "";
 }
 function applyConfigToInputs() {
     if (!localConfig) return;
@@ -643,7 +689,7 @@ if (localConfig.meta) {
         checkMetaValidity();
     }
 }
-// --- 12. RÉSEAUX SOCIAUX (CORRIGÉ) ---
+// --- 12. RÉSEAUX SOCIAUX ---
 if (localConfig.socials) {
     const s = localConfig.socials;
     const socialTitleIn = document.getElementById('social-title-input');
@@ -782,43 +828,59 @@ function disableIframeScaling(doc) {
 }
 function updateModifierBtnUI() {
     const btn = document.querySelector('#update-action-container button');
-    if (!btn || !window.localConfig) return; // Sécurité si config pas encore chargée
-
+    const microCopy = document.getElementById('modifier-micro-copy');
+    if (!btn || !microCopy || !window.localConfig) return;
     const mode = localConfig.selectedMode;
     const siteId = localConfig.meta?.netlifySiteId;
     const SECRET_HASH = "1a10705c240715d8c19d0dad3c5a59c9d18afc9a9d60c0755c46dd3fbb8c8360";
     const isAdmin = localStorage.getItem('_vxe_node') === SECRET_HASH;
-
-    // 1. Reset des styles (on enlève les classes de blocage au cas où)
+// reset
     btn.disabled = false;
-    btn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-
-    // 2. Cas particulier LinkedIn : Bouton toujours actif
-    if (mode === 'linkedin') {
-        btn.innerHTML = `<span>Mettre à jour mon Kit LinkedIn</span>`;
+    btn.classList.remove('opacity-50','cursor-not-allowed','pointer-events-none');
+    microCopy.classList.remove('text-red-400','text-green-400');
+// MODE LINKEDIN
+    if (mode === "linkedin") {
+        btn.innerHTML = `<span>Mettre mon kit LinkedIn à jour</span>`;
+        microCopy.innerText = "✨ Modifications illimitées offertes";
+        microCopy.classList.add("text-green-400");
         return;
     }
-
-    // 3. Cas Web/Full : On vérifie le chrono
+// MODE WEB / FULL
+    btn.innerHTML = `<span>Mettre ma vitrine à jour</span>`;
+    const delay = 72 * 60 * 60 * 1000;
+    const now = Date.now();
     if (siteId && !isAdmin) {
-        const lastDeploy = localStorage.getItem(`last_deploy_${siteId}`);
-        const delay = 72 * 60 * 60 * 1000;
-        const now = Date.now();
-
-        if (lastDeploy && (now - lastDeploy) < delay) {
-            const remainingTime = delay - (now - lastDeploy);
-            const hoursLeft = Math.ceil(remainingTime / (1000 * 60 * 60));
-
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-            // Micro-copy dynamique !
-            btn.innerHTML = `<span>⏳ Modif possible dans ${hoursLeft}h</span>`;
+        const lastDeploy = parseInt(localStorage.getItem(`last_deploy_${siteId}`));
+        if (!lastDeploy) {
+    // jamais modifié
+            microCopy.innerText = "✅ Une modification possible aujourd'hui";
+            microCopy.classList.add("text-accent");
             return;
         }
-    }
+        const diff = now - lastDeploy;
+        if (diff < delay) {
+    // BLOQUÉ
+            const remaining = delay - diff;
+            const hours = Math.floor(remaining / (1000*60*60));
+            const minutes = Math.floor((remaining % (1000*60*60)) / (1000*60));
+            btn.disabled = true;
+            btn.classList.add('opacity-50','cursor-not-allowed','pointer-events-none');
+            microCopy.innerText =
+                `⏳ Encore ${hours}h ${minutes}min avant la prochaine modification`;
+            microCopy.classList.add("text-orange-400");
+        } else {
+    // AUTORISÉ
+            microCopy.innerText = "✅ Une modification possible aujourd'hui";
+            microCopy.classList.add("text-accent");
 
-    // 4. Libellé par défaut si tout est OK
-    btn.innerHTML = `<span>Mettre ma vitrine à jour</span>`;
+        }
+    } else {
+    // ADMIN
+        microCopy.innerText = isAdmin
+            ? "⚡ MODE ADMIN : modifications illimitées"
+            : "✅ Une modification possible aujourd'hui";
+        microCopy.classList.add("text-accent");
+    }
 }
 async function triggerQuickUpdate() {
     const btn = document.querySelector('#update-action-container button');
@@ -836,8 +898,10 @@ async function triggerQuickUpdate() {
     if (isPushingToNetlify && siteId && !isAdmin) { 
         const lastDeploy = localStorage.getItem(`last_deploy_${siteId}`);
         const delay = 72 * 60 * 60 * 1000; 
-        if (lastDeploy && (Date.now() - lastDeploy) < delay) {
+        const now = Date.now();
+        if (lastDeploy && (now - parseInt(lastDeploy)) < delay) {
             updateModifierBtnUI(); 
+            console.warn("Tentative de mise à jour bloquée : Délai de 72h non respecté.");
             return;
         }
     }
@@ -1107,66 +1171,48 @@ async function buildClientSite(config) {
     function saveEmailLocally(email) {
         localStorage.setItem("lead_email", email);
     }
-// --- ENVOI A NETLIFY ---
-function sendProgressToNetlify(isFinal = false) {
+// --- FONCTION D'ENVOI QUESTIONNAIRE IA A NETLIFY ---
+function sendAIQuestionnaireToNetlify() {
     const email = localStorage.getItem("lead_email");
     if (!email) return;
-    if (isFinal && sessionStorage.getItem('lead_sent_final')) return;
-    if (!isFinal && sessionStorage.getItem('lead_sent_progress')) return;
-    const lastStep = localConfig?.lastStep || "section-ia";
-    const SEQUENCE = [
-        'section-vitrine','section-model','section-couleurs','section-identite',
-        'section-ia','section-accueil','section-services','section-avis',
-        'section-gallery','section-about','section-practical','section-faq',
-        'section-contact','section-social','section-seo','section-legale',
-        'section-hebergement','section-linkedin-kit','section-finale'
-    ];
-    const stepIndex = SEQUENCE.indexOf(lastStep);
-    const progressValue = Math.round(((stepIndex + 1) / SEQUENCE.length) * 100);
     const data = {
-        "form-name": "lead-vitrine", 
-        "email": email,
-        "status": isFinal ? "TERMINE" : "EN_COURS_OU_ABANDON",
-        "step": lastStep,
-        "progress": progressValue + "%"
-    };
-    const encodedData = Object.keys(data)
-        .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
-        .join("&");
-    if (isFinal) {
-        sessionStorage.setItem('lead_sent_final', 'true');
-        fetch("/", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: encodedData
-        }).catch(err => console.error("Netlify Error:", err));
-    } else {
-        sessionStorage.setItem('lead_sent_progress', 'true');
-        navigator.sendBeacon("/", new URLSearchParams(data));
-    }
+    "form-name": "lead-vitrine",
+    "subject": `📩 Nouveau questionnaire IA Vitrine Express - ${email}`,
+    "email": email,
+    "expertise": document.getElementById("ai-expertise")?.value || "Non renseigné",
+    "probleme": document.getElementById("ai-question-1")?.value || "Non renseigné",
+    "services": `${document.getElementById("ai-service-1")?.value || ''}, ${document.getElementById("ai-service-2")?.value || ''}, ${document.getElementById("ai-service-3")?.value || ''}`,
+    "benefices": document.getElementById("ai-question-2")?.value || "Non renseigné",
+    "difference": document.getElementById("ai-question-3")?.value || "Non renseigné",
+    "doutes": `${document.getElementById("ai-doubt-1")?.value || ''}, ${document.getElementById("ai-doubt-2")?.value || ''}, ${document.getElementById("ai-doubt-3")?.value || ''}`,
+    "style": document.getElementById("ai-style-select")?.value || "Standard",
+    "contact": document.getElementById("ai-contact-select")?.value || "Standard"
+};
+    const encodedData = new URLSearchParams(data).toString();
+    fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encodedData
+    })
+    .then(() => console.log("Questionnaire envoyé avec succès"))
+    .catch(err => console.error("Erreur envoi questionnaire:", err));
 }
-// --- SI EMAIL DÉJÀ STOCKÉ ---
-    const storedEmail = localStorage.getItem("lead_email");
-    if (storedEmail && isValidEmail(storedEmail)) {
-        if (emailInput) emailInput.value = storedEmail;
-        markButtonValidated();
-        showIASection();
-        saveEmailLocally(storedEmail);
-        sendProgressToNetlify(false); 
+// 3. Gestion de l'email au clic ou si déjà stocké
+function handleEmailValidation(email) {
+    if (!isValidEmail(email)) return false;
+    localStorage.setItem("lead_email", email);
+    markButtonValidated();
+    showIASection();
+    return true;
+}
+const storedEmail = localStorage.getItem("lead_email");
+if (storedEmail) handleEmailValidation(storedEmail);
+validateBtn?.addEventListener("click", () => {
+    const email = emailInput?.value.trim() || "";
+    if (!handleEmailValidation(email)) {
+        alert("Merci de renseigner un email valide.");
     }
-// --- BOUTON VALIDATION EMAIL ---
-    validateBtn?.addEventListener("click", () => {
-        const email = emailInput?.value.trim() || "";
-        if (!isValidEmail(email)) {
-            errorMsg.style.display = "block";
-            return;
-    }
-        errorMsg.style.display = "none";
-        markButtonValidated();
-        showIASection();
-        saveEmailLocally(email);
-        sendProgressToNetlify(false); 
-    });
+});
 // --- FONCTIONS DEDIEES A LA GENERATION IA  ---
 // 1. MAJ MICRO COPY TENTATIVES
 function updateAILimitUI() {
@@ -1319,7 +1365,7 @@ async function generateWithAI() {
             updateAILimitUI(); 
         }, 3000);
 // Envoi Netlify en arrière plan
-        sendProgressToNetlify(true);
+        sendAIQuestionnaireToNetlify();
     } catch (error) {
         console.error("Erreur IA:", error);
         if (progressInterval) clearInterval(progressInterval);
@@ -1748,16 +1794,6 @@ function switchPreview(mode) {
     const faqSelectMenu = document.querySelector('select[onchange*="updateFaqDisplayCount"]');
     if (faqSelectMenu) faqSelectMenu.value = currentFaqCount;
     updateFaqDisplayCount(currentFaqCount);
-// --- TRACKING MAIL ---
-    const finalBtn = document.getElementById('final-cta-button');
-    if (finalBtn) {
-        finalBtn.addEventListener('click', () => {
-            if (!finalBtn.classList.contains('cursor-not-allowed')) {
-                sendProgressToNetlify(true); 
-                console.log("Envoi final Netlify effectué.");
-            }
-        });
-    }
 };
 // --- ENVOI DES DONNEES ---
 function sync() {
@@ -1926,7 +1962,7 @@ function validateStep(nextSectionSelector) {
         nextSection.classList.add('ring-2', 'ring-[#8449d9]/30', 'rounded-2xl');
         setTimeout(() => nextSection.classList.remove('ring-2'), 2000);
     }
-// Mapping pour le scroll automatique dans la preview (droite)
+// Mapping pour le scroll automatique dans la preview 
     const scrollMapping = { 
         'section-accueil': 'hero', 
         'section-services': 'services', 
@@ -1958,7 +1994,6 @@ function updateProgressBar(currentSectionId) {
     ];
     const stepIndex = SEQUENCE.indexOf(currentSectionId);
     let percentage = 0;
-
     if (stepIndex !== -1) {
         percentage = Math.round(((stepIndex + 1) / SEQUENCE.length) * 100);
     } else {
@@ -3007,7 +3042,7 @@ function adaptUIForTemplate(templateId) {
         dropZone.style.pointerEvents = "auto";
         dropZone.classList.remove('cursor-not-allowed');
     } else {
-// Mode SANS IMAGE : on crée l'overlay
+// MODE SANS IMAGE : on crée un overlay
         dropZone.style.pointerEvents = "none";
         dropZone.classList.add('cursor-not-allowed');
         const overlay = document.createElement('div');
@@ -3213,7 +3248,6 @@ function checkGalleryValidity() {
         ) {
             isValid = false;
         }
-
     });
     checkSectionValidity('section-gallery', isValid);
 }
@@ -3702,20 +3736,14 @@ function encode(data) {
 }
 document.getElementById("help-form")?.addEventListener("submit", function(e) {
   e.preventDefault();
-  
   const form = e.target;
   const btn = form.querySelector('button[type="submit"]');
   const originalBtnText = btn.innerText;
-  
-  // État de chargement
   btn.disabled = true;
   btn.innerText = "Envoi en cours...";
   btn.style.opacity = "0.7";
-
-  // Utilisation de URLSearchParams (natif et ultra-fiable pour x-www-form-urlencoded)
   const formData = new FormData(form);
   const body = new URLSearchParams(formData).toString();
-
   fetch("/", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -3774,10 +3802,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- GESTION DU TRACKING MAIL ---
 window.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'hidden') {
-        sendProgressToNetlify(false);
     }
 });
-// Exécution au chargement
+// --- GESTION DE VERIF DES ACCES ---
 window.addEventListener('DOMContentLoaded', () => {
     verifyAccess();
+});
+// --- GESTION DU BOUTON DE MODIF ---
+document.addEventListener("DOMContentLoaded", () => {
+    updateModifierBtnUI();
+    setInterval(updateModifierBtnUI, 60000);
+
 });
